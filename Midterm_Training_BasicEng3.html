@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASE FILE: M.3 Midterm Protocol</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Fredoka:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+  :root{
+    --mustard:#E3A62F;
+    --burnt:#C1440E;
+    --teal:#2A8C82;
+    --brown-dark:#3B2A1E;
+    --brown-mid:#7A5230;
+    --manila:#E4CE9C;
+    --manila-dark:#D8BD84;
+    --cream:#F5ECD2;
+    --stamp-red:#A3272B;
+    --ink:#2C2013;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Fredoka',sans-serif;
+    color:var(--ink);
+    background-color:var(--manila);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(59,42,30,0.035) 0px, rgba(59,42,30,0.035) 1px, transparent 1px, transparent 3px),
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.25), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(59,42,30,0.12), transparent 55%);
+    min-height:100vh;
+  }
+  .font-header{font-family:'Righteous', cursive;}
+  .font-thai{font-family:'Kanit', sans-serif;}
+  .font-type{font-family:'Special Elite', monospace;}
+  .brutal{
+    border:3px solid var(--brown-dark);
+    box-shadow: 6px 6px 0px var(--brown-dark);
+  }
+  .brutal-sm{
+    border:3px solid var(--brown-dark);
+    box-shadow: 4px 4px 0px var(--brown-dark);
+  }
+  .brutal-btn{
+    border:3px solid var(--brown-dark);
+    box-shadow: 5px 5px 0px var(--brown-dark);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .brutal-btn:active{
+    transform: translate(4px,4px);
+    box-shadow: 1px 1px 0px var(--brown-dark);
+  }
+  .brutal-btn:disabled{opacity:0.5; cursor:not-allowed;}
+  .paper-clip{
+    position:absolute; top:-18px; left:24px; width:34px; height:60px;
+    border:5px solid #8a8f94; border-radius:16px 16px 0 0 / 26px 26px 0 0;
+    border-bottom:none; transform:rotate(-8deg);
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.25);
+  }
+  .stamp{
+    font-family:'Special Elite', monospace;
+    transform: rotate(-12deg);
+    letter-spacing: 2px;
+  }
+  @keyframes stampIn{
+    0%{ transform: rotate(-12deg) scale(2.4); opacity:0; }
+    60%{ transform: rotate(-12deg) scale(0.92); opacity:1; }
+    100%{ transform: rotate(-12deg) scale(1); opacity:1; }
+  }
+  .stamp-anim{ animation: stampIn 0.35s ease-out forwards; }
+  @keyframes popIn{
+    0%{ transform: scale(0.85); opacity:0; }
+    100%{ transform: scale(1); opacity:1; }
+  }
+  .pop-in{ animation: popIn 0.25s ease-out; }
+  @keyframes hop{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-8px) rotate(-6deg); }
+  }
+  .marker-hop{ animation: hop 0.6s ease-in-out infinite; }
+  .tile-done{ background: var(--teal); }
+  .tile-current{ background: var(--mustard); }
+  .tile-todo{ background: var(--cream); }
+  .scrollbar-thin::-webkit-scrollbar{height:8px; width:8px;}
+  .scrollbar-thin::-webkit-scrollbar-thumb{background:var(--brown-mid); border-radius:4px;}
+  .hidden-phase{display:none !important;}
+  .folder-tab{
+    background: var(--burnt);
+    border:3px solid var(--brown-dark);
+    border-bottom:none;
+    box-shadow: 4px -2px 0px var(--brown-dark);
+  }
+  input[type=text]:focus{ outline:3px solid var(--teal); outline-offset:1px; }
+  button:focus-visible, .clickable:focus-visible{ outline:3px solid var(--teal); outline-offset:2px; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-6 px-3 md:py-10">
+
+  <!-- ===================== HEADER / CASE FOLDER TAB ===================== -->
+  <div class="w-full max-w-3xl mb-[-3px] relative z-10">
+    <div class="folder-tab inline-block px-6 py-2 rounded-t-xl ml-4 md:ml-10">
+      <p class="font-type text-cream text-xs md:text-sm tracking-widest">TOP SECRET — KHAO CHAKAN DETECTIVE AGENCY</p>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN CASE FILE CONTAINER ===================== -->
+  <main class="w-full max-w-3xl bg-[var(--cream)] brutal rounded-2xl relative p-5 md:p-8">
+    <div class="paper-clip hidden md:block"></div>
+
+    <!-- Title -->
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b-4 border-dashed border-[var(--brown-mid)] pb-4 mb-5">
+      <h1 class="font-header text-2xl md:text-3xl text-[var(--burnt)]" style="text-shadow:2px 2px 0 var(--brown-dark);">CASE FILE: MIDTERM PROTOCOL</h1>
+      <span class="font-type text-xs md:text-sm bg-[var(--mustard)] text-[var(--brown-dark)] px-3 py-1 rounded-full brutal-sm">M.3 · CONFIDENTIAL</span>
+    </div>
+
+    <!-- ============ PHASE 1: BRIEFING ============ -->
+    <section id="phase1" class="pop-in">
+      <div id="slideCard" class="bg-white/70 brutal-sm rounded-xl p-5 md:p-6 min-h-[220px] max-h-[62vh] overflow-y-auto scrollbar-thin flex flex-col justify-between">
+        <div>
+          <h2 id="slideTitle" class="font-header text-lg md:text-xl text-[var(--teal)] mb-3 sticky -top-5 md:-top-6 bg-white/95 pt-1 pb-2 -mx-1 px-1 z-10 backdrop-blur-sm"></h2>
+          <div id="slideBody" class="font-thai text-base leading-relaxed text-[var(--ink)]"></div>
+        </div>
+      </div>
+
+      <!-- Dots -->
+      <div id="dots" class="flex justify-center gap-2 mt-4"></div>
+
+      <!-- Nav -->
+      <div class="flex justify-between items-center mt-5 gap-3">
+        <button id="prevBtn" class="brutal-btn font-thai font-medium bg-[var(--manila-dark)] px-4 py-2 rounded-lg text-sm md:text-base">← ก่อนหน้า</button>
+        <button id="nextBtn" class="brutal-btn font-thai font-medium bg-[var(--teal)] text-white px-4 py-2 rounded-lg text-sm md:text-base">ถัดไป →</button>
+        <button id="startBtn" class="hidden-phase brutal-btn font-thai font-bold bg-[var(--burnt)] text-white px-6 py-3 rounded-lg text-sm md:text-base">🕵️ เริ่มภารกิจสืบสวน</button>
+      </div>
+    </section>
+
+    <!-- ============ PHASE 2: SIMULATION ============ -->
+    <section id="phase2" class="hidden-phase">
+      <!-- HUD -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="brutal-sm rounded-lg px-4 py-2 bg-[var(--mustard)] font-type text-sm md:text-base">
+          🗂️ CASE <span id="qNum">1</span>/<span id="qTotal">26</span>
+        </div>
+        <div class="brutal-sm rounded-lg px-4 py-2 bg-[var(--burnt)] text-white font-type text-sm md:text-base">
+          🔥 STREAK: <span id="streakNum">0</span>
+        </div>
+      </div>
+
+      <!-- Board Trail -->
+      <div id="board" class="brutal-sm rounded-xl p-3 mb-5 bg-white/60 flex flex-wrap gap-1.5 justify-center"></div>
+
+      <!-- Question Card -->
+      <div id="questionCard" class="bg-white/70 brutal-sm rounded-xl p-5 md:p-6 min-h-[240px]"></div>
+    </section>
+
+    <!-- ============ PHASE 3: MISSION COMPLETE ============ -->
+    <section id="phase3" class="hidden-phase text-center py-8">
+      <h2 class="font-header text-3xl md:text-4xl text-[var(--burnt)] mb-2" style="text-shadow:3px 3px 0 var(--brown-dark);">CASE CLOSED!</h2>
+      <p class="font-thai text-base mb-6 text-[var(--brown-mid)]">คุณได้ไขคดีข้อสอบกลางภาคสำเร็จแล้ว นักสืบมือทอง!</p>
+      <div class="inline-block brutal rounded-xl bg-[var(--mustard)] px-8 py-5 mb-6">
+        <p class="font-type text-sm text-[var(--brown-dark)]">FINAL SCORE</p>
+        <p id="finalScore" class="font-header text-4xl text-[var(--brown-dark)]">26/26</p>
+      </div>
+      <div>
+        <button id="rebootBtn" class="brutal-btn font-thai font-bold bg-[var(--teal)] text-white px-6 py-3 rounded-lg">🔄 รีบูตระบบ</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FEEDBACK MODAL ===================== -->
+  <div id="modalOverlay" class="hidden-phase fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div class="bg-[var(--cream)] brutal rounded-2xl p-6 md:p-8 max-w-sm w-full relative">
+      <div class="flex justify-center mb-3">
+        <div id="stampEl" class="stamp stamp-anim border-4 border-[var(--stamp-red)] text-[var(--stamp-red)] px-4 py-2 rounded-md text-xl md:text-2xl font-bold">
+          EVIDENCE<br>REJECTED
+        </div>
+      </div>
+      <p id="rejectMsg" class="font-thai text-center text-base text-[var(--ink)] mb-1"></p>
+      <p class="font-thai text-center text-sm text-[var(--brown-mid)] mb-4">กลับไปพิจารณาเบาะแส (Grammar File) แล้วลองใหม่อีกครั้งนะนักสืบ</p>
+
+      <div id="hintWrap" class="mb-4">
+        <button id="hintBtn" class="w-full font-thai text-sm text-[var(--teal)] underline decoration-dotted underline-offset-4">💡 ติดจริงๆ ขอคำใบ้หน่อย</button>
+        <p id="feedbackText" class="hidden-phase font-thai text-center text-sm bg-white/70 border-2 border-dashed border-[var(--brown-mid)] rounded-lg p-3 mt-2 text-[var(--ink)]"></p>
+      </div>
+
+      <button id="retryBtn" class="brutal-btn font-thai font-bold bg-[var(--burnt)] text-white w-full py-3 rounded-lg">🔁 ลองอีกครั้ง</button>
+    </div>
+  </div>
+
+<script>
+/* ===================== CONTENT PAYLOAD ===================== */
+const SLIDES = [
+  { title: "Khao Chakan Witthayakhom: Midterm Protocol", html: `
+    <p class="mb-3">ยินดีต้อนรับสู่หน่วยสืบสวนสอบสวน! ก่อนออกปฏิบัติภารกิจ นักสืบทุกคนต้องตรวจสอบ "แฟ้มไวยากรณ์" ทั้ง 5 แฟ้มให้ครบก่อน เพื่อเตรียมพร้อมออกภาคสนาม</p>
+    <ul class="list-disc pl-5 space-y-1 text-[var(--brown-mid)]">
+      <li>แฟ้มที่ 1: Pronouns (คำสรรพนาม)</li>
+      <li>แฟ้มที่ 2: Can &amp; Have got</li>
+      <li>แฟ้มที่ 3: Present Simple &amp; Adverbs of Frequency</li>
+      <li>แฟ้มที่ 4: Wh-Questions &amp; Prepositions</li>
+      <li>แฟ้มที่ 5: Quantifiers (many/much/some/any)</li>
+    </ul>
+    <p class="mt-3">อ่านให้ละเอียด แล้วกดปุ่ม <b>"เริ่มภารกิจสืบสวน"</b> ที่แฟ้มสุดท้าย โชคดีนักสืบ! 🕵️‍♀️</p>
+  `},
+  { title: "Grammar File 1: Pronouns (คำสรรพนาม)", html: `
+    <p class="mb-2">Pronoun คือคำที่ใช้แทนคำนาม แบ่งเป็น 2 แบบหลักที่ต้องรู้ในเรื่องนี้ คือ <b>Subject Pronoun</b> (ประธาน) และ <b>Possessive Pronoun</b> (สรรพนามแสดงความเป็นเจ้าของ ที่ใช้แทนคำนามได้เลยโดยไม่ต้องมีนามตามหลัง)</p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">Subject</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ความหมาย</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">Possessive Pronoun</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ความหมาย</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">I</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ฉัน</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">mine</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของฉัน</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">You</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">คุณ</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">yours</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของคุณ</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">We</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">พวกเรา</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ours</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของพวกเรา</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">They</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">พวกเขา</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">theirs</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของพวกเขา</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">He</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เขา (ผู้ชาย)</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">his</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของเขา (ผู้ชาย)</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">She</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เธอ</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">hers</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของเธอ</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">It</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">มัน</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">its</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของมัน</td></tr>
+      </tbody>
+    </table>
+    <div class="bg-[var(--stamp-red)]/10 border-2 border-[var(--stamp-red)] rounded-lg p-3">
+      <p class="mb-1"><b>🚨 ALERT: Its vs It's (จุดที่พลาดบ่อยที่สุด!)</b></p>
+      <p class="mb-1">• <b>its</b> (ไม่มีจุด) = ของมัน → แสดงความเป็นเจ้าของ เช่น <i>The dog wags its tail.</i> (สุนัขส่ายหางของมัน)</p>
+      <p class="mb-1">• <b>it's</b> (มีจุด) = it is หรือ it has เช่น <i>It's raining.</i> (ฝนกำลังตก)</p>
+      <p class="text-sm text-[var(--brown-mid)]">เคล็ดลับ: ลองแทนคำว่า "it is" ลงไปตรงจุดนั้น ถ้าอ่านแล้วได้ความหมาย ให้ใช้ <b>it's</b> แต่ถ้าอ่านแล้วแปลกๆ ให้ใช้ <b>its</b></p>
+    </div>
+  `},
+  { title: "Grammar File 2: Can & Have got", html: `
+    <p class="mb-2"><b>1) Can</b> ใช้บอกความสามารถ (ability) ตามด้วยกริยาช่องที่ 1 เสมอ (V.1 ไม่ผัน ไม่เติม s แม้ประธานจะเป็น he/she/it)</p>
+    <div class="bg-white/70 border-2 border-[var(--brown-dark)] rounded-lg p-3 mb-3 text-sm">
+      <p>บอกเล่า: ประธาน + can + V.1 → <i>She can swim.</i></p>
+      <p>ปฏิเสธ: ประธาน + can't (cannot) + V.1 → <i>He can't cook.</i></p>
+      <p>คำถาม: Can + ประธาน + V.1? → <i>Can you drive?</i></p>
+      <p>คำตอบสั้น: <i>Yes, I can. / No, I can't.</i></p>
+    </div>
+    <p class="mb-2"><b>2) Have got</b> แปลว่า "มี" (นิยมใช้ในสำเนียงอังกฤษแบบ British)</p>
+    <div class="bg-white/70 border-2 border-[var(--brown-dark)] rounded-lg p-3 mb-3 text-sm">
+      <p>I / You / We / They <b>+ have got</b> (ย่อ: 've got)</p>
+      <p>He / She / It <b>+ has got</b> (ย่อ: 's got)</p>
+      <p>ตัวอย่าง: <i>I've got a new bike. / She's got two brothers.</i></p>
+    </div>
+    <div class="bg-[var(--stamp-red)]/10 border-2 border-[var(--stamp-red)] rounded-lg p-3">
+      <p class="mb-1"><b>🚨 ALERT: คำตอบสั้น (Short Answer)</b></p>
+      <p>คำถาม: <i>Have you got a computer?</i></p>
+      <p>ตอบถูก ✅ : <i>Yes, I have. / No, I haven't.</i></p>
+      <p>ตอบผิด ❌ : <s>Yes, I have got.</s> (ห้ามมีคำว่า got ในคำตอบสั้นเด็ดขาด!)</p>
+    </div>
+  `},
+  { title: "Grammar File 3: Present Simple & Adverbs", html: `
+    <p class="mb-2"><b>1) กฎการเติม s/es กับกริยา</b> เมื่อประธานเป็นเอกพจน์ (He/She/It หรือชื่อคนคนเดียว/สิ่งเดียว)</p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">กรณี</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">กฎ</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ตัวอย่าง</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ส่วนใหญ่</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เติม s</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">play → plays</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ลงท้าย s, ss, sh, ch, x, o</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เติม es</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">wash → washes, go → goes</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">พยัญชนะ + y</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เปลี่ยน y เป็น ies</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">study → studies</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">สระ + y</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เติม s ปกติ</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">play → plays</td></tr>
+      </tbody>
+    </table>
+    <p class="mb-2"><b>2) Adverbs of Frequency</b> (คำวิเศษณ์บอกความถี่) เรียงจากมากไปน้อย</p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">คำ</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ความถี่</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ความหมาย</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Always</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">100%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เสมอ</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Usually</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">~90%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">มักจะ/ส่วนใหญ่</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Often</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">~70%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">บ่อยๆ</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Sometimes</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">~50%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">บางครั้ง</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Rarely</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">~10%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">แทบไม่ค่อย</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Never</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">0%</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ไม่เคยเลย</td></tr>
+      </tbody>
+    </table>
+    <div class="bg-[var(--stamp-red)]/10 border-2 border-[var(--stamp-red)] rounded-lg p-3">
+      <p class="mb-1"><b>🚨 ALERT: ตำแหน่งการวาง</b></p>
+      <p>• วาง<b>หน้า</b>กริยาแท้ (main verb): <i>She usually goes to school by bus.</i></p>
+      <p>• วาง<b>หลัง</b> verb to be (is/am/are): <i>She is usually happy.</i></p>
+    </div>
+  `},
+  { title: "Grammar File 4: Wh-Questions & Prepositions", html: `
+    <p class="mb-2"><b>1) Wh-Words</b> (คำคำถามขึ้นต้น) ที่ต้องแยกให้ออก</p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">คำ</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ความหมาย</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ใช้ถาม</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Who</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ใคร</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามหาตัวบุคคล</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Whose</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ของใคร</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามหาเจ้าของ</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Which</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">อันไหน</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามเมื่อมีตัวเลือกให้จำกัด</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">What</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">อะไร</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามสิ่งของ/เหตุการณ์ทั่วไป</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Where</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ที่ไหน</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามสถานที่</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">Why</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ทำไม</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ถามเหตุผล</td></tr>
+      </tbody>
+    </table>
+    <p class="mb-2"><b>2) Prepositions of Time</b> (คำบุพบทบอกเวลา)</p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">คำ</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ใช้กับ</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ตัวอย่าง</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">IN</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เดือน / ฤดู / ปี</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">in May, in summer, in 2026</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">ON</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">วันที่ / วันในสัปดาห์</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">on Monday, on 22nd May</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">AT</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">เวลา / เทศกาล</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">at 8:30, at noon, at Christmas</td></tr>
+      </tbody>
+    </table>
+    <div class="bg-[var(--stamp-red)]/10 border-2 border-[var(--stamp-red)] rounded-lg p-3">
+      <p><b>🚨 ALERT:</b> คำว่า <b>between</b> (ระหว่าง) ใช้เมื่อพูดถึงสิ่งของหรือสถานที่ 2 อย่าง เช่น <i>The school is between the post office and the bank.</i></p>
+    </div>
+  `},
+  { title: "Grammar File 5: Quantifiers", html: `
+    <p class="mb-2">ก่อนเลือกใช้ many/much หรือ a few/a little ต้องดูก่อนว่าคำนามข้างหลังเป็น <b>นามนับได้</b> หรือ <b>นามนับไม่ได้</b></p>
+    <table class="w-full text-sm border-collapse mb-3">
+      <thead>
+        <tr class="bg-[var(--mustard)]">
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ชนิดคำนาม</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">มาก</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">น้อย/พอมี</th>
+          <th class="border-2 border-[var(--brown-dark)] px-2 py-1">ตัวอย่างคำนาม</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">นับได้ (Countable)</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">many</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">a few</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">apples, friends, books</td></tr>
+        <tr><td class="border-2 border-[var(--brown-dark)] px-2 py-1">นับไม่ได้ (Uncountable)</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">much</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">a little</td><td class="border-2 border-[var(--brown-dark)] px-2 py-1">milk, sugar, water, money</td></tr>
+      </tbody>
+    </table>
+    <p class="text-sm text-[var(--brown-mid)] mb-3">💡 เคล็ดลับ: <b>a lot of</b> ใช้ได้กับนามทั้งสองแบบเลย ไม่ต้องเลือกก็ได้!</p>
+    <div class="bg-[var(--stamp-red)]/10 border-2 border-[var(--stamp-red)] rounded-lg p-3">
+      <p class="mb-1"><b>🚨 ALERT: Some vs Any</b></p>
+      <p>• <b>Some</b> ใช้กับประโยค<b>บอกเล่า</b> (positive) เช่น <i>I have some money.</i></p>
+      <p>• <b>Any</b> ใช้กับประโยค<b>ปฏิเสธ</b>และ<b>คำถาม</b> เช่น <i>I don't have any money. / Do you have any money?</i></p>
+    </div>
+  `}
+];
+
+const QUESTION_BANK = [
+  { type: 'fill', sentence: "Look at that cat! _____ tail is very short.", choices: ["Its", "It's", "His"], correct: "Its", feedback: "Its แปลว่าของมัน (แสดงความเป็นเจ้าของ) ส่วน It's คือ It is" },
+  { type: 'fill', sentence: "I don't have a red pen. Can I borrow _____?", choices: ["yours", "your", "mine"], correct: "yours", feedback: "yours = ของคุณ (ทำหน้าที่แทนคำนามได้เลย)" },
+  { type: 'match', word1: "We", word2: "Ours", correct: "MATCH", feedback: "We (พวกเรา) คู่กับ Ours (ของพวกเรา)" },
+  { type: 'fill', sentence: "Where's Liz? _____ is at school.", choices: ["She", "He", "They"], correct: "She", feedback: "Liz เป็นผู้หญิงคนเดียว ใช้สรรพนาม She" },
+  { type: 'order', blocks: [{label:"A",text:"These"},{label:"B",text:"books"},{label:"C",text:"are"},{label:"D",text:"mine."}], correctOrder: ["A","B","C","D"], feedback: "These books are mine. (หนังสือเหล่านี้เป็นของฉัน)" },
+  { type: 'fill', sentence: "_____ Will boil an egg? Yes, he can.", choices: ["Can", "Does", "Has"], correct: "Can", feedback: "ถามความสามารถใช้ Can เสมอ" },
+  { type: 'fill', sentence: "Are they from England? No, they _____.", choices: ["aren't", "don't", "haven't"], correct: "aren't", feedback: "ถาม Are they...? ต้องตอบ they aren't." },
+  { type: 'fill', sentence: "Have you got a computer? Yes, I _____.", choices: ["have", "have got", "do"], correct: "have", feedback: "Short answer ใช้แค่ Yes, I have. ห้ามมี got ตามหลัง!" },
+  { type: 'match', word1: "He / She / It", word2: "have got", correct: "UNMATCH", feedback: "He/She/It ต้องใช้ has got" },
+  { type: 'scramble', scrambled: "A C N T", hint: "Cannot (รูปย่อ)", correct: "CANT", feedback: "Can't คือรูปปฏิเสธของ Can" },
+  { type: 'fill', sentence: "Tom _____ up early every day.", choices: ["gets", "get", "getting"], correct: "gets", feedback: "ประธานเอกพจน์ (Tom) กริยาต้องเติม s/es" },
+  { type: 'fill', sentence: "My dad _____ the car every Saturday.", choices: ["washes", "wash", "washing"], correct: "washes", feedback: "ประธานเอกพจน์ กริยาลงท้ายด้วย sh ต้องเติม es" },
+  { type: 'order', blocks: [{label:"A",text:"He"},{label:"B",text:"usually"},{label:"C",text:"washes the car"},{label:"D",text:"on Sundays."}], correctOrder: ["A","B","C","D"], feedback: "Adverb of Frequency (usually) ต้องอยู่หน้ากริยาแท้ (washes)" },
+  { type: 'fill', sentence: "How often do you play games? _____. I don't like them at all.", choices: ["Never", "Always", "Usually"], correct: "Never", feedback: "I don't like them at all แปลว่าไม่ชอบเลย จึงต้องตอบ Never (0%)" },
+  { type: 'match', word1: "Always", word2: "100%", correct: "MATCH", feedback: "Always แปลว่า สม่ำเสมอ/เป็นประจำ (100%)" },
+  { type: 'fill', sentence: "_____ does the laundry every week? (My mum does.)", choices: ["Who", "What", "Where"], correct: "Who", feedback: "คำตอบคือ My mum (คน) จึงต้องถามด้วย Who (ใคร)" },
+  { type: 'fill', sentence: "_____ dress are you wearing? The green one.", choices: ["Which", "Who", "Where"], correct: "Which", feedback: "มีตัวเลือกให้เลือก (The green one) ต้องใช้ Which (อันไหน/สิ่งไหน)" },
+  { type: 'fill', sentence: "Is your birthday _____ 22nd May?", choices: ["on", "in", "at"], correct: "on", feedback: "วันที่ และ วันในสัปดาห์ ต้องใช้ Preposition 'on'" },
+  { type: 'fill', sentence: "The English class starts _____ 08:30.", choices: ["at", "on", "in"], correct: "at", feedback: "เวลาตามเข็มนาฬิกา ต้องใช้ Preposition 'at'" },
+  { type: 'match', word1: "IN", word2: "Months / Years", correct: "MATCH", feedback: "IN ใช้กับ เดือน และ ปี" },
+  { type: 'fill', sentence: "Yor: How _____ apples do we need? Loid: Not many.", choices: ["many", "much", "long"], correct: "many", feedback: "Apples เป็นนามนับได้พหูพจน์ ต้องใช้ How many" },
+  { type: 'fill', sentence: "How _____ milk do you want?", choices: ["much", "many", "some"], correct: "much", feedback: "Milk เป็นนามนับไม่ได้ ต้องใช้ How much" },
+  { type: 'fill', sentence: "There isn't _____ cheese in the fridge.", choices: ["any", "some", "many"], correct: "any", feedback: "ประโยคปฏิเสธและคำถาม นิยมใช้ any" },
+  { type: 'match', word1: "A few", word2: "Uncountable Nouns", correct: "UNMATCH", feedback: "A few ใช้กับ นามนับได้ (แปลว่าพอมีอยู่บ้าง)" },
+  { type: 'scramble', scrambled: "O M S E", hint: "ใช้กับประโยคบอกเล่าแปลว่า 'บ้าง'", correct: "SOME", feedback: "Some ใช้กับประโยคบอกเล่า" },
+  { type: 'fill', sentence: "Bianca, this is my roommate, Enid. \nHello, Enid. ________", choices: ["Pleased to meet you.", "I'm fine, thanks.", "How do you do?"], correct: "Pleased to meet you.", feedback: "เมื่อถูกแนะนำให้รู้จักกันครั้งแรก ควรพูดว่า Pleased to meet you. (ยินดีที่ได้รู้จัก)" },
+  { type: 'fill', sentence: "Sign: Khao Chakan Market Open from 12:00 AM to 12:00 PM. \nWhen does it close?", choices: ["At noon", "At midnight", "In the evening"], correct: "At noon", feedback: "12:00 PM คือ Noon (เที่ยงวัน)" },
+  { type: 'scramble', scrambled: "U R I B B S H", hint: "ขยะ (Synonym of Garbage)", correct: "RUBBISH", feedback: "Rubbish แปลว่า ขยะ มักใช้ในอังกฤษ" },
+  { type: 'fill', sentence: "Notice: A blue jacket was found BETWEEN the library and the science lab.\nWhere is it?", choices: ["In the middle of the library and the science lab.", "Inside the library.", "Behind the science lab."], correct: "In the middle of the library and the science lab.", feedback: "Between แปลว่า ระหว่าง (ตรงกลางระหว่าง 2 สิ่ง)" },
+  { type: 'order', blocks: [{label:"A",text:"Contact"},{label:"B",text:"T. Ploy"},{label:"C",text:"at the"},{label:"D",text:"English Dept."}], correctOrder: ["A","B","C","D"], feedback: "Contact T. Ploy at the English Dept." },
+  { type: 'fill', sentence: "Peter gets up at 6:30 AM and goes to school _____ subway.", choices: ["by", "on", "in"], correct: "by", feedback: "การเดินทางด้วยยานพาหนะใช้ by (by subway)" },
+  { type: 'fill', sentence: "Peter is often late for dinner. Why?", choices: ["Because he helps people in the city.", "Because he plays games.", "Because he hates dinner."], correct: "Because he helps people in the city.", feedback: "จากบทอ่าน Peter เป็นฮีโร่คอยช่วยเหลือคนในเมือง" },
+  { type: 'match', word1: "Rarely", word2: "Often", correct: "UNMATCH", feedback: "Rarely (แทบจะไม่) เป็นคำตรงข้าม (Antonym) กับ Often (บ่อยๆ)" },
+  { type: 'fill', sentence: "Maria can speak English and Spanish, but she _____ speak Thai very well.", choices: ["can't", "don't", "isn't"], correct: "can't", feedback: "แสดงความไม่สามารถ ต้องใช้ can't (cannot)" },
+  { type: 'fill', sentence: "Why does Maria like Pad Thai?", choices: ["Because it is not spicy.", "Because it has a lot of chili.", "Because it's from Spain."], correct: "Because it is not spicy.", feedback: "จากบทอ่าน Maria ชอบผัดไทยเพราะมันไม่เผ็ด (not spicy)" },
+  { type: 'scramble', scrambled: "E E B W N E T", hint: "อยู่ระหว่าง (Preposition of Place)", correct: "BETWEEN", feedback: "Between = ระหว่าง (2 สิ่ง)" },
+  { type: 'fill', sentence: "Tanjiro doesn't drink _____ coffee because he is too young.", choices: ["any", "some", "a few"], correct: "any", feedback: "ประโยคปฏิเสธ (doesn't) ใช้ any" },
+  { type: 'fill', sentence: "Our school is _____ the post office and the bank.", choices: ["between", "under", "on"], correct: "between", feedback: "มีสถานที่ 2 แห่ง (post office และ bank) จึงต้องใช้ between" },
+  { type: 'fill', sentence: "He loves his bike very much, and he always cleans _____ wheels.", choices: ["its", "it's", "his"], correct: "its", feedback: "ล้อเป็นของจักรยาน (สัตว์/สิ่งของ) ต้องใช้ its (ของมัน)" },
+  { type: 'order', blocks: [{label:"A",text:"He"},{label:"B",text:"always"},{label:"C",text:"cleans"},{label:"D",text:"its wheels."}], correctOrder: ["A","B","C","D"], feedback: "Adverb of Frequency (always) วางหน้ากริยาแท้ (cleans)" },
+  { type: 'fill', sentence: "_____ bicycle is that? It's Jenny's.", choices: ["Whose", "Who", "Which"], correct: "Whose", feedback: "ถามหาเจ้าของใช้ Whose" },
+  { type: 'match', word1: "He / She / It", word2: "Verb เติม s/es", correct: "MATCH", feedback: "Present Simple Tense ประธานเอกพจน์ กริยาต้องเติม s/es" },
+  { type: 'scramble', scrambled: "T E H N R A V I N G S", hint: "วันหยุดเทศกาลขอบคุณพระเจ้า", correct: "THANKSGIVING", feedback: "เทศกาลต่างๆ มักใช้กับ Preposition 'at'" },
+  { type: 'order', blocks: [{label:"A",text:"How"},{label:"B",text:"much"},{label:"C",text:"sugar do"},{label:"D",text:"you need?"}], correctOrder: ["A","B","C","D"], feedback: "How much sugar do you need? (sugar นับไม่ได้ใช้ much)" },
+  { type: 'fill', sentence: "I have _____ friends. I am very happy.", choices: ["a lot of", "much", "a little"], correct: "a lot of", feedback: "Friends นับได้พหูพจน์ และประโยคสื่อความหมายเชิงบวก (Happy) จึงใช้ a lot of" }
+];
+
+/* ===================== STATE ===================== */
+const state = {
+  slideIndex: 0,
+  questions: [],
+  qIndex: 0,
+  streak: 0,
+  score: 0,
+  selectedOrder: []
+};
+
+/* ===================== ELEMENTS ===================== */
+const els = {
+  phase1: document.getElementById('phase1'),
+  phase2: document.getElementById('phase2'),
+  phase3: document.getElementById('phase3'),
+  slideTitle: document.getElementById('slideTitle'),
+  slideBody: document.getElementById('slideBody'),
+  dots: document.getElementById('dots'),
+  prevBtn: document.getElementById('prevBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  startBtn: document.getElementById('startBtn'),
+  board: document.getElementById('board'),
+  qNum: document.getElementById('qNum'),
+  qTotal: document.getElementById('qTotal'),
+  streakNum: document.getElementById('streakNum'),
+  questionCard: document.getElementById('questionCard'),
+  modalOverlay: document.getElementById('modalOverlay'),
+  rejectMsg: document.getElementById('rejectMsg'),
+  hintBtn: document.getElementById('hintBtn'),
+  feedbackText: document.getElementById('feedbackText'),
+  retryBtn: document.getElementById('retryBtn'),
+  stampEl: document.getElementById('stampEl'),
+  finalScore: document.getElementById('finalScore'),
+  rebootBtn: document.getElementById('rebootBtn')
+};
+
+/* ===================== UTIL ===================== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showPhase(n){
+  els.phase1.classList.toggle('hidden-phase', n !== 1);
+  els.phase2.classList.toggle('hidden-phase', n !== 2);
+  els.phase3.classList.toggle('hidden-phase', n !== 3);
+}
+
+/* ===================== PHASE 1: BRIEFING ===================== */
+function renderSlide(){
+  const s = SLIDES[state.slideIndex];
+  els.slideTitle.textContent = s.title;
+  els.slideBody.innerHTML = s.html;
+
+  els.dots.innerHTML = '';
+  SLIDES.forEach((_, i) => {
+    const dot = document.createElement('span');
+    dot.className = 'w-3 h-3 rounded-full border-2 border-[var(--brown-dark)] ' +
+      (i === state.slideIndex ? 'bg-[var(--burnt)]' : 'bg-white');
+    els.dots.appendChild(dot);
+  });
+
+  els.prevBtn.disabled = state.slideIndex === 0;
+  els.prevBtn.classList.toggle('opacity-40', state.slideIndex === 0);
+
+  const isLast = state.slideIndex === SLIDES.length - 1;
+  els.nextBtn.classList.toggle('hidden-phase', isLast);
+  els.startBtn.classList.toggle('hidden-phase', !isLast);
+}
+
+els.prevBtn.addEventListener('click', () => {
+  if(state.slideIndex > 0){ state.slideIndex--; renderSlide(); }
+});
+els.nextBtn.addEventListener('click', () => {
+  if(state.slideIndex < SLIDES.length - 1){ state.slideIndex++; renderSlide(); }
+});
+els.startBtn.addEventListener('click', startSimulation);
+
+/* ===================== PHASE 2: SIMULATION ===================== */
+function startSimulation(){
+  state.questions = shuffle(QUESTION_BANK).slice(0, 26);
+  state.qIndex = 0;
+  state.streak = 0;
+  state.score = 0;
+  els.qTotal.textContent = state.questions.length;
+  showPhase(2);
+  renderBoard();
+  renderQuestion();
+}
+
+function renderBoard(){
+  els.board.innerHTML = '';
+  const total = state.questions.length;
+  for(let i = 0; i < total; i++){
+    const tile = document.createElement('div');
+    let cls = 'w-7 h-7 md:w-8 md:h-8 rounded-md border-2 border-[var(--brown-dark)] flex items-center justify-center text-xs font-type ';
+    if(i < state.qIndex){
+      cls += 'tile-done text-white';
+    } else if(i === state.qIndex){
+      cls += 'tile-current';
+    } else {
+      cls += 'tile-todo';
+    }
+    tile.className = cls;
+    if(i === state.qIndex){
+      tile.innerHTML = '<span class="marker-hop">🕵️</span>';
+    } else if(i < state.qIndex){
+      tile.innerHTML = '✓';
+    } else {
+      tile.textContent = i + 1;
+    }
+    els.board.appendChild(tile);
+  }
+}
+
+function renderQuestion(){
+  state.selectedOrder = [];
+  const q = state.questions[state.qIndex];
+  els.qNum.textContent = state.qIndex + 1;
+  els.streakNum.textContent = state.streak;
+
+  let html = '';
+  if(q.type === 'fill'){
+    html += `<p class="font-thai text-lg text-[var(--brown-dark)] mb-5 whitespace-pre-line">${escapeHtml(q.sentence)}</p>`;
+    html += `<div class="flex flex-col gap-3" id="choiceWrap">`;
+    q.choices.forEach((c, i) => {
+      html += `<button class="brutal-btn choice-btn font-thai text-left bg-white px-4 py-3 rounded-lg" data-choice="${escapeHtml(c)}">${escapeHtml(c)}</button>`;
+    });
+    html += `</div>`;
+  } else if(q.type === 'match'){
+    html += `<p class="font-thai text-sm text-[var(--brown-mid)] mb-4">คำสองคำนี้เข้าคู่กันหรือไม่?</p>`;
+    html += `<div class="flex items-center justify-center gap-4 mb-6">
+      <div class="brutal-sm rounded-lg px-4 py-3 bg-white font-header text-base md:text-lg text-[var(--teal)]">${escapeHtml(q.word1)}</div>
+      <span class="font-header text-2xl text-[var(--brown-mid)]">⇄</span>
+      <div class="brutal-sm rounded-lg px-4 py-3 bg-white font-header text-base md:text-lg text-[var(--burnt)]">${escapeHtml(q.word2)}</div>
+    </div>`;
+    html += `<div class="flex gap-3 justify-center">
+      <button class="brutal-btn choice-btn font-thai font-bold bg-[var(--teal)] text-white px-6 py-3 rounded-lg" data-choice="MATCH">✅ MATCH</button>
+      <button class="brutal-btn choice-btn font-thai font-bold bg-[var(--stamp-red)] text-white px-6 py-3 rounded-lg" data-choice="UNMATCH">❌ UNMATCH</button>
+    </div>`;
+  } else if(q.type === 'scramble'){
+    html += `<p class="font-thai text-sm text-[var(--brown-mid)] mb-2">คำใบ้: ${escapeHtml(q.hint)}</p>`;
+    html += `<p class="font-header text-2xl md:text-3xl tracking-[6px] text-[var(--burnt)] text-center mb-5">${escapeHtml(q.scrambled)}</p>`;
+    html += `<div class="flex flex-col sm:flex-row gap-3">
+      <input id="scrambleInput" type="text" autocomplete="off" placeholder="พิมพ์คำตอบที่นี่..." class="flex-1 brutal-sm rounded-lg px-4 py-3 font-type bg-white" />
+      <button id="scrambleSubmit" class="brutal-btn font-thai font-bold bg-[var(--teal)] text-white px-6 py-3 rounded-lg">ส่งคำตอบ</button>
+    </div>`;
+  } else if(q.type === 'order'){
+    html += `<p class="font-thai text-sm text-[var(--brown-mid)] mb-2">คลิกคำตามลำดับให้ถูกต้อง</p>`;
+    html += `<div id="orderSelected" class="min-h-[48px] brutal-sm rounded-lg bg-white/80 px-3 py-2 mb-4 flex flex-wrap gap-2 items-center font-type text-sm"></div>`;
+    html += `<div id="orderBlocks" class="flex flex-wrap gap-2 mb-5">`;
+    q.blocks.forEach(b => {
+      html += `<button class="brutal-btn order-block font-thai bg-white px-3 py-2 rounded-lg" data-label="${b.label}">${escapeHtml(b.text)}</button>`;
+    });
+    html += `</div>`;
+    html += `<div class="flex gap-3">
+      <button id="orderClear" class="brutal-btn font-thai bg-[var(--manila-dark)] px-4 py-2 rounded-lg text-sm">↺ ล้างลำดับ</button>
+      <button id="orderSubmit" class="brutal-btn font-thai font-bold bg-[var(--teal)] text-white px-6 py-2 rounded-lg text-sm">ส่งคำตอบ</button>
+    </div>`;
+  }
+
+  els.questionCard.innerHTML = html;
+  bindQuestionEvents(q);
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function bindQuestionEvents(q){
+  if(q.type === 'fill' || q.type === 'match'){
+    document.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-choice');
+        checkAnswer(val === q.correct, q);
+      });
+    });
+  } else if(q.type === 'scramble'){
+    const input = document.getElementById('scrambleInput');
+    const submit = document.getElementById('scrambleSubmit');
+    const doSubmit = () => {
+      const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
+      checkAnswer(val === q.correct.toUpperCase(), q);
+    };
+    submit.addEventListener('click', doSubmit);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') doSubmit(); });
+  } else if(q.type === 'order'){
+    const selectedWrap = document.getElementById('orderSelected');
+    const renderSelected = () => {
+      if(state.selectedOrder.length === 0){
+        selectedWrap.innerHTML = '<span class="text-[var(--brown-mid)] italic">ยังไม่ได้เลือก...</span>';
+      } else {
+        selectedWrap.innerHTML = state.selectedOrder.map(label => {
+          const block = q.blocks.find(b => b.label === label);
+          return `<span class="bg-[var(--mustard)] border-2 border-[var(--brown-dark)] rounded px-2 py-1">${escapeHtml(block.text)}</span>`;
+        }).join('');
+      }
+    };
+    renderSelected();
+
+    document.querySelectorAll('.order-block').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const label = btn.getAttribute('data-label');
+        if(state.selectedOrder.includes(label)) return;
+        state.selectedOrder.push(label);
+        btn.disabled = true;
+        btn.classList.add('opacity-40');
+        renderSelected();
+      });
+    });
+
+    document.getElementById('orderClear').addEventListener('click', () => {
+      state.selectedOrder = [];
+      document.querySelectorAll('.order-block').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('opacity-40');
+      });
+      renderSelected();
+    });
+
+    document.getElementById('orderSubmit').addEventListener('click', () => {
+      const isCorrect = state.selectedOrder.length === q.correctOrder.length &&
+        state.selectedOrder.every((label, i) => label === q.correctOrder[i]);
+      checkAnswer(isCorrect, q);
+    });
+  }
+}
+
+const REJECT_MESSAGES = [
+  "ยังไม่ใช่คำตอบที่ถูกต้อง นักสืบ!",
+  "เกือบแล้ว... แต่ยังไม่ใช่หลักฐานที่ถูกต้อง",
+  "หลักฐานชิ้นนี้ยังไม่ตรงกับคดี ลองอีกครั้ง!",
+  "ยังจับผิดจุดไม่ได้ ลองสังเกตดูดีๆ อีกที"
+];
+let pendingFeedback = '';
+
+function checkAnswer(isCorrect, q){
+  if(isCorrect){
+    state.streak++;
+    state.score++;
+    state.qIndex++;
+    if(state.qIndex >= state.questions.length){
+      completeGame();
+    } else {
+      renderBoard();
+      renderQuestion();
+    }
+  } else {
+    state.streak = 0;
+    showRejectedModal(q.feedback);
+  }
+}
+
+function showRejectedModal(feedback){
+  pendingFeedback = feedback;
+  els.rejectMsg.textContent = REJECT_MESSAGES[Math.floor(Math.random() * REJECT_MESSAGES.length)];
+  els.feedbackText.textContent = feedback;
+  els.feedbackText.classList.add('hidden-phase');
+  els.hintBtn.classList.remove('hidden-phase');
+  els.modalOverlay.classList.remove('hidden-phase');
+  els.stampEl.classList.remove('stamp-anim');
+  void els.stampEl.offsetWidth;
+  els.stampEl.classList.add('stamp-anim');
+  els.streakNum.textContent = state.streak;
+}
+
+els.hintBtn.addEventListener('click', () => {
+  els.feedbackText.classList.remove('hidden-phase');
+  els.hintBtn.classList.add('hidden-phase');
+});
+
+els.retryBtn.addEventListener('click', () => {
+  els.modalOverlay.classList.add('hidden-phase');
+  renderQuestion();
+});
+
+/* ===================== PHASE 3: MISSION COMPLETE ===================== */
+function completeGame(){
+  showPhase(3);
+  els.finalScore.textContent = `${state.score}/${state.questions.length}`;
+  fireConfetti();
+}
+
+function fireConfetti(){
+  if(typeof confetti !== 'function') return;
+  const colors = ['#E3A62F', '#C1440E', '#2A8C82', '#3B2A1E'];
+  confetti({ particleCount: 140, spread: 80, origin: { y: 0.6 }, colors });
+  setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0 }, colors }), 250);
+  setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1 }, colors }), 250);
+}
+
+els.rebootBtn.addEventListener('click', () => {
+  state.slideIndex = 0;
+  showPhase(1);
+  renderSlide();
+});
+
+/* ===================== INIT ===================== */
+renderSlide();
+showPhase(1);
+</script>
+</body>
+</html>
