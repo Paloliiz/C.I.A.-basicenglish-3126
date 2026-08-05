@@ -145,89 +145,373 @@
    ========================================================= */
 
 // ---------- CONFIG ----------
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwq0hDwSyu0sZJ3ERVhW7GmwvHS2XU2x7sDaiCuSgKbKIhfVj3Y-PYHq_THFSbI9jKT/exec'; // เปลี่ยนเป็น URL ของ Google Script ถ้าต้องการเก็บคะแนน
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwq0hDwSyu0sZJ3ERVhW7GmwvHS2XU2x7sDaiCuSgKbKIhfVj3Y-PYHq_THFSbI9jKT/exec'; 
 const EXAM_TIME_LIMIT_SEC = 40 * 60;      
 const COOLDOWN_SEC = 15 * 60;             
-const PASS_RAW_SCORE = 28;                
+const PASS_RAW_SCORE = 19;   // เกณฑ์ผ่านคือ 19 จาก 40 ข้อ (หาร 2 ปัดเศษขึ้น = 10/20 คะแนน)            
 const TOTAL_QUESTIONS = 40;
 const MAX_LIVES = 3;
-const CAPPED_PASS_SCORE = "14 / 20";
+const CAPPED_PASS_SCORE = "10 / 20"; 
 const ADMIN_ID = "7238";
 const ADMIN_FIRSTNAME = "พะโล้";
 
 // ---------- STUDENT DATABASE (M.3/1 - M.3/2) ----------
 const studentDB = {
-  "12514": { "name": "เด็กชายกลวัชร สิงขรณ์", "score": 13, "passedMidterm": false },
-  "12515": { "name": "เด็กชายก้องภพ เอ้ยวัน", "score": 36, "passedMidterm": true },
-  "12517": { "name": "เด็กชายเด็นนี่ คิง", "score": 36, "passedMidterm": true },
-  "12518": { "name": "เด็กชายทัศภูมิ ด่านลัดต้อน", "score": 23, "passedMidterm": false },
-  "12519": { "name": "เด็กชายธนกฤต ปัดนา", "score": 21, "passedMidterm": false },
-  "12520": { "name": "เด็กชายธันวา เพ็ชรเงิน", "score": 28, "passedMidterm": true },
-  "12521": { "name": "เด็กชายธีรภัทร์ ยาคำ", "score": 23, "passedMidterm": false },
-  "12522": { "name": "เด็กชายปัญญาพล คณาญาติ", "score": 15, "passedMidterm": false },
-  "12523": { "name": "เด็กชายพรหมพิทักษ์ บุญสร้าง", "score": 30, "passedMidterm": true },
-  "12524": { "name": "เด็กชายพีรณัฐ ยอดโพธิ์", "score": 14, "passedMidterm": false },
-  "12525": { "name": "เด็กชายพีรพัฒน์ เก่าด่านจาก", "score": 29, "passedMidterm": true },
-  "12526": { "name": "เด็กชายภูรินท์ โงนสาย", "score": 22, "passedMidterm": false },
-  "12527": { "name": "เด็กชายวรโชติ ศรีม่วงกลาง", "score": 27, "passedMidterm": false },
-  "12528": { "name": "เด็กชายศรัณย์ พิพัฒน์จรูญกุล", "score": 20, "passedMidterm": false },
-  "12529": { "name": "เด็กชายศิวกร เทียมโสภา", "score": 22, "passedMidterm": false },
-  "12530": { "name": "เด็กชายสิทธิกร เพชรแท้", "score": 32, "passedMidterm": true },
-  "12531": { "name": "เด็กชายสุรบดี คำผาย", "score": 12, "passedMidterm": false },
-  "12532": { "name": "เด็กชายหัฎฐกร ซับจันทึก", "score": 20, "passedMidterm": false },
-  "12533": { "name": "เด็กชายอัสนี ภัสสรรัชนีกร", "score": 24, "passedMidterm": false },
-  "13054": { "name": "เด็กชายจิรภาส ศรีเมือง", "score": 21, "passedMidterm": false },
-  "12534": { "name": "เด็กหญิงกุลณัชญา ดวงเนตร", "score": 23, "passedMidterm": false },
-  "12535": { "name": "เด็กหญิงจิราภรณ์ สาวิสิทธิ์", "score": 33, "passedMidterm": true },
-  "12536": { "name": "เด็กหญิงชนิดา ทัศนา", "score": 24, "passedMidterm": false },
-  "12537": { "name": "เด็กหญิงณัฐชภัทร ปลั่งกลาง", "score": 32, "passedMidterm": true },
-  "12538": { "name": "เด็กหญิงธัญชนก ชำนาญ", "score": 19, "passedMidterm": false },
-  "12539": { "name": "เด็กหญิงนงนภัส มิทะลา", "score": 35, "passedMidterm": true },
-  "12540": { "name": "เด็กหญิงปภาวรินทร์ สีหลิ่ง", "score": 24, "passedMidterm": false },
-  "12541": { "name": "เด็กหญิงปิยธิดา แก้วแก่นคูณ", "score": 13, "passedMidterm": false },
-  "12542": { "name": "เด็กหญิงภัทรมน อานุการ", "score": 25, "passedMidterm": false },
-  "12544": { "name": "เด็กหญิงรัตนาภรณ์ ทูคำมี", "score": 21, "passedMidterm": false },
-  "12545": { "name": "เด็กหญิงรวิสรา ทำกินดี", "score": 28, "passedMidterm": true },
-  "12546": { "name": "เด็กหญิงวารุณี จิว", "score": 33, "passedMidterm": true },
-  "12548": { "name": "เด็กหญิงสุทธาทิพย์ ดีพรหม", "score": 30, "passedMidterm": true },
-  "12549": { "name": "เด็กหญิงสุภัสสรา สุขสำราญ", "score": 20, "passedMidterm": false },
-  "12550": { "name": "เด็กหญิงเสาวนีย์ ไชยนคร", "score": 14, "passedMidterm": false },
-  "13074": { "name": "เด็กหญิงกานต์สินี เหล็กสงษ์", "score": 32, "passedMidterm": true },
-  "12551": { "name": "เด็กชายทินภัทร เทพรักษา", "score": 5, "passedMidterm": false },
-  "12552": { "name": "เด็กชายธนวัฒน์ ไชยรักษ์", "score": 11, "passedMidterm": false },
-  "12553": { "name": "เด็กชายปัณณวัฒน์ ชาลีเปรี่ยม", "score": 11, "passedMidterm": false },
-  "12554": { "name": "เด็กชายพุฒธิพงษ์ ฆ้องชะฎา", "score": 12, "passedMidterm": false },
-  "12555": { "name": "เด็กชายรัชต์พล มหาโยธี", "score": 10, "passedMidterm": false },
-  "12556": { "name": "เด็กชายวรเมธ ไพลเถื่อน", "score": 9, "passedMidterm": false },
-  "12557": { "name": "เด็กชายสิทธิชัย นามธรรม", "score": 16, "passedMidterm": false },
-  "12558": { "name": "เด็กชายอนันดา ธรรมวงศ์", "score": 22, "passedMidterm": false },
-  "12559": { "name": "เด็กชายอนันต์ยศ ผุสดี", "score": 21, "passedMidterm": false },
-  "12561": { "name": "เด็กหญิงกัลยกร เจริญภูมิ", "score": 13, "passedMidterm": false },
-  "12562": { "name": "เด็กหญิงชนิตา สวัสดี", "score": 9, "passedMidterm": false },
-  "12563": { "name": "เด็กหญิงณัฐธิดา มาวิเศษ", "score": 18, "passedMidterm": false },
-  "12564": { "name": "เด็กหญิงเทวิกา พัสดร", "score": 12, "passedMidterm": false },
-  "12565": { "name": "เด็กหญิงธนภรณ์ เหมือนอินทร์", "score": 12, "passedMidterm": false },
-  "12566": { "name": "เด็กหญิงธนารีย์ บุญเย็น", "score": 11, "passedMidterm": false },
-  "12567": { "name": "เด็กหญิงเบญจาวรรณ ชื่นจิตร", "score": 11, "passedMidterm": false },
-  "12568": { "name": "เด็กหญิงปวีณา บุญร่วม", "score": 17, "passedMidterm": false },
-  "12569": { "name": "เด็กหญิงพัชราภา วิเศษ", "score": 11, "passedMidterm": false },
-  "12570": { "name": "เด็กหญิงรุจิรดา ชาญสูงเนิน", "score": 25, "passedMidterm": false },
-  "12571": { "name": "เด็กหญิงวนิดา แสงคำ", "score": 18, "passedMidterm": false },
-  "12572": { "name": "เด็กหญิงวรกานต์ กัลยา", "score": 10, "passedMidterm": false },
-  "12573": { "name": "เด็กหญิงวรดา กลางนอก", "score": 17, "passedMidterm": false },
-  "12574": { "name": "เด็กหญิงวรรณดา หอศิลป์", "score": 16, "passedMidterm": false },
-  "12575": { "name": "เด็กหญิงวรัณญา พรรคทิง", "score": 10, "passedMidterm": false },
-  "12576": { "name": "เด็กหญิงวสุธัญ ชื่นบาน", "score": 9, "passedMidterm": false },
-  "12577": { "name": "เด็กหญิงสิริญากร พนังศรี", "score": 13, "passedMidterm": false },
-  "12578": { "name": "เด็กหญิงสุปรียา จันทนา", "score": 8, "passedMidterm": false },
-  "12579": { "name": "เด็กหญิงสุพรรษา เกตุสวย", "score": 9, "passedMidterm": false },
-  "12580": { "name": "เด็กหญิงสุมิตรา สิทธิไกรพงษ์", "score": 7, "passedMidterm": false },
-  "12581": { "name": "เด็กหญิงอัฐภิญญา เพ็ชรนิล", "score": 13, "passedMidterm": false },
-  "12582": { "name": "เด็กหญิงอิสริยา จากครบุรี", "score": 13, "passedMidterm": false },
-  "12583": { "name": "เด็กหญิงขวัญชีวา บุตรจันทา", "score": 9, "passedMidterm": false },
-  "12585": { "name": "เด็กหญิงชัญญา พนมสัก", "score": 24, "passedMidterm": false },
-  "12586": { "name": "เด็กหญิงธัญญาภรณ์ ไพพร", "score": 13, "passedMidterm": false },
-  "13055": { "name": "นางสาวตรีสรา พานแก้ว", "score": 24, "passedMidterm": false }
+  "12514": {
+    "name": "เด็กชายกลวัชร สิงขรณ์",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12515": {
+    "name": "เด็กชายก้องภพ เอ้ยวัน",
+    "score": 36,
+    "passedMidterm": true
+  },
+  "12517": {
+    "name": "เด็กชายเด็นนี่ คิง",
+    "score": 36,
+    "passedMidterm": true
+  },
+  "12518": {
+    "name": "เด็กชายทัศภูมิ ด่านลัดต้อน",
+    "score": 23,
+    "passedMidterm": true
+  },
+  "12519": {
+    "name": "เด็กชายธนกฤต ปัดนา",
+    "score": 21,
+    "passedMidterm": true
+  },
+  "12520": {
+    "name": "เด็กชายธันวา เพ็ชรเงิน",
+    "score": 28,
+    "passedMidterm": true
+  },
+  "12521": {
+    "name": "เด็กชายธีรภัทร์ ยาคำ",
+    "score": 23,
+    "passedMidterm": true
+  },
+  "12522": {
+    "name": "เด็กชายปัญญาพล คณาญาติ",
+    "score": 15,
+    "passedMidterm": false
+  },
+  "12523": {
+    "name": "เด็กชายพรหมพิทักษ์ บุญสร้าง",
+    "score": 30,
+    "passedMidterm": true
+  },
+  "12524": {
+    "name": "เด็กชายพีรณัฐ ยอดโพธิ์",
+    "score": 14,
+    "passedMidterm": false
+  },
+  "12525": {
+    "name": "เด็กชายพีรพัฒน์ เก่าด่านจาก",
+    "score": 29,
+    "passedMidterm": true
+  },
+  "12526": {
+    "name": "เด็กชายภูรินท์ โงนสาย",
+    "score": 22,
+    "passedMidterm": true
+  },
+  "12527": {
+    "name": "เด็กชายวรโชติ ศรีม่วงกลาง",
+    "score": 27,
+    "passedMidterm": true
+  },
+  "12528": {
+    "name": "เด็กชายศรัณย์ พิพัฒน์จรูญกุล",
+    "score": 20,
+    "passedMidterm": true
+  },
+  "12529": {
+    "name": "เด็กชายศิวกร เทียมโสภา",
+    "score": 22,
+    "passedMidterm": true
+  },
+  "12530": {
+    "name": "เด็กชายสิทธิกร เพชรแท้",
+    "score": 32,
+    "passedMidterm": true
+  },
+  "12531": {
+    "name": "เด็กชายสุรบดี คำผาย",
+    "score": 12,
+    "passedMidterm": false
+  },
+  "12532": {
+    "name": "เด็กชายหัฎฐกร ซับจันทึก",
+    "score": 20,
+    "passedMidterm": true
+  },
+  "12533": {
+    "name": "เด็กชายอัสนี ภัสสรรัชนีกร",
+    "score": 24,
+    "passedMidterm": true
+  },
+  "13054": {
+    "name": "เด็กชายจิรภาส ศรีเมือง",
+    "score": 21,
+    "passedMidterm": true
+  },
+  "12534": {
+    "name": "เด็กหญิงกุลณัชญา ดวงเนตร",
+    "score": 23,
+    "passedMidterm": true
+  },
+  "12535": {
+    "name": "เด็กหญิงจิราภรณ์ สาวิสิทธิ์",
+    "score": 33,
+    "passedMidterm": true
+  },
+  "12536": {
+    "name": "เด็กหญิงชนิดา ทัศนา",
+    "score": 24,
+    "passedMidterm": true
+  },
+  "12537": {
+    "name": "เด็กหญิงณัฐชภัทร ปลั่งกลาง",
+    "score": 32,
+    "passedMidterm": true
+  },
+  "12538": {
+    "name": "เด็กหญิงธัญชนก ชำนาญ",
+    "score": 19,
+    "passedMidterm": true
+  },
+  "12539": {
+    "name": "เด็กหญิงนงนภัส มิทะลา",
+    "score": 35,
+    "passedMidterm": true
+  },
+  "12540": {
+    "name": "เด็กหญิงปภาวรินทร์ สีหลิ่ง",
+    "score": 24,
+    "passedMidterm": true
+  },
+  "12541": {
+    "name": "เด็กหญิงปิยธิดา แก้วแก่นคูณ",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12542": {
+    "name": "เด็กหญิงภัทรมน อานุการ",
+    "score": 25,
+    "passedMidterm": true
+  },
+  "12544": {
+    "name": "เด็กหญิงรัตนาภรณ์ ทูคำมี",
+    "score": 21,
+    "passedMidterm": true
+  },
+  "12545": {
+    "name": "เด็กหญิงรวิสรา ทำกินดี",
+    "score": 28,
+    "passedMidterm": true
+  },
+  "12546": {
+    "name": "เด็กหญิงวารุณี จิว",
+    "score": 33,
+    "passedMidterm": true
+  },
+  "12548": {
+    "name": "เด็กหญิงสุทธาทิพย์ ดีพรหม",
+    "score": 30,
+    "passedMidterm": true
+  },
+  "12549": {
+    "name": "เด็กหญิงสุภัสสรา สุขสำราญ",
+    "score": 20,
+    "passedMidterm": true
+  },
+  "12550": {
+    "name": "เด็กหญิงเสาวนีย์ ไชยนคร",
+    "score": 14,
+    "passedMidterm": false
+  },
+  "13074": {
+    "name": "เด็กหญิงกานต์สินี เหล็กสงษ์",
+    "score": 32,
+    "passedMidterm": true
+  },
+  "12551": {
+    "name": "เด็กชายทินภัทร เทพรักษา",
+    "score": 5,
+    "passedMidterm": false
+  },
+  "12552": {
+    "name": "เด็กชายธนวัฒน์ ไชยรักษ์",
+    "score": 11,
+    "passedMidterm": false
+  },
+  "12553": {
+    "name": "เด็กชายปัณณวัฒน์ ชาลีเปรี่ยม",
+    "score": 11,
+    "passedMidterm": false
+  },
+  "12554": {
+    "name": "เด็กชายพุฒธิพงษ์ ฆ้องชะฎา",
+    "score": 12,
+    "passedMidterm": false
+  },
+  "12555": {
+    "name": "เด็กชายรัชต์พล มหาโยธี",
+    "score": 10,
+    "passedMidterm": false
+  },
+  "12556": {
+    "name": "เด็กชายวรเมธ ไพลเถื่อน",
+    "score": 9,
+    "passedMidterm": false
+  },
+  "12557": {
+    "name": "เด็กชายสิทธิชัย นามธรรม",
+    "score": 16,
+    "passedMidterm": false
+  },
+  "12558": {
+    "name": "เด็กชายอนันดา ธรรมวงศ์",
+    "score": 22,
+    "passedMidterm": true
+  },
+  "12559": {
+    "name": "เด็กชายอนันต์ยศ ผุสดี",
+    "score": 21,
+    "passedMidterm": true
+  },
+  "12561": {
+    "name": "เด็กหญิงกัลยกร เจริญภูมิ",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12562": {
+    "name": "เด็กหญิงชนิตา สวัสดี",
+    "score": 9,
+    "passedMidterm": false
+  },
+  "12563": {
+    "name": "เด็กหญิงณัฐธิดา มาวิเศษ",
+    "score": 18,
+    "passedMidterm": false
+  },
+  "12564": {
+    "name": "เด็กหญิงเทวิกา พัสดร",
+    "score": 12,
+    "passedMidterm": false
+  },
+  "12565": {
+    "name": "เด็กหญิงธนภรณ์ เหมือนอินทร์",
+    "score": 12,
+    "passedMidterm": false
+  },
+  "12566": {
+    "name": "เด็กหญิงธนารีย์ บุญเย็น",
+    "score": 11,
+    "passedMidterm": false
+  },
+  "12567": {
+    "name": "เด็กหญิงเบญจาวรรณ ชื่นจิตร",
+    "score": 11,
+    "passedMidterm": false
+  },
+  "12568": {
+    "name": "เด็กหญิงปวีณา บุญร่วม",
+    "score": 17,
+    "passedMidterm": false
+  },
+  "12569": {
+    "name": "เด็กหญิงพัชราภา วิเศษ",
+    "score": 11,
+    "passedMidterm": false
+  },
+  "12570": {
+    "name": "เด็กหญิงรุจิรดา ชาญสูงเนิน",
+    "score": 25,
+    "passedMidterm": true
+  },
+  "12571": {
+    "name": "เด็กหญิงวนิดา แสงคำ",
+    "score": 18,
+    "passedMidterm": false
+  },
+  "12572": {
+    "name": "เด็กหญิงวรกานต์ กัลยา",
+    "score": 10,
+    "passedMidterm": false
+  },
+  "12573": {
+    "name": "เด็กหญิงวรดา กลางนอก",
+    "score": 17,
+    "passedMidterm": false
+  },
+  "12574": {
+    "name": "เด็กหญิงวรรณดา หอศิลป์",
+    "score": 16,
+    "passedMidterm": false
+  },
+  "12575": {
+    "name": "เด็กหญิงวรัณญา พรรคทิง",
+    "score": 10,
+    "passedMidterm": false
+  },
+  "12576": {
+    "name": "เด็กหญิงวสุธัญ ชื่นบาน",
+    "score": 9,
+    "passedMidterm": false
+  },
+  "12577": {
+    "name": "เด็กหญิงสิริญากร พนังศรี",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12578": {
+    "name": "เด็กหญิงสุปรียา จันทนา",
+    "score": 8,
+    "passedMidterm": false
+  },
+  "12579": {
+    "name": "เด็กหญิงสุพรรษา เกตุสวย",
+    "score": 9,
+    "passedMidterm": false
+  },
+  "12580": {
+    "name": "เด็กหญิงสุมิตรา สิทธิไกรพงษ์",
+    "score": 7,
+    "passedMidterm": false
+  },
+  "12581": {
+    "name": "เด็กหญิงอัฐภิญญา เพ็ชรนิล",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12582": {
+    "name": "เด็กหญิงอิสริยา จากครบุรี",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "12583": {
+    "name": "เด็กหญิงขวัญชีวา บุตรจันทา",
+    "score": 9,
+    "passedMidterm": false
+  },
+  "12585": {
+    "name": "เด็กหญิงชัญญา พนมสัก",
+    "score": 24,
+    "passedMidterm": true
+  },
+  "12586": {
+    "name": "เด็กหญิงธัญญาภรณ์ ไพพร",
+    "score": 13,
+    "passedMidterm": false
+  },
+  "13055": {
+    "name": "นางสาวตรีสรา พานแก้ว",
+    "score": 24,
+    "passedMidterm": true
+  }
 };
 
 // ---------- EXAM DATA (M.3 - 40 Questions) ----------
@@ -293,6 +577,33 @@ function storageKey(id){ return `mia_m3_state_${id}`; }
 function loadState(id){ try{ const raw = localStorage.getItem(storageKey(id)); if(!raw) return null; return JSON.parse(raw); }catch(e){ return null; } }
 function saveState(id, state){ try{ localStorage.setItem(storageKey(id), JSON.stringify(state)); }catch(e){} }
 function defaultState(){ return { lives: MAX_LIVES, cooldownEnd: null, status: 'active', lastScoreDisplay: null }; }
+
+// ---------- IN-APP BROWSER DETECTION ----------
+function isInAppBrowser(){ 
+  const ua = navigator.userAgent || navigator.vendor || window.opera || ''; 
+  return /Line\//i.test(ua) || /FBAN|FBAV|FB_IAB/i.test(ua) || /Instagram/i.test(ua) || /MicroMessenger/i.test(ua); 
+}
+
+// ================= PHASE: BLOCKED =================
+function renderBlocked(){
+  return `
+  <div class="w-full max-w-md mt-10 md:mt-12 fade-in pb-10">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-red-600"></span><span class="text-xs tracking-[0.2em] text-red-600 font-bold uppercase">Security Alert</span></div>
+      <h1 class="font-retro text-5xl font-bold text-teal-dark tracking-wider drop-shadow-md">M.I.A.</h1>
+    </div>
+    <div class="panel p-6 md:p-8 text-center bg-white">
+      <div class="text-6xl mb-4 font-retro">🛑</div>
+      <h2 class="font-retro text-2xl text-red-600 tracking-widest mb-3 uppercase">ACCESS BLOCKED</h2>
+      <p class="text-sm font-medium text-brown/80 leading-relaxed mb-4">ตรวจพบการเปิดผ่านแอป (LINE / Facebook / IG) ระบบจำเป็นต้องทำงานบนเบราว์เซอร์หลักเพื่อป้องกันระบบจับเวลาขัดข้องครับ</p>
+      <div class="bg-manila border-2 border-brown/30 rounded-md p-4 text-xs font-bold text-brown/80 leading-relaxed">
+        โปรดกดที่จุด 3 จุด <span class="text-burnt-orange font-black text-sm">" ⋮ "</span> หรือ <span class="text-burnt-orange font-black text-sm">"..."</span> มุมขวาบน<br>
+        แล้วเลือกเมนู <span class="text-burnt-orange font-black text-sm">"เปิดในเบราว์เซอร์" (Open in Browser)</span><br>
+        เพื่อใช้งานผ่าน <span class="text-teal-dark text-sm">Safari</span> หรือ <span class="text-teal-dark text-sm">Chrome</span>
+      </div>
+    </div>
+  </div>`;
+}
 
 // ---------- CUSTOM MODAL ----------
 function showCustomModal(icon, title, message, callback, opts = {}){
@@ -419,6 +730,10 @@ function closeCert(){
 // ---------- RENDER ROOT ----------
 function render(){
   const app = document.getElementById('app');
+  
+  // ดัก In-app Browser ทันทีที่โหลด
+  if(isInAppBrowser()){ app.innerHTML = renderBlocked(); return; }
+
   switch(session.phase){
     case 'login': app.innerHTML = renderLogin(); attachLoginEvents(); break;
     case 'dashboard': app.innerHTML = renderDashboard(); attachDashboardEvents(); startDashboardTicker(); break;
@@ -482,7 +797,9 @@ function attachLoginEvents(){
     
     if(record.passedMidterm && st.status !== 'passed'){
       st.status = 'passed';
-      st.lastScoreDisplay = record.score + ' / 40 (MIDTERM EXAM)';
+      // หารคะแนนดิบ 2 ปัดเศษขึ้น เพื่อให้แสดงคะแนนเต็ม 20
+      const pointEarned = Math.ceil(record.score / 2);
+      st.lastScoreDisplay = pointEarned + ' / 20 (MIDTERM EXAM)';
       st.lives = MAX_LIVES; 
       st.cooldownEnd = null;
     }
@@ -537,7 +854,7 @@ function renderDashboard(){
         <div class="text-5xl mb-3 font-retro">🕵️‍♂️</div>
         <h2 class="font-retro text-xl text-teal-dark tracking-wide mb-2 uppercase">Unsolved Case File</h2>
         <p class="text-sm font-medium text-brown/80 mb-2">Previous Exam Score: <span class="text-red-600 font-bold text-lg">${prevScore} / 40</span></p>
-        <p class="text-sm font-medium text-brown/60 mb-1">You must score at least <span class="text-teal-dark font-bold">70%</span> (28/40) to close this case.</p>
+        <p class="text-sm font-medium text-brown/60 mb-1">You must score at least <span class="text-teal-dark font-bold">19</span> (19/40) to close this case.</p>
         <div class="inline-block bg-mustard/20 border-2 border-mustard-dark rounded-md px-4 py-2 mt-3">
           <p class="text-xs font-bold text-brown uppercase">Time Limit: 40:00 minutes<br>${TOTAL_QUESTIONS} Clues to find</p>
         </div>
@@ -577,7 +894,7 @@ function attachDashboardEvents(){
   const initBtn = document.getElementById('initiateBtn');
   if(initBtn){
     initBtn.addEventListener('click', () => {
-      showCustomModal('📁', 'OPEN CONFIDENTIAL FILE', `You are about to start the investigation.\n\n${TOTAL_QUESTIONS} Questions · 40:00 Minutes\nTarget Score: 70% (28/40)\n\nOnce opened, the timer cannot be paused.`, (confirmed) => {
+      showCustomModal('📁', 'OPEN CONFIDENTIAL FILE', `You are about to start the investigation.\n\n${TOTAL_QUESTIONS} Questions · 40:00 Minutes\nTarget Score: 19/40\n\nOnce opened, the timer cannot be paused.`, (confirmed) => {
         if(confirmed) startExam();
       }, { confirm:true, confirmText:'START EXAM', cancelText:'CANCEL' });
     });
@@ -752,7 +1069,7 @@ function renderResult(){
       <div class="text-center py-4">
         <div class="text-6xl mb-3 font-retro">${lockedNow ? '🚨' : '❌'}</div>
         <h2 class="font-retro text-2xl md:text-3xl text-red-600 tracking-widest mb-2 uppercase">${lockedNow ? 'LICENSE REVOKED' : 'INVESTIGATION FAILED'}</h2>
-        <p class="text-sm font-medium text-brown/70 mb-1">Score: <span class="text-red-600 font-bold">${r.raw} / ${TOTAL_QUESTIONS}</span> (Target: 28)</p>
+        <p class="text-sm font-medium text-brown/70 mb-1">Score: <span class="text-red-600 font-bold">${r.raw} / ${TOTAL_QUESTIONS}</span> (Target: 19)</p>
         <p class="text-xs font-bold text-brown/50 mb-3 uppercase">1 Permit Confiscated</p>
         <div class="flex gap-2 justify-center mb-4">${renderCores(r.coresLeft)}</div>
         ${lockedNow ? '<p class="text-xs text-red-600 font-bold tracking-wide mt-2 uppercase">CONTACT CHIEF (T. Ploy) IMMEDIATELY.</p>' : '<p class="text-xs font-bold text-burnt-orange mt-2 uppercase">System will enter 15:00 cooldown before retry.</p>'}
