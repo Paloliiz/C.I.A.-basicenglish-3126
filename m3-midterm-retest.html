@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>M.I.A: Midterm Investigation Agency</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+  /* 1970s Retro Detective Theme Variables */
+  :root {
+    --mustard: #eab308;
+    --mustard-dark: #ca8a04;
+    --burnt-orange: #ea580c;
+    --burnt-orange-dark: #c2410c;
+    --teal: #14b8a6;
+    --teal-dark: #0f766e;
+    --brown: #451a03;
+    --manila: #fef3c7;
+    --manila-dark: #fde68a;
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--manila); color: var(--brown); font-family: 'Kanit', sans-serif; min-height: 100vh; overscroll-behavior: none; }
+  body { user-select: none; background-image: repeating-linear-gradient(45deg, rgba(69, 26, 3, 0.03) 0px, rgba(69, 26, 3, 0.03) 2px, transparent 2px, transparent 8px); }
+  input, textarea { user-select: text; }
+  h1, h2, h3, .font-retro { font-family: 'Fredoka', sans-serif; }
+  .font-serif { font-family: 'Playfair Display', serif; }
+
+  /* Retro Brutalism UI */
+  .panel {
+    background-color: #fff;
+    border: 4px solid var(--brown);
+    border-radius: 12px;
+    box-shadow: 8px 8px 0px var(--brown);
+  }
+  
+  .btn-agent {
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    background-color: var(--teal);
+    color: #fff;
+    border: 3px solid var(--brown);
+    border-radius: 8px;
+    box-shadow: 4px 4px 0px var(--brown);
+    transition: all 0.1s ease-in-out;
+  }
+  .btn-agent:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+  .btn-agent:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+  .btn-agent:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); box-shadow: 4px 4px 0px var(--brown) !important; transform: none !important; }
+
+  .btn-danger { background-color: #dc2626; color: #fff; border: 3px solid var(--brown); border-radius: 8px; box-shadow: 4px 4px 0px var(--brown); font-weight: 700; transition: all 0.1s; }
+  .btn-danger:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+  
+  .btn-gold { background-color: var(--mustard); color: var(--brown); border: 3px solid var(--brown); border-radius: 8px; box-shadow: 4px 4px 0px var(--brown); font-weight: 700; transition: all 0.1s; }
+  .btn-gold:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+  .btn-ghost { background-color: #f8fafc; color: var(--brown); border: 3px solid var(--brown); border-radius: 8px; box-shadow: 4px 4px 0px var(--brown); font-weight: 700; transition: all 0.1s; }
+  .btn-ghost:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+  .input-terminal {
+    background: #fff;
+    border: 3px solid var(--brown);
+    color: var(--brown);
+    font-family: 'Fredoka', sans-serif;
+    letter-spacing: 0.1em;
+    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+  }
+  .input-terminal:focus { outline: none; border-color: var(--teal); }
+
+  /* Investigation Permits (Lives) */
+  .core { font-size: 1.5rem; transition: all 0.3s; }
+  .core.dead { opacity: 0.2; filter: grayscale(1); }
+
+  .progress-track { background: var(--manila-dark); border: 2px solid var(--brown); }
+  .progress-fill { background: var(--burnt-orange); border-right: 2px solid var(--brown); transition: width .3s ease; }
+
+  /* Choice Buttons */
+  .choice-btn { background: #fff; border: 3px solid var(--brown); transition: all .15s ease; text-align: left; box-shadow: 4px 4px 0px rgba(69, 26, 3, 0.15); border-radius: 8px; }
+  .choice-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px rgba(69, 26, 3, 0.15); }
+  .choice-btn.selected { border-color: var(--teal); background: var(--teal); color: #fff; box-shadow: 4px 4px 0px var(--brown); transform: translate(-2px, -2px); }
+  .choice-letter { font-family: 'Fredoka', sans-serif; background: var(--manila-dark); border: 2px solid var(--brown); color: var(--brown); font-weight: bold; }
+  .choice-btn.selected .choice-letter { background: #fff; color: var(--teal); border-color: #fff; }
+
+  .modal-backdrop { background: rgba(69, 26, 3, 0.8); backdrop-filter: blur(4px); }
+  .fade-in { animation: fadeIn .3s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .timer-critical { color: #dc2626 !important; animation: blinkRed 1s step-start infinite; }
+  @keyframes blinkRed { 50% { opacity: 0.5; } }
+
+  .log-row-correct { border-left: 4px solid var(--teal); }
+  .log-row-wrong { border-left: 4px solid #dc2626; }
+
+  /* CERTIFICATE PRINT STYLES */
+  @media print {
+    body * { visibility: hidden; }
+    #certOverlay, #certOverlay * { visibility: visible; }
+    #certOverlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: white !important; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .no-print { display: none !important; }
+    #certificateNode { box-shadow: none !important; transform: scale(1) !important; width: 100% !important; height: auto !important; max-width: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen relative" oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
+
+<div id="app" class="relative z-10 min-h-screen flex flex-col items-center justify-start px-4 py-6 md:py-10"></div>
+
+<!-- MODAL ROOT -->
+<div id="modalRoot"></div>
+
+<!-- CERTIFICATE OVERLAY -->
+<div id="certOverlay" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/90 p-4 backdrop-blur-md fade-in">
+  <div id="certificateNode" class="bg-[#fdfbf7] text-slate-900 w-full max-w-4xl aspect-[1.414/1] relative p-10 md:p-16 border-[12px] border-double border-brown flex flex-col items-center justify-center text-center shadow-2xl bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
+    <div class="absolute inset-2 border-2 border-brown/20"></div>
+    <div class="text-brown mb-2 font-serif italic text-lg md:text-xl">Khao Chakan Witthayakom School</div>
+    <h1 class="font-retro text-4xl md:text-5xl font-bold text-burnt-orange mb-4 tracking-wide uppercase drop-shadow-md">OFFICIAL DETECTIVE LICENSE</h1>
+    <p class="text-brown font-kanit text-sm md:text-base mb-4">This proudly certifies that</p>
+    <div id="certStudentName" class="font-serif text-4xl md:text-5xl text-teal-dark border-b-4 border-brown/50 pb-2 px-10 mb-6 font-bold italic">STUDENT NAME</div>
+    <p class="text-brown font-kanit text-sm md:text-base mb-2">has successfully solved the cases of the</p>
+    <div id="certExamType" class="font-retro text-xl md:text-2xl text-brown font-bold uppercase tracking-widest mb-1">MIDTERM EXAMINATION</div>
+    <div id="certRank" class="mb-8 font-kanit"></div>
+    <p class="text-brown/70 font-kanit text-xs md:text-sm mb-12">Subject: Basic English 3 (อ 23101) &nbsp;|&nbsp; Grade: Matthayom 3</p>
+    <div class="w-full flex justify-between px-10 md:px-20 mt-auto text-brown">
+      <div class="flex flex-col items-center">
+        <div class="border-b-2 border-brown w-40 h-8 mb-2 flex items-end justify-center"><span class="font-serif italic text-xl">S. Jantaket</span></div>
+        <p class="text-xs font-kanit font-bold">Chief Inspector<br>(Course Instructor)</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <div class="border-b-2 border-brown w-40 h-8 mb-2 flex items-end justify-center"><span id="certDate" class="font-serif italic text-lg"></span></div>
+        <p class="text-xs font-kanit font-bold">Date of Issue</p>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-6 flex gap-4 no-print">
+    <button onclick="window.print()" class="btn-gold px-6 py-3 rounded-sm text-sm tracking-widest font-semibold flex items-center gap-2">🖨️ PRINT / PDF</button>
+    <button onclick="closeCert()" class="btn-ghost px-6 py-3 rounded-sm text-sm tracking-widest bg-white">✖ CLOSE</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   M.I.A: Midterm Investigation Agency (M.3 Retest)
+   ========================================================= */
+
+// ---------- CONFIG ----------
+const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; // เปลี่ยนเป็น URL ของ Google Script ถ้าต้องการเก็บคะแนน
+const EXAM_TIME_LIMIT_SEC = 40 * 60;      
+const COOLDOWN_SEC = 15 * 60;             
+const PASS_RAW_SCORE = 28;                
+const TOTAL_QUESTIONS = 40;
+const MAX_LIVES = 3;
+const CAPPED_PASS_SCORE = "14 / 20";
+const ADMIN_ID = "7238";
+const ADMIN_FIRSTNAME = "พะโล้";
+
+// ---------- STUDENT DATABASE (M.3/1 - M.3/2) ----------
+const studentDB = {
+  "12514": { "name": "เด็กชายกลวัชร สิงขรณ์", "score": 13, "passedMidterm": false },
+  "12515": { "name": "เด็กชายก้องภพ เอ้ยวัน", "score": 36, "passedMidterm": true },
+  "12517": { "name": "เด็กชายเด็นนี่ คิง", "score": 36, "passedMidterm": true },
+  "12518": { "name": "เด็กชายทัศภูมิ ด่านลัดต้อน", "score": 23, "passedMidterm": false },
+  "12519": { "name": "เด็กชายธนกฤต ปัดนา", "score": 21, "passedMidterm": false },
+  "12520": { "name": "เด็กชายธันวา เพ็ชรเงิน", "score": 28, "passedMidterm": true },
+  "12521": { "name": "เด็กชายธีรภัทร์ ยาคำ", "score": 23, "passedMidterm": false },
+  "12522": { "name": "เด็กชายปัญญาพล คณาญาติ", "score": 15, "passedMidterm": false },
+  "12523": { "name": "เด็กชายพรหมพิทักษ์ บุญสร้าง", "score": 30, "passedMidterm": true },
+  "12524": { "name": "เด็กชายพีรณัฐ ยอดโพธิ์", "score": 14, "passedMidterm": false },
+  "12525": { "name": "เด็กชายพีรพัฒน์ เก่าด่านจาก", "score": 29, "passedMidterm": true },
+  "12526": { "name": "เด็กชายภูรินท์ โงนสาย", "score": 22, "passedMidterm": false },
+  "12527": { "name": "เด็กชายวรโชติ ศรีม่วงกลาง", "score": 27, "passedMidterm": false },
+  "12528": { "name": "เด็กชายศรัณย์ พิพัฒน์จรูญกุล", "score": 20, "passedMidterm": false },
+  "12529": { "name": "เด็กชายศิวกร เทียมโสภา", "score": 22, "passedMidterm": false },
+  "12530": { "name": "เด็กชายสิทธิกร เพชรแท้", "score": 32, "passedMidterm": true },
+  "12531": { "name": "เด็กชายสุรบดี คำผาย", "score": 12, "passedMidterm": false },
+  "12532": { "name": "เด็กชายหัฎฐกร ซับจันทึก", "score": 20, "passedMidterm": false },
+  "12533": { "name": "เด็กชายอัสนี ภัสสรรัชนีกร", "score": 24, "passedMidterm": false },
+  "13054": { "name": "เด็กชายจิรภาส ศรีเมือง", "score": 21, "passedMidterm": false },
+  "12534": { "name": "เด็กหญิงกุลณัชญา ดวงเนตร", "score": 23, "passedMidterm": false },
+  "12535": { "name": "เด็กหญิงจิราภรณ์ สาวิสิทธิ์", "score": 33, "passedMidterm": true },
+  "12536": { "name": "เด็กหญิงชนิดา ทัศนา", "score": 24, "passedMidterm": false },
+  "12537": { "name": "เด็กหญิงณัฐชภัทร ปลั่งกลาง", "score": 32, "passedMidterm": true },
+  "12538": { "name": "เด็กหญิงธัญชนก ชำนาญ", "score": 19, "passedMidterm": false },
+  "12539": { "name": "เด็กหญิงนงนภัส มิทะลา", "score": 35, "passedMidterm": true },
+  "12540": { "name": "เด็กหญิงปภาวรินทร์ สีหลิ่ง", "score": 24, "passedMidterm": false },
+  "12541": { "name": "เด็กหญิงปิยธิดา แก้วแก่นคูณ", "score": 13, "passedMidterm": false },
+  "12542": { "name": "เด็กหญิงภัทรมน อานุการ", "score": 25, "passedMidterm": false },
+  "12544": { "name": "เด็กหญิงรัตนาภรณ์ ทูคำมี", "score": 21, "passedMidterm": false },
+  "12545": { "name": "เด็กหญิงรวิสรา ทำกินดี", "score": 28, "passedMidterm": true },
+  "12546": { "name": "เด็กหญิงวารุณี จิว", "score": 33, "passedMidterm": true },
+  "12548": { "name": "เด็กหญิงสุทธาทิพย์ ดีพรหม", "score": 30, "passedMidterm": true },
+  "12549": { "name": "เด็กหญิงสุภัสสรา สุขสำราญ", "score": 20, "passedMidterm": false },
+  "12550": { "name": "เด็กหญิงเสาวนีย์ ไชยนคร", "score": 14, "passedMidterm": false },
+  "13074": { "name": "เด็กหญิงกานต์สินี เหล็กสงษ์", "score": 32, "passedMidterm": true },
+  "12551": { "name": "เด็กชายทินภัทร เทพรักษา", "score": 5, "passedMidterm": false },
+  "12552": { "name": "เด็กชายธนวัฒน์ ไชยรักษ์", "score": 11, "passedMidterm": false },
+  "12553": { "name": "เด็กชายปัณณวัฒน์ ชาลีเปรี่ยม", "score": 11, "passedMidterm": false },
+  "12554": { "name": "เด็กชายพุฒธิพงษ์ ฆ้องชะฎา", "score": 12, "passedMidterm": false },
+  "12555": { "name": "เด็กชายรัชต์พล มหาโยธี", "score": 10, "passedMidterm": false },
+  "12556": { "name": "เด็กชายวรเมธ ไพลเถื่อน", "score": 9, "passedMidterm": false },
+  "12557": { "name": "เด็กชายสิทธิชัย นามธรรม", "score": 16, "passedMidterm": false },
+  "12558": { "name": "เด็กชายอนันดา ธรรมวงศ์", "score": 22, "passedMidterm": false },
+  "12559": { "name": "เด็กชายอนันต์ยศ ผุสดี", "score": 21, "passedMidterm": false },
+  "12561": { "name": "เด็กหญิงกัลยกร เจริญภูมิ", "score": 13, "passedMidterm": false },
+  "12562": { "name": "เด็กหญิงชนิตา สวัสดี", "score": 9, "passedMidterm": false },
+  "12563": { "name": "เด็กหญิงณัฐธิดา มาวิเศษ", "score": 18, "passedMidterm": false },
+  "12564": { "name": "เด็กหญิงเทวิกา พัสดร", "score": 12, "passedMidterm": false },
+  "12565": { "name": "เด็กหญิงธนภรณ์ เหมือนอินทร์", "score": 12, "passedMidterm": false },
+  "12566": { "name": "เด็กหญิงธนารีย์ บุญเย็น", "score": 11, "passedMidterm": false },
+  "12567": { "name": "เด็กหญิงเบญจาวรรณ ชื่นจิตร", "score": 11, "passedMidterm": false },
+  "12568": { "name": "เด็กหญิงปวีณา บุญร่วม", "score": 17, "passedMidterm": false },
+  "12569": { "name": "เด็กหญิงพัชราภา วิเศษ", "score": 11, "passedMidterm": false },
+  "12570": { "name": "เด็กหญิงรุจิรดา ชาญสูงเนิน", "score": 25, "passedMidterm": false },
+  "12571": { "name": "เด็กหญิงวนิดา แสงคำ", "score": 18, "passedMidterm": false },
+  "12572": { "name": "เด็กหญิงวรกานต์ กัลยา", "score": 10, "passedMidterm": false },
+  "12573": { "name": "เด็กหญิงวรดา กลางนอก", "score": 17, "passedMidterm": false },
+  "12574": { "name": "เด็กหญิงวรรณดา หอศิลป์", "score": 16, "passedMidterm": false },
+  "12575": { "name": "เด็กหญิงวรัณญา พรรคทิง", "score": 10, "passedMidterm": false },
+  "12576": { "name": "เด็กหญิงวสุธัญ ชื่นบาน", "score": 9, "passedMidterm": false },
+  "12577": { "name": "เด็กหญิงสิริญากร พนังศรี", "score": 13, "passedMidterm": false },
+  "12578": { "name": "เด็กหญิงสุปรียา จันทนา", "score": 8, "passedMidterm": false },
+  "12579": { "name": "เด็กหญิงสุพรรษา เกตุสวย", "score": 9, "passedMidterm": false },
+  "12580": { "name": "เด็กหญิงสุมิตรา สิทธิไกรพงษ์", "score": 7, "passedMidterm": false },
+  "12581": { "name": "เด็กหญิงอัฐภิญญา เพ็ชรนิล", "score": 13, "passedMidterm": false },
+  "12582": { "name": "เด็กหญิงอิสริยา จากครบุรี", "score": 13, "passedMidterm": false },
+  "12583": { "name": "เด็กหญิงขวัญชีวา บุตรจันทา", "score": 9, "passedMidterm": false },
+  "12585": { "name": "เด็กหญิงชัญญา พนมสัก", "score": 24, "passedMidterm": false },
+  "12586": { "name": "เด็กหญิงธัญญาภรณ์ ไพพร", "score": 13, "passedMidterm": false },
+  "13055": { "name": "นางสาวตรีสรา พานแก้ว", "score": 24, "passedMidterm": false }
+};
+
+// ---------- EXAM DATA (M.3 - 40 Questions) ----------
+const examData = [
+  // Part 1: Language Use
+  { q: "Situation: Wednesday introduces her new roommate at Nevermore Academy.\n\nWednesday: Bianca, this is my roommate, Enid.\nBianca: Hello, Enid. _______", choices: ["A. How do you do?", "B. Pleased to meet you.", "C. I'm fine, thanks, and you?", "D. I don't think you've met Enid."], ans: 1, exp: "เมื่อแนะนำตัวให้รู้จักกันครั้งแรก นิยมใช้คำว่า 'Pleased to meet you.' (ยินดีที่ได้รู้จัก)" },
+  { q: "Situation: At the school cafeteria.\n\nDustin: Hi, Steve. _______\nSteve: Pretty good, thanks.", choices: ["A. How are you?", "B. What are you?", "C. Where are you from?", "D. Pleased to meet you too."], ans: 0, exp: "Steve ตอบว่า Pretty good (ค่อนข้างดี) จึงต้องถามสารทุกข์สุกดิบด้วยคำว่า 'How are you?'" },
+  { q: "Situation: In the living room, looking at a new pet.\n\nAnya: Look at that dog! _______ tail is very short.", choices: ["A. It", "B. It's", "C. Its", "D. His"], ans: 2, exp: "ต้องการคำแสดงความเป็นเจ้าของ (ของมัน) สำหรับสัตว์ ใช้ 'Its' (ไม่มีเครื่องหมาย ' )" },
+  { q: "Situation: In the classroom.\n\nPeter: I don't have a red pen. Can I borrow _______?\nNed: Yes, it is on my desk.", choices: ["A. your", "B. yours", "C. you", "D. mine"], ans: 1, exp: "ต้องการคำสรรพนามที่แทนคำนาม (your pen) เพื่อหลีกเลี่ยงการพูดซ้ำ จึงใช้ 'yours' (ของคุณ)" },
+  { q: "Situation: Cooking in the kitchen.\n\nSanji: _______ apples do we need for the pie?\nLuffy: Not many. Just three or four. I will eat the rest!", choices: ["A. How much", "B. How long", "C. How often", "D. How many"], ans: 3, exp: "apples เป็นนามนับได้พหูพจน์ ต้องใช้ 'How many' ในการถามจำนวน" },
+  { q: "Situation: Making a shopping list.\n\nYor: Do we have _______ milk left in the fridge?\nLoid: No, there isn't _______ milk. We need to buy some for Anya.", choices: ["A. some / any", "B. any / any", "C. any / some", "D. a little / a few"], ans: 1, exp: "ประโยคคำถาม (Do we have...?) และประโยคปฏิเสธ (there isn't...) ทั้งสองประโยคบังคับให้ใช้ 'any'" },
+  { q: "Situation: Asking about ability.\n\nMike: _______ Will boil an egg?\nEleven: Yes, he _______. He is a great chef!", choices: ["A. Has / has", "B. Does / does", "C. Can / can", "D. Have / can"], ans: 2, exp: "ถามความสามารถใช้ Can ขึ้นต้น และตอบรับสั้นๆ ว่า Yes, he can." },
+  { q: "Situation: Talking about weekends.\n\nZenitsu: _______ does your brother wash the car?\nTanjiro: He usually washes it on Sundays.", choices: ["A. When", "B. What time", "C. Who", "D. How long"], ans: 0, exp: "คำตอบคือ on Sundays (วันอาทิตย์) เป็นการบอกเวลา/วัน จึงต้องถามด้วย 'When' (เมื่อไหร่)" },
+  { q: "Situation: Discussing daily habits.\n\nStudent A: How often do you play online games?\nStudent B: _______. I don't like video games at all.", choices: ["A. Always", "B. Usually", "C. Sometimes", "D. Never"], ans: 3, exp: "Student B บอกว่าไม่ชอบวิดีโอเกมเลย (at all) ดังนั้นความถี่ในการเล่นต้องเป็น 'Never' (ไม่เคย)" },
+  { q: "Situation: Choosing a dress for the Rave'N Dance.\n\nEnid: _______ dress are you wearing to the party?\nWednesday: The black one, of course.", choices: ["A. What", "B. Which", "C. Whose", "D. Who"], ans: 1, exp: "มีการให้เลือกสิ่งใดสิ่งหนึ่ง (ชุดสีดำ) จึงใช้ 'Which' (อันไหน/ตัวไหน)" },
+  
+  // Part 2: Visual Reading
+  { q: "<div class='p-5 border-4 border-brown bg-white text-center rounded-lg shadow-sm'><b class='text-lg uppercase text-burnt-orange font-retro'>Khao Chakan Fresh Market</b><br><br><b>Open Daily</b><br>From: 12:00 AM (Midnight)<br>To: 12:00 PM (Noon)<br><br><span class='text-sm text-brown/70'>Please keep the area clean. Put rubbish in the bins _______ the entrance.</span></div><br>Which preposition best completes the blank on the sign?", choices: ["A. under", "B. on", "C. near", "D. above"], ans: 2, exp: "ถังขยะควรจะวางอยู่ 'ใกล้ๆ' (near) ทางเข้าบ้าน/ตลาด" },
+  { q: "<div class='p-5 border-4 border-brown bg-white text-center rounded-lg shadow-sm'><b class='text-lg uppercase text-burnt-orange font-retro'>Khao Chakan Fresh Market</b><br><br><b>Open Daily</b><br>From: 12:00 AM (Midnight)<br>To: 12:00 PM (Noon)<br><br><span class='text-sm text-brown/70'>Please keep the area clean. Put rubbish in the bins near the entrance.</span></div><br>When does the market close?", choices: ["A. At noon", "B. At midnight", "C. In the evening", "D. In the afternoon"], ans: 0, exp: "ป้ายระบุว่า To: 12:00 PM (Noon) แปลว่าปิดตอนเที่ยงวัน (At noon)" },
+  { q: "<div class='p-5 border-4 border-dashed border-brown bg-[#fffbeb] rounded-lg shadow-sm'><b class='text-lg uppercase text-burnt-orange font-retro border-b-2 border-brown/20 pb-2 mb-2 block'>Easy Cherry Pie</b><ul class='text-left list-disc pl-6'><li>1 kilo of cherries</li><li>2 cups of flour</li><li>A little sugar</li><li>A few eggs</li><li>Some butter</li></ul></div><br>Which ingredient from the recipe is COUNTABLE?", choices: ["A. Flour", "B. Sugar", "C. Butter", "D. Egg"], ans: 3, exp: "แป้ง(Flour), น้ำตาล(Sugar), เนย(Butter) เป็นนามนับไม่ได้ มีเพียงไข่ (Egg) ที่นับเป็นฟองได้" },
+  { q: "<div class='p-5 border-4 border-dashed border-brown bg-[#fffbeb] rounded-lg shadow-sm'><b class='text-lg uppercase text-burnt-orange font-retro border-b-2 border-brown/20 pb-2 mb-2 block'>Easy Cherry Pie</b><ul class='text-left list-disc pl-6'><li>1 kilo of cherries</li><li>2 cups of flour</li><li>A little sugar</li><li>A few eggs</li><li>Some butter</li></ul></div><br>If you follow the recipe, how much sugar do you need?", choices: ["A. A lot of", "B. Not much", "C. Not many", "D. Too much"], ans: 1, exp: "ในสูตรเขียนว่า 'A little sugar' ซึ่งตรงกับความหมายว่า 'Not much' (ไม่มาก/นิดหน่อย)" },
+  { q: "<div class='p-5 border-4 border-dashed border-brown bg-[#fffbeb] rounded-lg shadow-sm'><b class='text-lg uppercase text-burnt-orange font-retro border-b-2 border-brown/20 pb-2 mb-2 block'>Easy Cherry Pie</b><ul class='text-left list-disc pl-6'><li>1 kilo of cherries</li><li>2 cups of flour</li><li>A little sugar</li><li>A few eggs</li><li>Some butter</li></ul></div><br>Yor wants to make this pie, but she has got <u>very few</u> cherries. What does this mean?", choices: ["A. She has got enough cherries to make the pie.", "B. She has got a lot of cherries.", "C. She has almost no cherries and can't make the pie.", "D. She doesn't need cherries to make this pie."], ans: 2, exp: "คำว่า 'few' หรือ 'very few' มีความหมายเชิงปฏิเสธ แปลว่าแทบจะไม่มีเลย (almost no cherries)" },
+  
+  { q: "<div class='overflow-x-auto'><table class='w-full text-center border-collapse border border-brown mb-4 bg-white'><tr class='bg-mustard font-bold'> <th class='border border-brown p-2'>Time</th> <th class='border border-brown p-2'>Monday</th> <th class='border border-brown p-2'>Tuesday</th> <th class='border border-brown p-2'>Wednesday</th></tr><tr> <td class='border border-brown p-2 font-bold'>08.30-09.30</td> <td class='border border-brown p-2'>Math</td> <td class='border border-brown p-2'>Science</td> <td class='border border-brown p-2 bg-teal/20'>English</td></tr><tr> <td class='border border-brown p-2 font-bold'>09.30-10.30</td> <td class='border border-brown p-2'>English</td> <td class='border border-brown p-2'>History</td> <td class='border border-brown p-2'>Art</td></tr></table></div><br>What time does the English class start on Monday?", choices: ["A. At nine thirty", "B. In eight thirty", "C. On eight thirty", "D. From eight thirty"], ans: 0, exp: "วิชาภาษาอังกฤษในวันจันทร์ เริ่มเรียนเวลา 09.30 (At nine thirty)" },
+  { q: "<div class='overflow-x-auto'><table class='w-full text-center border-collapse border border-brown mb-4 bg-white'><tr class='bg-mustard font-bold'> <th class='border border-brown p-2'>Time</th> <th class='border border-brown p-2'>Monday</th> <th class='border border-brown p-2'>Tuesday</th> <th class='border border-brown p-2'>Wednesday</th></tr><tr> <td class='border border-brown p-2 font-bold'>08.30-09.30</td> <td class='border border-brown p-2'>Math</td> <td class='border border-brown p-2'>Science</td> <td class='border border-brown p-2'>English</td></tr><tr> <td class='border border-brown p-2 font-bold'>09.30-10.30</td> <td class='border border-brown p-2'>English</td> <td class='border border-brown p-2'>History</td> <td class='border border-brown p-2'>Art</td></tr></table></div><br>Which statement is TRUE according to the timetable?", choices: ["A. The student studies Science on Monday.", "B. The student has two English classes a week.", "C. Art class is on Wednesday at 08:30.", "D. History class is in the afternoon."], ans: 1, exp: "จากตาราง มีเรียนวิชาภาษาอังกฤษ (English) 2 คาบต่อสัปดาห์ คือวันจันทร์และวันพุธ" },
+  { q: "<div class='overflow-x-auto'><table class='w-full text-center border-collapse border border-brown mb-4 bg-white'><tr class='bg-mustard font-bold'> <th class='border border-brown p-2'>Time</th> <th class='border border-brown p-2'>Monday</th> <th class='border border-brown p-2'>Tuesday</th> <th class='border border-brown p-2'>Wednesday</th></tr><tr> <td class='border border-brown p-2 font-bold'>08.30-09.30</td> <td class='border border-brown p-2'>Math</td> <td class='border border-brown p-2'>Science</td> <td class='border border-brown p-2'>English</td></tr><tr> <td class='border border-brown p-2 font-bold'>09.30-10.30</td> <td class='border border-brown p-2'>English</td> <td class='border border-brown p-2'>History</td> <td class='border border-brown p-2'>Art</td></tr></table></div><br>What does the student study _______ 08:30 _______ Wednesday?", choices: ["A. in / on", "B. at / on", "C. on / at", "D. at / in"], ans: 1, exp: "เวลาตามเข็มนาฬิกาใช้ 'at' ส่วนวันในสัปดาห์ใช้ 'on'" },
+  { q: "<div class='p-5 border-4 border-double border-brown bg-white text-center rounded-sm shadow-sm'><b class='text-xl uppercase text-red-600 font-retro tracking-widest'>LOST AND FOUND</b><br><br><span class='text-sm font-medium'>A blue jacket was found between the library and the science lab.<br>If this is yours, please contact T. Ploy at the English Department.</span></div><br>Where was the jacket found?", choices: ["A. Inside the library.", "B. In the middle of the library and the science lab.", "C. Behind the science lab.", "D. Opposite the English Department."], ans: 1, exp: "between แปลว่า 'ระหว่าง' หรือตรงกลาง (In the middle of) ระหว่างสองสถานที่" },
+  { q: "<div class='p-5 border-4 border-double border-brown bg-white text-center rounded-sm shadow-sm'><b class='text-xl uppercase text-red-600 font-retro tracking-widest'>LOST AND FOUND</b><br><br><span class='text-sm font-medium'>A blue jacket was found between the library and the science lab.<br>If this is yours, please contact T. Ploy at the English Department.</span></div><br>What does the word 'yours' refer to in this notice?", choices: ["A. The library", "B. The science lab", "C. The English Department", "D. The blue jacket"], ans: 3, exp: "yours ในที่นี้หมายถึงเสื้อแจ็คเก็ตสีฟ้า (blue jacket) ที่เก็บได้นั่นเอง" },
+
+  // Part 3: Reading Comprehension
+  { q: "<b>Read the passage and answer the question:</b><br><br>Peter Parker is a high school student, but he has a big secret. He is Spider-Man! His daily routine is very busy. He usually wakes up at 6:30 AM and goes to school by subway. He studies hard because he loves science.<br><br>After school, he doesn't go home immediately. He puts on his red and blue suit and swings through the city. He always helps people in danger. Because of his superhero duties, Peter is often late for dinner with his Aunt May. He rarely has time to hang out with his best friend, Ned, on weekends. However, Peter doesn't mind. 'With great power comes great responsibility,' he always says.<br><br>What is the main idea of this passage?", choices: ["A. How to make a superhero suit.", "B. The busy life of a teenage superhero.", "C. The best way to travel around the city.", "D. Why science is an important school subject."], ans: 1, exp: "เนื้อเรื่องพูดถึงชีวิตประจำวันที่ยุ่งเหยิงของ Peter ในฐานะฮีโร่วัยรุ่น" },
+  { q: "How does Peter travel to school?", choices: ["A. By bus", "B. By car", "C. By subway", "D. On foot"], ans: 2, exp: "ในบรรทัดที่ 3 ระบุชัดเจนว่า 'goes to school by subway'" },
+  { q: "Why is Peter often late for dinner?", choices: ["A. Because he studies science after school.", "B. Because he plays video games with Ned.", "C. Because he helps people in the city.", "D. Because he misses the train to go home."], ans: 2, exp: "ในเนื้อเรื่องระบุว่า Because of his superhero duties (ช่วยเหลือคน) ทำให้เขากลับไปกินข้าวเย็นสายบ่อยๆ" },
+  { q: "How often does Peter have time to hang out with Ned on weekends?", choices: ["A. Always", "B. Usually", "C. Often", "D. Rarely"], ans: 3, exp: "เนื้อเรื่องใช้คำว่า 'He rarely has time...' (แทบจะไม่มีเวลา)" },
+  { q: "Which of the following is TRUE about Peter Parker?", choices: ["A. He goes home immediately after school.", "B. He hates studying science.", "C. He wears a black and green suit.", "D. He has a secret superhero identity."], ans: 3, exp: "ข้อมูลที่ถูกต้องเพียงข้อเดียวคือข้อ D (เขามีความลับในการเป็นซูเปอร์ฮีโร่)" },
+  
+  { q: "<b>Read the passage and answer the question:</b><br><br>Hi! My name is Maria. I am an exchange student from Spain. Currently, I am studying at Khao Chakan Witthayakhom School. The school is very big and beautiful. I live with a host family. They are very kind to me.<br><br>In Spain, I usually walk to school, but here, I take the bus. I can speak English and Spanish, but I can't speak Thai very well yet. I try to learn five new Thai words every day. Thai food is delicious, but sometimes there is too much chili for me! My favorite dish is Pad Thai because it is not spicy.<br><br>Where is Maria studying right now?", choices: ["A. In Spain", "B. At Khao Chakan Witthayakhom School", "C. At an English school", "D. She is not studying."], ans: 1, exp: "บรรทัดที่ 2 ระบุว่า 'I am studying at Khao Chakan Witthayakhom School.'" },
+  { q: "How does Maria go to school in Thailand?", choices: ["A. She walks.", "B. She takes the bus.", "C. She goes by car.", "D. She rides a bicycle."], ans: 1, exp: "ในย่อหน้าที่ 2 เธอบอกว่า 'but here, I take the bus.'" },
+  { q: "Which of the following can Maria NOT do well?", choices: ["A. Speak English", "B. Speak Spanish", "C. Speak Thai", "D. Walk to school"], ans: 2, exp: "เธอบอกว่า 'but I can't speak Thai very well yet.'" },
+  { q: "Why does Maria like Pad Thai?", choices: ["A. Because it has a lot of chili.", "B. Because it is from Spain.", "C. Because she can cook it.", "D. Because it is not spicy."], ans: 3, exp: "ประโยคสุดท้ายบอกว่า 'because it is not spicy.' (เพราะมันไม่เผ็ด)" },
+  { q: "Which word best describes Maria's host family?", choices: ["A. Kind", "B. Spicy", "C. Big", "D. Tired"], ans: 0, exp: "เธออธิบายถึงครอบครัวอุปถัมภ์ว่า 'They are very kind to me.' (ใจดี)" },
+
+  // Part 4: Cloze Test
+  { q: "<b>Choose the best word to fill in the blank (31):</b><br><br>My name is Nezuko. I am a student. My brother, Tanjiro, and I <b>(31) _______</b> to the same school.", choices: ["A. go", "B. goes", "C. is go", "D. going"], ans: 0, exp: "ประธานคือ Tanjiro and I (พหูพจน์) กริยาช่องที่ 1 จึงไม่ต้องเติม s/es" },
+  { q: "<b>Choose the best word to fill in the blank (32):</b><br><br>Tanjiro is a very active person. He always <b>(32) _______</b> up early in the morning.", choices: ["A. wake", "B. wakes", "C. waking", "D. is wake"], ans: 1, exp: "ประธานคือ He (เอกพจน์) เป็น Present Simple Tense กริยาต้องเติม s/es" },
+  { q: "<b>Choose the best word to fill in the blank (33):</b><br><br>For breakfast, he usually eats two <b>(33) _______</b> of bread and drinks a glass of orange juice.", choices: ["A. slice", "B. sliced", "C. slices", "D. slicing"], ans: 2, exp: "แผ่นขนมปัง (slice) มีจำนวน 2 แผ่นขึ้นไป (two) จึงต้องเติม s เป็น slices" },
+  { q: "<b>Choose the best word to fill in the blank (34):</b><br><br>He doesn't drink <b>(34) _______</b> coffee because he is too young.", choices: ["A. some", "B. any", "C. many", "D. a few"], ans: 1, exp: "เป็นประโยคปฏิเสธ (doesn't drink) จึงต้องใช้ any นำหน้าคำนาม" },
+  { q: "<b>Choose the best word to fill in the blank (35):</b><br><br>We go to school together <b>(35) _______</b> 7:30 AM.", choices: ["A. in", "B. on", "C. at", "D. to"], ans: 2, exp: "บอกเวลาตามเข็มนาฬิกา ต้องใช้ Preposition 'at'" },
+  { q: "<b>Choose the best word to fill in the blank (36):</b><br><br>Our school is <b>(36) _______</b> the post office and the bank.", choices: ["A. under", "B. above", "C. between", "D. on"], ans: 2, exp: "มีสถานที่ 2 แห่งเชื่อมด้วย and (post office และ bank) จึงต้องใช้ between (อยู่ระหว่าง...และ...)" },
+  { q: "<b>Choose the best word to fill in the blank (37):</b><br><br>Tanjiro is very smart. He <b>(37) _______</b> solve difficult math problems easily,", choices: ["A. have", "B. has", "C. can", "D. can't"], ans: 2, exp: "ประโยคบอกเล่าความสามารถในทางบวก (very smart, easily) จึงต้องใช้ can" },
+  { q: "<b>Choose the best word to fill in the blank (38):</b><br><br>but he <b>(38) _______</b> draw very well.", choices: ["A. can", "B. can't", "C. isn't", "D. haven't"], ans: 1, exp: "มีคำเชื่อม but (แต่) ขัดแย้งกับประโยคหน้า จึงต้องเปลี่ยนเป็นรูปปฏิเสธ คือ can't" },
+  { q: "<b>Choose the best word to fill in the blank (39):</b><br><br>Look at that red bicycle over there. It is <b>(39) _______</b>. He rides it every weekend.", choices: ["A. his", "B. him", "C. he", "D. its"], ans: 0, exp: "ต้องการคำสรรพนามแสดงความเป็นเจ้าของที่ทำหน้าที่แทนคำนามได้เลย จักรยานเป็นของผู้ชาย (He) จึงใช้ his" },
+  { q: "<b>Choose the best word to fill in the blank (40):</b><br><br>He loves his bike very much, and he always cleans <b>(40) _______</b> wheels.", choices: ["A. it", "B. it's", "C. its", "D. theirs"], ans: 2, exp: "ล้อ (wheels) เป็นของจักรยานคันนั้น (สิ่งของ) แสดงความเป็นเจ้าของของ It จึงต้องใช้ its (ไม่มี ')" }
+];
+
+// ---------- STATE ----------
+let session = { studentId: null, studentName: null, isAdmin: false, phase: 'login' };
+let examRuntime = { answers: [], currentQ: 0, timeLeft: EXAM_TIME_LIMIT_SEC, timerHandle: null, lastResult: null };
+let dashboardTimerHandle = null;
+
+// ---------- STORAGE HELPERS ----------
+function storageKey(id){ return `mia_m3_state_${id}`; }
+function loadState(id){ try{ const raw = localStorage.getItem(storageKey(id)); if(!raw) return null; return JSON.parse(raw); }catch(e){ return null; } }
+function saveState(id, state){ try{ localStorage.setItem(storageKey(id), JSON.stringify(state)); }catch(e){} }
+function defaultState(){ return { lives: MAX_LIVES, cooldownEnd: null, status: 'active', lastScoreDisplay: null }; }
+
+// ---------- CUSTOM MODAL ----------
+function showCustomModal(icon, title, message, callback, opts = {}){
+  const root = document.getElementById('modalRoot');
+  const confirmMode = !!opts.confirm;
+  const confirmText = opts.confirmText || 'ACKNOWLEDGE';
+  const cancelText = opts.cancelText || 'ABORT';
+  const dangerConfirm = !!opts.danger;
+
+  root.innerHTML = `
+    <div class="fixed inset-0 z-[100] modal-backdrop flex items-center justify-center p-4 fade-in">
+      <div class="panel max-w-md w-full p-6 relative">
+        <div class="flex flex-col items-center text-center gap-3 w-full">
+          <div class="text-5xl font-retro">${icon}</div>
+          <h3 class="font-retro text-xl md:text-2xl text-burnt-orange tracking-wide uppercase">${title}</h3>
+          <p class="text-sm font-medium leading-relaxed whitespace-pre-line text-brown/80">${message}</p>
+          <div class="flex gap-3 mt-4 w-full">
+            ${confirmMode ? `<button id="modalCancelBtn" class="btn-ghost flex-1 py-3 rounded-md text-sm tracking-wide">${cancelText}</button>` : ''}
+            <button id="modalOkBtn" class="${dangerConfirm ? 'btn-danger' : 'btn-agent'} flex-1 py-3 rounded-md text-sm tracking-wide uppercase">${confirmText}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalOkBtn').onclick = () => { root.innerHTML = ''; if(callback) callback(true); };
+  if(confirmMode){ document.getElementById('modalCancelBtn').onclick = () => { root.innerHTML = ''; if(callback) callback(false); }; }
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+// ---------- EXAM OVERVIEW MODAL ----------
+function showOverviewModal(){
+  const root = document.getElementById('modalRoot');
+  let gridHtml = '<div class="grid grid-cols-5 md:grid-cols-8 gap-2 mt-4 max-h-[350px] overflow-y-auto p-2 w-full">';
+  for(let i=0; i<examData.length; i++){
+    const answered = examRuntime.answers[i] !== null;
+    gridHtml += `<button onclick="jumpToQuestion(${i})" class="w-full aspect-square flex items-center justify-center rounded-md text-sm font-kanit font-bold transition-all border-2 ${answered ? 'bg-teal text-white border-teal-dark shadow-sm' : 'bg-manila text-brown/50 border-brown/30 hover:border-burnt-orange'}">${i+1}</button>`;
+  }
+  gridHtml += '</div>';
+
+  root.innerHTML = `
+    <div class="fixed inset-0 z-[100] modal-backdrop flex items-center justify-center p-4 fade-in">
+      <div class="panel max-w-md w-full p-6 relative">
+        <div class="flex flex-col items-center text-center w-full">
+          <div class="text-4xl mb-2 font-retro">📂</div>
+          <h3 class="font-retro text-xl text-teal-dark tracking-wide uppercase">CASE FILE OVERVIEW</h3>
+          <p class="text-xs text-brown/60 mb-2 font-medium">Select a clue number to jump directly to it.</p>
+          <div class="flex gap-4 text-[11px] font-bold text-brown/70 mb-2">
+            <span class="flex items-center gap-1"><div class="w-3 h-3 bg-teal border border-teal-dark rounded-sm"></div> Collected</span>
+            <span class="flex items-center gap-1"><div class="w-3 h-3 bg-manila border border-brown/30 rounded-sm"></div> Missing</span>
+          </div>
+          ${gridHtml}
+          <button onclick="closeModal()" class="btn-ghost w-full mt-5 py-3 rounded-md text-sm tracking-wide">CLOSE FOLDER</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function jumpToQuestion(idx) {
+  examRuntime.currentQ = idx;
+  updateExamViewOnly();
+  closeModal();
+}
+
+// ---------- UTIL ----------
+function fmtTime(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function fireConfetti(){
+  const duration = 2500;
+  const end = Date.now() + duration;
+  const colors = ['#eab308', '#ea580c', '#14b8a6', '#451a03'];
+  (function frame(){
+    confetti({ particleCount: 4, angle: 60, spread: 65, origin: {x:0}, colors: colors });
+    confetti({ particleCount: 4, angle: 120, spread: 65, origin: {x:1}, colors: colors });
+    if(Date.now() < end) requestAnimationFrame(frame);
+  })();
+  confetti({ particleCount: 140, spread: 100, origin: {y:0.5}, colors: colors });
+}
+
+// ---------- CERTIFICATE LOGIC ----------
+function openCert(type){
+  const overlay = document.getElementById('certOverlay');
+  const nameEl = document.getElementById('certStudentName');
+  const typeEl = document.getElementById('certExamType');
+  const dateEl = document.getElementById('certDate');
+  const rankEl = document.getElementById('certRank');
+  
+  let dispName = session.studentName === 'DIRECTOR' ? 'SARUTA JANTAKET' : session.studentName;
+  dispName = dispName.replace('เด็กหญิง', 'Miss ').replace('เด็กชาย', 'Mr. ').replace('นางสาว', 'Miss ').replace('นาย', 'Mr. ');
+  nameEl.textContent = dispName;
+
+  typeEl.textContent = type === 'retest' ? 'MIDTERM RETEST' : 'MIDTERM EXAMINATION';
+  
+  const record = studentDB[session.studentId] || {};
+  let rankText = '';
+  if (type === 'midterm') {
+     const score = record.score || 20; 
+     if (score >= 32) { // 80% of 40
+        rankText = '<span style="color:#ea580c" class="font-bold">RANK: MASTER DETECTIVE</span> <span class="text-sm text-brown/60 font-medium">(Top Investigator)</span>';
+     } else {
+        rankText = '<span style="color:#0f766e" class="font-bold">RANK: SENIOR INVESTIGATOR</span> <span class="text-sm text-brown/60 font-medium">(Advanced Skills)</span>';
+     }
+  } else {
+     rankText = '<span style="color:#ca8a04" class="font-bold">RANK: QUALIFIED INVESTIGATOR</span> <span class="text-sm text-brown/60 font-medium">(Approved)</span>';
+  }
+  rankEl.innerHTML = rankText;
+  
+  const today = new Date();
+  dateEl.textContent = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  
+  overlay.classList.remove('hidden');
+  overlay.classList.add('flex');
+}
+function closeCert(){
+  const overlay = document.getElementById('certOverlay');
+  overlay.classList.add('hidden');
+  overlay.classList.remove('flex');
+}
+
+// ---------- RENDER ROOT ----------
+function render(){
+  const app = document.getElementById('app');
+  switch(session.phase){
+    case 'login': app.innerHTML = renderLogin(); attachLoginEvents(); break;
+    case 'dashboard': app.innerHTML = renderDashboard(); attachDashboardEvents(); startDashboardTicker(); break;
+    case 'exam': app.innerHTML = renderExam(); attachExamEvents(); break;
+    case 'result': app.innerHTML = renderResult(); attachResultEvents(); break;
+    default: app.innerHTML = renderLogin(); attachLoginEvents();
+  }
+}
+
+// ================= PHASE: LOGIN =================
+function renderLogin(){
+  return `
+  <div class="w-full max-w-md mt-6 md:mt-12 fade-in">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-burnt-orange"></span><span class="text-xs tracking-[0.2em] text-burnt-orange font-bold">TOP SECRET PROTOCOL</span></div>
+      <h1 class="font-retro text-5xl md:text-6xl font-bold text-teal-dark tracking-wider drop-shadow-md">M.I.A.</h1>
+      <p class="text-sm md:text-base text-brown font-bold mt-1 tracking-wide">MIDTERM INVESTIGATION AGENCY</p>
+      <div class="mt-3 text-[11px] md:text-xs text-brown/60 font-medium tracking-wide leading-relaxed uppercase">
+        Basic English 3 | Khao Chakan Witthayakom<br>Chief Inspector: Saruta J.
+      </div>
+    </div>
+    <div class="panel p-6 md:p-8">
+      <h2 class="font-retro text-xl text-teal-dark mb-1 tracking-wide border-b-2 border-brown/20 pb-2">DETECTIVE LOGIN</h2>
+      <p class="text-xs font-medium text-brown/60 mb-5 mt-2">Enter your badge number and name to access the case file.</p>
+      <label class="block text-xs text-brown/80 mb-1 font-bold tracking-wide uppercase">Badge No. (รหัสนักเรียน 5 หลัก)</label>
+      <input id="loginId" maxlength="5" inputmode="numeric" placeholder="•••••" class="input-terminal w-full rounded-md px-4 py-3 mb-4 text-lg tracking-[0.3em] font-bold text-center" />
+      <label class="block text-xs text-brown/80 mb-1 font-bold tracking-wide uppercase">First Name (ชื่อจริงภาษาไทย)</label>
+      <input id="loginName" placeholder="ไม่ต้องใส่ ด.ช./ด.ญ." class="input-terminal w-full rounded-md px-4 py-3 mb-2 text-base text-center font-bold" />
+      <p id="loginError" class="text-xs font-bold text-red-600 min-h-[1.2rem] mb-2 text-center"></p>
+      <button id="loginBtn" class="btn-agent w-full py-4 rounded-md mt-2 font-retro text-lg tracking-widest uppercase">Unlock Case File ➔</button>
+    </div>
+  </div>`;
+}
+
+function attachLoginEvents(){
+  const btn = document.getElementById('loginBtn');
+  const idInput = document.getElementById('loginId');
+  const nameInput = document.getElementById('loginName');
+  const err = document.getElementById('loginError');
+
+  idInput.addEventListener('input', () => { idInput.value = idInput.value.replace(/[^0-9]/g,'').slice(0,5); });
+
+  const attempt = () => {
+    const id = idInput.value.trim();
+    const name = nameInput.value.trim();
+    err.textContent = '';
+    if(!id || !name){ err.textContent = 'ERROR: Badge Number and Name are required.'; return; }
+    if(id === ADMIN_ID && name === ADMIN_FIRSTNAME){
+      session.studentId = id; session.studentName = 'DIRECTOR'; session.isAdmin = true;
+      let st = loadState(id) || defaultState(); st.lives = MAX_LIVES; st.cooldownEnd = null; st.status = 'active'; saveState(id, st);
+      session.phase = 'dashboard'; render(); return;
+    }
+    if(id.length !== 5 || !studentDB.hasOwnProperty(id)){ err.textContent = 'ACCESS DENIED: Badge Number not found in database.'; return; }
+    const record = studentDB[id];
+    if(!record.name.includes(name)){ err.textContent = 'ACCESS DENIED: Name does not match records.'; return; }
+    
+    session.studentId = id; session.studentName = record.name; session.isAdmin = false;
+    let st = loadState(id);
+    
+    if(!st) st = defaultState();
+    
+    if(record.passedMidterm && st.status !== 'passed'){
+      st.status = 'passed';
+      st.lastScoreDisplay = record.score + ' / 40 (MIDTERM EXAM)';
+      st.lives = MAX_LIVES; 
+      st.cooldownEnd = null;
+    }
+    saveState(id, st);
+    
+    session.phase = 'dashboard'; render();
+  };
+  btn.addEventListener('click', attempt);
+  nameInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') attempt(); });
+  idInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') attempt(); });
+}
+
+// ================= PHASE: DASHBOARD =================
+function currentStudentState(){ return loadState(session.studentId) || defaultState(); }
+function renderCores(lives){ let html = ''; for(let i=0;i<MAX_LIVES;i++){ html += `<div class="core ${i < lives ? '' : 'dead'}">🎟️</div>`; } return html; }
+
+function renderDashboard(){
+  const st = currentStudentState();
+  const now = Date.now();
+  const inCooldown = st.cooldownEnd && now < st.cooldownEnd && !session.isAdmin;
+  const locked = st.status === 'locked' && !session.isAdmin;
+  const passed = st.status === 'passed';
+
+  let bodyHtml = '';
+  if(locked){
+    bodyHtml = `<div class="text-center py-6"><div class="text-6xl mb-4">🚨</div><h2 class="font-retro text-2xl text-red-600 tracking-widest mb-3">LICENSE REVOKED</h2><p class="text-sm font-medium text-brown/80 mb-1">All Investigation Permits depleted. You cannot solve this case anymore.</p><p class="text-sm text-red-600 font-bold tracking-wide mt-3">CONTACT CHIEF INSPECTOR (T. Ploy) IMMEDIATELY.</p></div>`;
+  } else if(passed){
+    const isMidtermPass = st.lastScoreDisplay && st.lastScoreDisplay.includes('MIDTERM');
+    const certBtnHtml = isMidtermPass
+      ? `<button onclick="openCert('midterm')" class="btn-gold py-3 rounded-md font-bold tracking-widest w-full md:w-3/4 mx-auto">🪪 PRINT DETECTIVE LICENSE</button>`
+      : `<button onclick="openCert('retest')" class="btn-agent py-3 rounded-md font-bold tracking-widest w-full md:w-3/4 mx-auto">🪪 PRINT DETECTIVE LICENSE</button>`;
+
+    bodyHtml = `
+      <div class="text-center py-6">
+        <div class="text-6xl mb-4 font-retro">🏆</div>
+        <h2 class="font-retro text-2xl text-teal-dark tracking-widest mb-3 uppercase">CASE CLOSED!</h2>
+        <p class="text-sm font-medium text-brown/80">Final Evaluation Score: <span class="text-teal-dark font-bold text-lg">${st.lastScoreDisplay || CAPPED_PASS_SCORE}</span></p>
+        <p class="text-xs font-bold text-brown/50 mt-2 mb-6">Excellent work, Detective. No further action required.</p>
+        <h3 class="font-retro text-sm text-burnt-orange tracking-wide mb-3 border-t-2 border-brown/20 pt-4 uppercase">Claim Your Reward</h3>
+        <div class="flex flex-col gap-2">
+          ${certBtnHtml}
+        </div>
+      </div>`;
+  } else if(inCooldown){
+    bodyHtml = `<div class="text-center mb-5"><div class="text-5xl mb-3 font-retro">⏳</div><h2 class="font-retro text-xl text-burnt-orange tracking-widest mb-1 uppercase">PAPERWORK PENDING</h2><p class="text-xs font-medium text-brown/70 mb-4">The chief is reviewing your previous failure. Next permit unlocks in:</p><div id="cooldownTimer" class="font-retro text-4xl text-mustard-dark tracking-widest">--:--</div></div><div class="border-t-2 border-brown/20 pt-4 mt-2"><h3 class="font-retro text-sm text-teal-dark tracking-wide mb-2 uppercase">Required Action:</h3><div class="bg-manila border-2 border-brown/30 rounded-md p-4 text-sm font-medium text-brown/80 leading-relaxed text-center">Please review your Grammar and Vocabulary notes (Phase 1) before requesting a new permit.</div></div>`;
+  } else {
+    const record = studentDB[session.studentId] || {};
+    const prevScore = record.score !== undefined ? record.score : '--';
+
+    bodyHtml = `
+      <div class="text-center py-4">
+        <div class="text-5xl mb-3 font-retro">🕵️‍♂️</div>
+        <h2 class="font-retro text-xl text-teal-dark tracking-wide mb-2 uppercase">Unsolved Case File</h2>
+        <p class="text-sm font-medium text-brown/80 mb-2">Previous Exam Score: <span class="text-red-600 font-bold text-lg">${prevScore} / 40</span></p>
+        <p class="text-sm font-medium text-brown/60 mb-1">You must score at least <span class="text-teal-dark font-bold">70%</span> (28/40) to close this case.</p>
+        <div class="inline-block bg-mustard/20 border-2 border-mustard-dark rounded-md px-4 py-2 mt-3">
+          <p class="text-xs font-bold text-brown uppercase">Time Limit: 40:00 minutes<br>${TOTAL_QUESTIONS} Clues to find</p>
+        </div>
+      </div>`;
+  }
+
+  const canInitiate = !locked && !passed && !inCooldown;
+
+  return `
+  <div class="w-full max-w-lg mt-4 md:mt-8 fade-in pb-10">
+    <div class="text-center mb-5">
+      <h1 class="font-retro text-4xl font-bold text-teal-dark tracking-wider drop-shadow-sm">M.I.A. HEADQUARTERS</h1>
+      <p class="text-[11px] font-bold text-brown/60 tracking-wide mt-1 uppercase">Khao Chakan Witthayakom | Dept. of English</p>
+    </div>
+    <div class="panel p-4 mb-4 flex items-center justify-between">
+      <div>
+        <p class="text-[10px] text-brown/50 tracking-widest font-bold uppercase">Detective on Duty</p>
+        <p class="text-brown font-bold text-sm md:text-base">${session.studentName}${session.isAdmin ? ' <span class="text-burnt-orange text-xs">[CHIEF]</span>' : ''}</p>
+        <p class="text-[10px] text-brown/50 mt-0.5 font-bold">Badge No: ${session.studentId}</p>
+      </div>
+      <div class="text-right border-l-2 border-brown/20 pl-4">
+        <p class="text-[10px] text-brown/50 tracking-widest font-bold mb-1 uppercase">Permits Left</p>
+        <div class="flex gap-1 justify-end">${renderCores(session.isAdmin ? MAX_LIVES : st.lives)}</div>
+      </div>
+    </div>
+    <div class="panel p-6 md:p-8 mb-4">
+      ${bodyHtml}
+    </div>
+    <button id="initiateBtn" ${canInitiate ? '' : 'disabled'} class="btn-agent w-full py-4 rounded-md font-retro text-lg tracking-widest uppercase ${passed ? 'hidden' : ''}">
+      ${locked ? '✖ ACCESS DENIED' : passed ? '' : inCooldown ? '⏳ PROCESSING...' : '🔍 OPEN CASE FILE'}
+    </button>
+    <button id="logoutBtn" class="btn-ghost w-full py-3 rounded-md mt-3 text-xs tracking-widest uppercase">Log Out</button>
+  </div>`;
+}
+
+function attachDashboardEvents(){
+  const initBtn = document.getElementById('initiateBtn');
+  if(initBtn){
+    initBtn.addEventListener('click', () => {
+      showCustomModal('📁', 'OPEN CONFIDENTIAL FILE', `You are about to start the investigation.\n\n${TOTAL_QUESTIONS} Questions · 40:00 Minutes\nTarget Score: 70% (28/40)\n\nOnce opened, the timer cannot be paused.`, (confirmed) => {
+        if(confirmed) startExam();
+      }, { confirm:true, confirmText:'START EXAM', cancelText:'CANCEL' });
+    });
+  }
+  const logoutBtn = document.getElementById('logoutBtn');
+  if(logoutBtn){
+    logoutBtn.addEventListener('click', () => {
+      if(dashboardTimerHandle) clearInterval(dashboardTimerHandle);
+      session.studentId = null; session.studentName = null; session.isAdmin = false; session.phase = 'login'; render();
+    });
+  }
+}
+
+function startDashboardTicker(){
+  if(dashboardTimerHandle) clearInterval(dashboardTimerHandle);
+  const timerEl = document.getElementById('cooldownTimer');
+  if(!timerEl) return;
+  const tick = () => {
+    const st = currentStudentState(); const now = Date.now();
+    const remaining = Math.max(0, Math.floor((st.cooldownEnd - now)/1000));
+    const el = document.getElementById('cooldownTimer');
+    if(!el){ clearInterval(dashboardTimerHandle); return; }
+    el.textContent = fmtTime(remaining);
+    if(remaining <= 0){ clearInterval(dashboardTimerHandle); render(); }
+  };
+  tick(); dashboardTimerHandle = setInterval(tick, 1000);
+}
+
+// ================= PHASE: EXAM =================
+function startExam(){
+  examRuntime = { answers: new Array(examData.length).fill(null), currentQ: 0, timeLeft: EXAM_TIME_LIMIT_SEC, timerHandle: null, lastResult: null };
+  session.phase = 'exam'; render();
+}
+
+function renderExam(){
+  const q = examData[examRuntime.currentQ]; const total = examData.length;
+  const progressPct = Math.round(((examRuntime.currentQ) / total) * 100);
+  const selected = examRuntime.answers[examRuntime.currentQ];
+  const choicesHtml = q.choices.map((c, i) => `<button data-idx="${i}" class="choice-btn w-full flex items-center gap-3 px-4 py-3 mb-3 ${selected === i ? 'selected' : ''}"><span class="choice-letter w-8 h-8 flex items-center justify-center rounded-sm text-sm flex-shrink-0">${String.fromCharCode(65+i)}</span><span class="text-sm font-medium">${c}</span></button>`).join('');
+
+  return `
+  <div class="w-full max-w-2xl mt-4 fade-in pb-10">
+    <div class="flex items-center justify-between mb-2">
+      <div class="font-retro text-sm text-burnt-orange tracking-widest uppercase">Clue ${examRuntime.currentQ+1} / ${total}</div>
+      <div id="examTimer" class="font-retro text-xl text-teal-dark tracking-widest">${fmtTime(examRuntime.timeLeft)}</div>
+    </div>
+    <div class="progress-track rounded-full h-2.5 mb-6 overflow-hidden"><div class="progress-fill h-full rounded-full" style="width:${progressPct}%"></div></div>
+    
+    <div class="panel p-6 mb-5 min-h-[120px] bg-white">
+      <p class="text-base md:text-lg font-medium leading-relaxed whitespace-pre-line text-brown">${q.q}</p>
+    </div>
+    
+    <div id="choicesWrap">${choicesHtml}</div>
+    
+    <div class="flex gap-2 mt-6">
+      <button id="prevBtn" ${examRuntime.currentQ === 0 ? 'disabled' : ''} class="btn-ghost flex-1 py-3 rounded-md text-xs md:text-sm tracking-widest uppercase">◄ Back</button>
+      <button id="overviewBtn" class="btn-ghost flex-1 py-3 rounded-md text-xs md:text-sm tracking-widest uppercase text-teal-dark">📂 Folder</button>
+      ${examRuntime.currentQ === total - 1 ? `<button id="submitBtn" class="btn-agent flex-1 py-3 rounded-md text-xs md:text-sm tracking-widest uppercase">Close Case ✔</button>` : `<button id="nextBtn" class="btn-agent flex-1 py-3 rounded-md text-xs md:text-sm tracking-widest uppercase">Next ►</button>`}
+    </div>
+  </div>`;
+}
+
+function attachExamEvents(){
+  const wrap = document.getElementById('choicesWrap');
+  wrap.querySelectorAll('.choice-btn').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.getAttribute('data-idx'), 10); examRuntime.answers[examRuntime.currentQ] = idx; wrap.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }); });
+  
+  const prevBtn = document.getElementById('prevBtn'); if(prevBtn) prevBtn.addEventListener('click', () => { if(examRuntime.currentQ > 0){ examRuntime.currentQ--; updateExamViewOnly(); } });
+  const nextBtn = document.getElementById('nextBtn'); if(nextBtn) nextBtn.addEventListener('click', () => { if(examRuntime.currentQ < examData.length - 1){ examRuntime.currentQ++; updateExamViewOnly(); } });
+  const submitBtn = document.getElementById('submitBtn'); if(submitBtn) submitBtn.addEventListener('click', () => { const unanswered = examRuntime.answers.filter(a => a === null).length; showCustomModal('📤', 'SUBMIT EVIDENCE', unanswered > 0 ? `You have ${unanswered} missing clues.\nSubmit the case anyway?` : `All clues collected.\nClose this case now?`, (confirmed) => { if(confirmed) finishExam('submitted'); }, { confirm:true, confirmText:'SUBMIT', cancelText:'REVIEW' }); });
+  const overviewBtn = document.getElementById('overviewBtn'); if(overviewBtn) overviewBtn.addEventListener('click', showOverviewModal);
+  
+  startExamTimer();
+}
+
+function updateExamViewOnly(){ const app = document.getElementById('app'); app.innerHTML = renderExam(); attachExamEventsNoTimer(); }
+
+function attachExamEventsNoTimer(){
+  const wrap = document.getElementById('choicesWrap');
+  wrap.querySelectorAll('.choice-btn').forEach(btn => { btn.addEventListener('click', () => { const idx = parseInt(btn.getAttribute('data-idx'), 10); examRuntime.answers[examRuntime.currentQ] = idx; wrap.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }); });
+  
+  const prevBtn = document.getElementById('prevBtn'); if(prevBtn) prevBtn.addEventListener('click', () => { if(examRuntime.currentQ > 0){ examRuntime.currentQ--; updateExamViewOnly(); } });
+  const nextBtn = document.getElementById('nextBtn'); if(nextBtn) nextBtn.addEventListener('click', () => { if(examRuntime.currentQ < examData.length - 1){ examRuntime.currentQ++; updateExamViewOnly(); } });
+  const submitBtn = document.getElementById('submitBtn'); if(submitBtn) submitBtn.addEventListener('click', () => { const unanswered = examRuntime.answers.filter(a => a === null).length; showCustomModal('📤', 'SUBMIT EVIDENCE', unanswered > 0 ? `You have ${unanswered} missing clues.\nSubmit the case anyway?` : `All clues collected.\nClose this case now?`, (confirmed) => { if(confirmed) finishExam('submitted'); }, { confirm:true, confirmText:'SUBMIT', cancelText:'REVIEW' }); });
+  const overviewBtn = document.getElementById('overviewBtn'); if(overviewBtn) overviewBtn.addEventListener('click', showOverviewModal);
+  
+  syncExamTimerDisplay();
+}
+
+function startExamTimer(){
+  if(examRuntime.timerHandle) clearInterval(examRuntime.timerHandle);
+  examRuntime.timerHandle = setInterval(() => {
+    examRuntime.timeLeft--; syncExamTimerDisplay();
+    if(examRuntime.timeLeft <= 0){ clearInterval(examRuntime.timerHandle); finishExam('timeout'); }
+  }, 1000);
+}
+function syncExamTimerDisplay(){
+  const el = document.getElementById('examTimer'); if(!el) return;
+  el.textContent = fmtTime(examRuntime.timeLeft);
+  if(examRuntime.timeLeft <= 60) el.classList.add('timer-critical');
+}
+
+// ---------- SCORING & SUBMISSION ----------
+function finishExam(reason){
+  if(examRuntime.timerHandle) clearInterval(examRuntime.timerHandle);
+  closeModal();
+
+  let raw = 0;
+  const logs = examData.map((q, i) => {
+    const userAns = examRuntime.answers[i];
+    const correct = userAns === q.ans;
+    if(correct) raw++;
+    return { q: q.q, choices: q.choices, userAns, correctAns: q.ans, correct, exp: q.exp };
+  });
+
+  const passed = raw >= PASS_RAW_SCORE;
+  let st = currentStudentState();
+  let coresLeft = session.isAdmin ? MAX_LIVES : st.lives;
+  let statusOut = 'active';
+  let finalScoreDisplay;
+
+  if(passed){
+    finalScoreDisplay = CAPPED_PASS_SCORE; statusOut = 'passed';
+    if(!session.isAdmin){ st.status = 'passed'; st.lastScoreDisplay = finalScoreDisplay; st.cooldownEnd = null; saveState(session.studentId, st); }
+  } else {
+    finalScoreDisplay = `${raw} / ${TOTAL_QUESTIONS} (FAILED)`;
+    if(!session.isAdmin){
+      st.lives = Math.max(0, st.lives - 1); coresLeft = st.lives;
+      if(st.lives <= 0){ st.status = 'locked'; st.cooldownEnd = null; statusOut = 'locked'; }
+      else { st.status = 'active'; st.cooldownEnd = Date.now() + COOLDOWN_SEC * 1000; statusOut = 'cooldown'; }
+      saveState(session.studentId, st);
+    } else { statusOut = 'admin_fail_ignored'; }
+  }
+
+  examRuntime.lastResult = { raw, passed, reason, logs, finalScoreDisplay, coresLeft, statusOut, submittedAt: new Date().toISOString() };
+
+  if(SCRIPT_URL && SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE'){
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentId: session.studentId, studentName: session.studentName, rawScore: raw, finalCappedScore: passed ? CAPPED_PASS_SCORE : `${raw} / ${TOTAL_QUESTIONS}`, coresLeft: coresLeft, status: statusOut })
+    }).catch(err => console.error('[MIA] Failed to submit result:', err));
+  }
+
+  session.phase = 'result';
+  render();
+  
+  if(passed) fireConfetti(); 
+}
+
+// ================= PHASE: RESULT =================
+function renderResult(){
+  const r = examRuntime.lastResult;
+  if(!r){ session.phase = 'dashboard'; return renderDashboard(); }
+
+  const reasonNote = { submitted: '', timeout: '<p class="text-xs font-bold text-red-600 mt-2 uppercase">⏱ Time Expired (Auto-Submit)</p>' }[r.reason] || '';
+
+  let mainBlock;
+  if(r.passed){
+    mainBlock = `
+      <div class="text-center py-4">
+        <div class="text-6xl mb-3 font-retro">🏆</div>
+        <h2 class="font-retro text-2xl md:text-3xl text-teal-dark tracking-widest mb-2 uppercase">CASE CLOSED SUCCESSFULLY</h2>
+        <p class="text-sm font-medium text-brown/60 mb-4">Final Evaluation Score</p>
+        <div class="font-retro text-5xl text-teal-dark tracking-wider mb-2 drop-shadow-sm">${CAPPED_PASS_SCORE}</div>
+        <p class="text-xs font-bold text-brown/50 mb-6 uppercase">(Raw performance: ${r.raw} / ${TOTAL_QUESTIONS})</p>
+        <div class="flex justify-center mt-4 border-t-2 border-brown/20 pt-6">
+          <button onclick="openCert('retest')" class="btn-agent w-full py-4 rounded-md font-retro text-lg tracking-widest uppercase">Print License ➔</button>
+        </div>
+        ${reasonNote}
+      </div>`;
+  } else {
+    const lockedNow = r.statusOut === 'locked';
+    mainBlock = `
+      <div class="text-center py-4">
+        <div class="text-6xl mb-3 font-retro">${lockedNow ? '🚨' : '❌'}</div>
+        <h2 class="font-retro text-2xl md:text-3xl text-red-600 tracking-widest mb-2 uppercase">${lockedNow ? 'LICENSE REVOKED' : 'INVESTIGATION FAILED'}</h2>
+        <p class="text-sm font-medium text-brown/70 mb-1">Score: <span class="text-red-600 font-bold">${r.raw} / ${TOTAL_QUESTIONS}</span> (Target: 28)</p>
+        <p class="text-xs font-bold text-brown/50 mb-3 uppercase">1 Permit Confiscated</p>
+        <div class="flex gap-2 justify-center mb-4">${renderCores(r.coresLeft)}</div>
+        ${lockedNow ? '<p class="text-xs text-red-600 font-bold tracking-wide mt-2 uppercase">CONTACT CHIEF (T. Ploy) IMMEDIATELY.</p>' : '<p class="text-xs font-bold text-burnt-orange mt-2 uppercase">System will enter 15:00 cooldown before retry.</p>'}
+        ${reasonNote}
+      </div>`;
+  }
+
+  return `
+  <div class="w-full max-w-2xl mt-4 fade-in pb-10">
+    <div class="panel p-6 md:p-8 mb-5">
+      ${mainBlock}
+    </div>
+    <div class="flex gap-3">
+      <button id="viewLogsBtn" class="btn-ghost flex-1 py-3 rounded-md text-sm font-bold tracking-widest uppercase text-teal-dark">📋 View Case Logs</button>
+      <button id="backToDashBtn" class="btn-agent flex-1 py-3 rounded-md text-sm font-bold tracking-widest uppercase">Return to HQ</button>
+    </div>
+    <div id="logsPanel" class="mt-5 hidden"></div>
+  </div>`;
+}
+
+function attachResultEvents(){
+  const backBtn = document.getElementById('backToDashBtn'); backBtn.addEventListener('click', () => { session.phase = 'dashboard'; render(); });
+  const logsBtn = document.getElementById('viewLogsBtn');
+  logsBtn.addEventListener('click', () => {
+    const panel = document.getElementById('logsPanel');
+    if(panel.classList.contains('hidden')){ panel.innerHTML = renderLogs(); panel.classList.remove('hidden'); logsBtn.textContent = '📋 HIDE LOGS'; }
+    else { panel.classList.add('hidden'); panel.innerHTML = ''; logsBtn.textContent = '📋 VIEW CASE LOGS'; }
+  });
+}
+
+function renderLogs(){
+  const r = examRuntime.lastResult;
+  const rows = r.logs.map((entry, i) => {
+    const userLabel = entry.userAns === null ? '<span class="text-red-600 font-bold italic">No answer</span>' : `${String.fromCharCode(65+entry.userAns)}. ${entry.choices[entry.userAns]}`;
+    let extra = '';
+    if(!entry.correct){
+      if(session.isAdmin){ extra = `<p class="text-sm text-teal-dark font-bold mt-2">Correct: ${String.fromCharCode(65+entry.correctAns)}. ${entry.choices[entry.correctAns]}</p>`; }
+      else { extra = `<p class="text-sm text-burnt-orange font-bold mt-2 bg-manila-dark p-2 rounded-md">💡 Detective Hint: ${entry.exp}</p>`; }
+    }
+    return `<div class="${entry.correct ? 'log-row-correct' : 'log-row-wrong'} bg-white border-2 border-brown/20 rounded-md p-4 mb-3 shadow-sm"><p class="text-xs font-bold text-brown/60 mb-2 uppercase">Clue ${i+1}</p><div class="text-sm font-medium text-brown mb-3 whitespace-pre-line">${entry.q}</div><p class="text-sm font-medium text-brown/80 bg-gray-50 p-2 rounded border border-gray-200">Your answer: ${userLabel} ${entry.correct ? '<span class="text-teal font-bold ml-2">✔ CORRECT</span>' : '<span class="text-red-600 font-bold ml-2">✘ INCORRECT</span>'}</p>${extra}</div>`;
+  }).join('');
+  return `<div class="panel p-4 max-h-[500px] overflow-y-auto bg-manila"><h3 class="font-retro text-base text-teal-dark tracking-wide mb-4 border-b-2 border-brown/20 pb-2 uppercase">EVIDENCE REVIEW ${session.isAdmin ? '(ADMIN MODE)' : ''}</h3>${rows}</div>`;
+}
+
+// ---------- INIT ----------
+render();
+</script>
+</body>
+</html>
