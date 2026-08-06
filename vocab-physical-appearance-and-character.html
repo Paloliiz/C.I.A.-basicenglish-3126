@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>M.I.A: Vocabulary Protocol</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Fredoka:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mustard: #eab308;
+    --mustard-dark: #ca8a04;
+    --burnt-orange: #ea580c;
+    --teal: #14b8a6;
+    --teal-dark: #0f766e;
+    --brown: #451a03;
+    --manila: #fef3c7;
+    --manila-dark: #fde68a;
+  }
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  body { 
+    background: var(--manila); 
+    color: var(--brown); 
+    font-family: 'Kanit', sans-serif; 
+    min-height: 100vh;
+    background-image: repeating-linear-gradient(45deg, rgba(69, 26, 3, 0.03) 0px, rgba(69, 26, 3, 0.03) 2px, transparent 2px, transparent 8px); 
+  }
+  .font-retro { font-family: 'Fredoka', sans-serif; }
+  .font-type { font-family: 'Special Elite', monospace; }
+
+  .panel {
+    background-color: #fff;
+    border: 4px solid var(--brown);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0px var(--brown);
+  }
+
+  .btn-agent {
+    font-family: 'Fredoka', sans-serif;
+    background-color: var(--teal);
+    color: #fff;
+    border: 3px solid var(--brown);
+    border-radius: 8px;
+    box-shadow: 4px 4px 0px var(--brown);
+    transition: all 0.1s ease-in-out;
+  }
+  .btn-agent:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+  
+  .btn-ghost { 
+    background-color: #f8fafc; color: var(--brown); 
+    border: 3px solid var(--brown); border-radius: 8px; 
+    box-shadow: 4px 4px 0px var(--brown); transition: all 0.1s; 
+  }
+  .btn-ghost:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+  .input-terminal {
+    background: #fff; border: 3px solid var(--brown); color: var(--brown);
+    font-family: 'Fredoka', sans-serif; letter-spacing: 0.1em;
+    box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+  }
+  .input-terminal:focus { outline: none; border-color: var(--teal); }
+
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Game specific */
+  .btn-folder { font-family: 'Fredoka', sans-serif; font-weight: 600; border: 3px solid var(--brown); border-radius: 8px; box-shadow: 4px 4px 0px var(--brown); transition: all 0.1s ease-in-out; color: white; }
+  .btn-folder:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+  
+  .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+  /* Vocab list specific */
+  .vocab-card { background: #fff; border: 3px solid var(--brown); border-radius: 8px; padding: 12px; box-shadow: 4px 4px 0px rgba(69, 26, 3, 0.15); position: relative; }
+  .tag-pos { background: var(--teal); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-family: 'Fredoka', sans-serif; border: 1.5px solid var(--brown); }
+  table th, table td { border: 2px solid var(--brown); padding: 8px; font-size: 14px; text-align: center; }
+</style>
+</head>
+<body class="flex flex-col items-center justify-start px-4 py-6 md:py-10">
+
+  <!-- ชุดไฟล์เสียง (ซ่อนไว้ไม่ให้แสดงบนจอ) -->
+  <audio id="sfxCorrect" src="https://assets.mixkit.co/sfx/preview/mixkit-animated-small-pop-2462.mp3" preload="auto"></audio>
+  <audio id="sfxWrong" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3" preload="auto"></audio>
+
+  <div id="app" class="w-full max-w-3xl"></div>
+
+<script>
+// ================= DATA & CONFIG =================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfuchlHZ_L6URWZBDvU5RqTIVU3s9ShsKN-oEG8PGO5pFF10Ae5QnEhzu2qoPj49T7_A/exec';
+
+const studentDB = {
+  "12514": { name: "เด็กชายกลวัชร สิงขรณ์" }, "12515": { name: "เด็กชายก้องภพ เอ้ยวัน" }, "12517": { name: "เด็กชายเด็นนี่ คิง" },
+  "12518": { name: "เด็กชายทัศภูมิ ด่านลัดต้อน" }, "12519": { name: "เด็กชายธนกฤต ปัดนา" }, "12520": { name: "เด็กชายธันวา เพ็ชรเงิน" },
+  "12521": { name: "เด็กชายธีรภัทร์ ยาคำ" }, "12522": { name: "เด็กชายปัญญาพล คณาญาติ" }, "12523": { name: "เด็กชายพรหมพิทักษ์ บุญสร้าง" },
+  "12524": { name: "เด็กชายพีรณัฐ ยอดโพธิ์" }, "12525": { name: "เด็กชายพีรพัฒน์ เก่าด่านจาก" }, "12526": { name: "เด็กชายภูรินท์ โงนสาย" },
+  "12527": { name: "เด็กชายวรโชติ ศรีม่วงกลาง" }, "12528": { name: "เด็กชายศรัณย์ พิพัฒน์จรูญกุล" }, "12529": { name: "เด็กชายศิวกร เทียมโสภา" },
+  "12530": { name: "เด็กชายสิทธิกร เพชรแท้" }, "12531": { name: "เด็กชายสุรบดี คำผาย" }, "12532": { name: "เด็กชายหัฎฐกร ซับจันทึก" },
+  "12533": { name: "เด็กชายอัสนี ภัสสรรัชนีกร" }, "13054": { name: "เด็กชายจิรภาส ศรีเมือง" }, "12534": { name: "เด็กหญิงกุลณัชญา ดวงเนตร" },
+  "12535": { name: "เด็กหญิงจิราภรณ์ สาวิสิทธิ์" }, "12536": { name: "เด็กหญิงชนิดา ทัศนา" }, "12537": { name: "เด็กหญิงณัฐชภัทร ปลั่งกลาง" },
+  "12538": { name: "เด็กหญิงธัญชนก ชำนาญ" }, "12539": { name: "เด็กหญิงนงนภัส มิทะลา" }, "12540": { name: "เด็กหญิงปภาวรินทร์ สีหลิ่ง" },
+  "12541": { name: "เด็กหญิงปิยธิดา แก้วแก่นคูณ" }, "12542": { name: "เด็กหญิงภัทรมน อานุการ" }, "12544": { name: "เด็กหญิงรัตนาภรณ์ ทูคำมี" },
+  "12545": { name: "เด็กหญิงรวิสรา ทำกินดี" }, "12546": { name: "เด็กหญิงวารุณี จิว" }, "12548": { name: "เด็กหญิงสุทธาทิพย์ ดีพรหม" },
+  "12549": { name: "เด็กหญิงสุภัสสรา สุขสำราญ" }, "12550": { name: "เด็กหญิงเสาวนีย์ ไชยนคร" }, "13074": { name: "เด็กหญิงกานต์สินี เหล็กสงษ์" },
+  "12551": { name: "เด็กชายทินภัทร เทพรักษา" }, "12552": { name: "เด็กชายธนวัฒน์ ไชยรักษ์" }, "12553": { name: "เด็กชายปัณณวัฒน์ ชาลีเปรี่ยม" },
+  "12554": { name: "เด็กชายพุฒธิพงษ์ ฆ้องชะฎา" }, "12555": { name: "เด็กชายรัชต์พล มหาโยธี" }, "12556": { name: "เด็กชายวรเมธ ไพลเถื่อน" },
+  "12557": { name: "เด็กชายสิทธิชัย นามธรรม" }, "12558": { name: "เด็กชายอนันดา ธรรมวงศ์" }, "12559": { name: "เด็กชายอนันต์ยศ ผุสดี" },
+  "12561": { name: "เด็กหญิงกัลยกร เจริญภูมิ" }, "12562": { name: "เด็กหญิงชนิตา สวัสดี" }, "12563": { name: "เด็กหญิงณัฐธิดา มาวิเศษ" },
+  "12564": { name: "เด็กหญิงเทวิกา พัสดร" }, "12565": { name: "เด็กหญิงธนภรณ์ เหมือนอินทร์" }, "12566": { name: "เด็กหญิงธนารีย์ บุญเย็น" },
+  "12567": { name: "เด็กหญิงเบญจาวรรณ ชื่นจิตร" }, "12568": { name: "เด็กหญิงปวีณา บุญร่วม" }, "12569": { name: "เด็กหญิงพัชราภา วิเศษ" },
+  "12570": { name: "เด็กหญิงรุจิรดา ชาญสูงเนิน" }, "12571": { name: "เด็กหญิงวนิดา แสงคำ" }, "12572": { name: "เด็กหญิงวรกานต์ กัลยา" },
+  "12573": { name: "เด็กหญิงวรดา กลางนอก" }, "12574": { name: "เด็กหญิงวรรณดา หอศิลป์" }, "12575": { name: "เด็กหญิงวรัณญา พรรคทิง" },
+  "12576": { name: "เด็กหญิงวสุธัญ ชื่นบาน" }, "12577": { name: "เด็กหญิงสิริญากร พนังศรี" }, "12578": { name: "เด็กหญิงสุปรียา จันทนา" },
+  "12579": { name: "เด็กหญิงสุพรรษา เกตุสวย" }, "12580": { name: "เด็กหญิงสุมิตรา สิทธิไกรพงษ์" }, "12581": { name: "เด็กหญิงอัฐภิญญา เพ็ชรนิล" },
+  "12582": { name: "เด็กหญิงอิสริยา จากครบุรี" }, "12583": { name: "เด็กหญิงขวัญชีวา บุตรจันทา" }, "12585": { name: "เด็กหญิงชัญญา พนมสัก" },
+  "12586": { name: "เด็กหญิงธัญญาภรณ์ ไพพร" }, "13055": { name: "นางสาวตรีสรา พานแก้ว" }
+};
+
+const masterVocab = [
+  { word: "oval", pos: "adj.", eng: "shaped like an egg", thai: "รูปไข่", cat: "FACE" },
+  { word: "round", pos: "adj.", eng: "shaped like a circle", thai: "กลม", cat: "FACE" },
+  { word: "fair", pos: "adj.", eng: "light-coloured", thai: "(ผิว/ผม) สีอ่อน, ขาว", cat: "HAIR" },
+  { word: "spiky", pos: "adj.", eng: "having one or more sharp points", thai: "(ผม) ตั้งชี้แหลม", cat: "HAIR" },
+  { word: "wavy", pos: "adj.", eng: "(for hair) having curves", thai: "(ผม) หยักศก", cat: "HAIR" },
+  { word: "long", pos: "adj.", eng: "measuring a great distance", thai: "(ผม) ยาว", cat: "HAIR" },
+  { word: "curly", pos: "adj.", eng: "having curls", thai: "หยิก, เป็นลอน", cat: "HAIR" },
+  { word: "straight", pos: "adj.", eng: "not curled or curved", thai: "(ผม) ตรง", cat: "HAIR" },
+  { word: "dark", pos: "adj.", eng: "having a dark colour", thai: "(ผิว/ผม) เข้ม, คล้ำ", cat: "HAIR" },
+  { word: "moustache", pos: "n.", eng: "hair grown on a man's upper lip", thai: "หนวด", cat: "SPECIAL FEATURES" },
+  { word: "beard", pos: "n.", eng: "hair on the lower part of a man's face", thai: "เครา", cat: "SPECIAL FEATURES" },
+  { word: "freckles", pos: "n.", eng: "small light brown spots on the skin", thai: "รอยกระ", cat: "SPECIAL FEATURES" },
+  { word: "wrinkles", pos: "n.", eng: "lines on the skin", thai: "รอยย่น, ริ้วรอย", cat: "SPECIAL FEATURES" },
+  { word: "short", pos: "adj.", eng: "not tall or not long", thai: "เตี้ย, สั้น", cat: "HEIGHT" },
+  { word: "of medium height", pos: "phr.", eng: "not too short and not too tall", thai: "ส่วนสูงปานกลาง", cat: "HEIGHT" },
+  { word: "tall", pos: "adj.", eng: "of more than average height", thai: "สูง", cat: "HEIGHT" },
+  { word: "plump", pos: "adj.", eng: "quite fat, chubby", thai: "ท้วม, จ้ำม่ำ", cat: "BUILD" },
+  { word: "well built", pos: "adj.", eng: "big and strong", thai: "รูปร่างดี, กำยำ", cat: "BUILD" },
+  { word: "slim", pos: "adj.", eng: "attractively thin", thai: "หุ่นดี, ผอมบาง", cat: "BUILD" },
+  { word: "fat", pos: "adj.", eng: "having a lot of flesh on the body", thai: "อ้วน", cat: "BUILD" },
+  { word: "small", pos: "adj.", eng: "not large in size", thai: "เล็ก, ตัวเล็ก", cat: "BUILD" },
+  { word: "thin", pos: "adj.", eng: "not fat", thai: "ผอม", cat: "BUILD" },
+  { word: "overweight", pos: "adj.", eng: "too heavy or fat", thai: "น้ำหนักเกิน", cat: "BUILD" },
+  { word: "skinny", pos: "adj.", eng: "very thin", thai: "ผอมแห้ง", cat: "BUILD" },
+  { word: "old", pos: "adj.", eng: "not young", thai: "แก่, มีอายุ", cat: "AGE" },
+  { word: "in her late twenties", pos: "phr.", eng: "between 25-30 years old", thai: "อายุยี่สิบปลายๆ", cat: "AGE" },
+  { word: "in his early thirties", pos: "phr.", eng: "between 30-34 years old", thai: "อายุสามสิบต้นๆ", cat: "AGE" },
+  { word: "teenager", pos: "n.", eng: "a person aged between 13-19", thai: "วัยรุ่น", cat: "AGE" },
+  { word: "in his mid forties", pos: "phr.", eng: "around 44-46 years old", thai: "อายุสี่สิบกลางๆ", cat: "AGE" },
+  { word: "middle-aged", pos: "adj.", eng: "in the middle of their life", thai: "วัยกลางคน", cat: "AGE" },
+  { word: "easy-going", pos: "adj.", eng: "relaxed, carefree", thai: "สบายๆ, ง่ายๆ", cat: "CHARACTER" },
+  { word: "honest", pos: "adj.", eng: "truthful", thai: "ซื่อสัตย์", cat: "CHARACTER" },
+  { word: "sensitive", pos: "adj.", eng: "easily hurt and cries easily", thai: "อ่อนไหวง่าย", cat: "CHARACTER" },
+  { word: "reserved", pos: "adj.", eng: "shy, quiet", thai: "สงวนท่าที, เก็บตัว", cat: "CHARACTER" },
+  { word: "rude", pos: "adj.", eng: "impolite", thai: "หยาบคาย", cat: "CHARACTER" },
+  { word: "shy", pos: "adj.", eng: "not confident", thai: "ขี้อาย", cat: "CHARACTER" },
+  { word: "outgoing", pos: "adj.", eng: "sociable", thai: "ชอบเข้าสังคม", cat: "CHARACTER" },
+  { word: "patient", pos: "adj.", eng: "calm, able to wait", thai: "อดทน, ใจเย็น", cat: "CHARACTER" },
+  { word: "polite", pos: "adj.", eng: "showing good manners", thai: "สุภาพ", cat: "CHARACTER" }
+];
+
+const categories = ["FACE", "HAIR", "SPECIAL FEATURES", "HEIGHT", "BUILD", "AGE", "CHARACTER"];
+const colorPalette = ['#3b82f6', '#ef4444', '#8b5cf6', '#ec4899', '#f59e0b', '#d946ef', '#84cc16']; 
+
+// ================= STATE =================
+let session = { id: null, name: null, phase: 'login', isAdmin: false };
+let game = { queue: [], currentIdx: 0, errors: 0, results: {} };
+
+function render() {
+  const app = document.getElementById('app');
+  if(session.phase === 'login') app.innerHTML = getLoginHTML();
+  else if(session.phase === 'dashboard') app.innerHTML = getDashboardHTML();
+  else if(session.phase === 'vocab') app.innerHTML = getVocabHTML();
+  else if(session.phase === 'sorting') app.innerHTML = getSortingHTML();
+  else if(session.phase === 'summary') app.innerHTML = getSummaryHTML();
+}
+
+// ---------------- LOGIN ----------------
+function getLoginHTML() {
+  return `
+  <div class="fade-in max-w-md mx-auto mt-6">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-burnt-orange"></span><span class="text-xs tracking-[0.2em] text-burnt-orange font-bold uppercase">M.I.A. Protocol</span></div>
+      <h1 class="font-retro text-5xl md:text-6xl font-bold text-teal-dark tracking-wider drop-shadow-md">LOGIN</h1>
+      <p class="text-sm text-brown font-bold mt-1 tracking-wide uppercase">Lifestyles Unit</p>
+    </div>
+    <div class="panel p-6 md:p-8 text-center">
+      <label class="block text-xs text-brown/80 mb-1 font-bold tracking-wide uppercase">Badge No. (รหัสนักเรียน / รหัสครู)</label>
+      <input id="loginId" maxlength="5" inputmode="numeric" placeholder="•••••" class="input-terminal w-full rounded-md px-4 py-3 mb-4 text-lg tracking-[0.3em] font-bold text-center" />
+      <label class="block text-xs text-brown/80 mb-1 font-bold tracking-wide uppercase">First Name (ชื่อจริงภาษาไทย)</label>
+      <input id="loginName" placeholder="ไม่ต้องใส่ ด.ช./ด.ญ." class="input-terminal w-full rounded-md px-4 py-3 mb-2 text-base text-center font-bold" />
+      <p id="loginError" class="text-xs font-bold text-red-600 min-h-[1.2rem] mb-2"></p>
+      <button onclick="attemptLogin()" class="btn-agent w-full py-4 rounded-md mt-2 font-retro text-lg tracking-widest uppercase">ENTER SYSTEM</button>
+    </div>
+  </div>`;
+}
+
+function attemptLogin() {
+  const id = document.getElementById('loginId').value.trim();
+  const name = document.getElementById('loginName').value.trim();
+  const err = document.getElementById('loginError');
+  
+  if(!id || !name) { err.textContent = 'กรุณากรอกข้อมูลให้ครบถ้วน'; return; }
+
+  if(id === '7238' && name === 'พะโล้') {
+    session.id = id; 
+    session.name = 'พะโล้';
+    session.isAdmin = true;
+    session.phase = 'dashboard'; 
+    render();
+    return;
+  }
+
+  if(id.length !== 5 || !studentDB[id]) { err.textContent = 'ไม่พบรหัสนักเรียนในระบบ'; return; }
+  if(!studentDB[id].name.includes(name)) { err.textContent = 'ชื่อไม่ตรงกับรหัสนักเรียน'; return; }
+  
+  session.id = id; 
+  session.name = studentDB[id].name;
+  session.isAdmin = false;
+  session.phase = 'dashboard'; 
+  render();
+}
+
+// ---------------- DASHBOARD ----------------
+function getDashboardHTML() {
+  const badgeTitle = session.isAdmin 
+    ? '<span class="text-burnt-orange font-black ml-1">[CHIEF INSPECTOR]</span>' 
+    : '';
+
+  return `
+  <div class="fade-in">
+    <div class="text-center mb-6">
+      <h1 class="font-retro text-4xl font-bold text-teal-dark uppercase">Mission Hub</h1>
+      <p class="text-sm font-bold text-brown/60 mt-1 uppercase">Welcome, ${session.name} ${badgeTitle}</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="panel p-6 text-center hover:-translate-y-1 transition-transform cursor-pointer" onclick="goToPhase('vocab')">
+        <div class="text-6xl mb-4">📚</div>
+        <h2 class="font-retro text-xl text-burnt-orange uppercase">Vocab Database</h2>
+        <p class="text-sm font-medium text-brown/70 mt-2">ค้นหาความหมายและฟังเสียงคำศัพท์ทั้ง ${masterVocab.length} คำ</p>
+      </div>
+      <div class="panel p-6 text-center hover:-translate-y-1 transition-transform cursor-pointer border-4 border-teal-dark" onclick="startSortingGame()">
+        <div class="text-6xl mb-4">🕵️‍♂️</div>
+        <h2 class="font-retro text-xl text-teal uppercase">Sorting Mission</h2>
+        <p class="text-sm font-medium text-brown/70 mt-2">ทำภารกิจแยกแฟ้มคำศัพท์เพื่อจดลงใบงาน (มีการบันทึกคะแนน)</p>
+      </div>
+    </div>
+    <div class="mt-6 text-center">
+      <button onclick="logout()" class="btn-ghost px-6 py-2 rounded font-bold text-sm uppercase">Log Out</button>
+    </div>
+  </div>`;
+}
+
+function goToPhase(phase) { session.phase = phase; render(); }
+function logout() { session.id = null; session.name = null; session.isAdmin = false; session.phase = 'login'; render(); }
+
+// ---------------- VOCAB DB ----------------
+function getVocabHTML() {
+  setTimeout(() => renderVocabList(masterVocab), 10);
+  return `
+  <div class="fade-in">
+    <button onclick="goToPhase('dashboard')" class="btn-ghost px-4 py-2 rounded text-sm font-bold mb-4">◄ กลับหน้าหลัก</button>
+    <div class="text-center mb-4">
+      <h1 class="font-retro text-3xl font-bold text-teal uppercase">Vocab Database</h1>
+    </div>
+    <input type="text" id="searchInput" onkeyup="filterVocab(this.value)" class="input-terminal w-full rounded-md px-4 py-3 mb-6 font-bold" placeholder="🔍 ค้นหาคำศัพท์ หรือ ความหมายไทย...">
+    <div id="vocabContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>`;
+}
+
+function renderVocabList(data) {
+  const container = document.getElementById('vocabContainer');
+  container.innerHTML = data.map(item => `
+    <div class="vocab-card flex justify-between items-start">
+      <div>
+        <h2 class="font-retro text-xl text-teal-dark mb-1">${item.word} <span class="tag-pos ml-1">${item.pos}</span></h2>
+        <p class="text-sm font-medium text-brown/70 font-type">${item.eng}</p>
+        <p class="text-sm font-bold text-burnt-orange mt-1">${item.thai}</p>
+      </div>
+      <button class="bg-mustard border-2 border-brown rounded w-10 h-10 flex items-center justify-center font-bold text-lg hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#451a03]" onclick="speak('${item.word}')">🔊</button>
+    </div>
+  `).join('');
+}
+function filterVocab(str) {
+  const q = str.toLowerCase();
+  const filtered = masterVocab.filter(i => i.word.toLowerCase().includes(q) || i.thai.includes(q) || i.eng.toLowerCase().includes(q));
+  renderVocabList(filtered);
+}
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+}
+
+// ---------------- SORTING GAME ----------------
+function startSortingGame() {
+  game.queue = [...masterVocab].sort(() => Math.random() - 0.5);
+  game.currentIdx = 0; game.errors = 0;
+  game.results = { "FACE": [], "HAIR": [], "SPECIAL FEATURES": [], "HEIGHT": [], "BUILD": [], "AGE": [], "CHARACTER": [] };
+  session.phase = 'sorting'; render();
+}
+
+function getSortingHTML() {
+  const w = game.queue[game.currentIdx];
+  const currentColors = [...colorPalette].sort(() => Math.random() - 0.5);
+
+  return `
+  <div class="fade-in w-full max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-4 font-type font-bold text-sm">
+      <div class="bg-white border-2 border-brown px-3 py-1 rounded">EVIDENCE: ${game.currentIdx}/${game.queue.length}</div>
+      <div class="bg-mustard border-2 border-brown px-3 py-1 rounded">ERRORS: <span class="text-red-600">${game.errors}</span></div>
+    </div>
+    <div class="panel p-8 text-center mb-6 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] relative" id="wordPanel">
+      <p class="text-xs font-bold text-brown/50 tracking-widest uppercase mb-2">Current Evidence</p>
+      <h2 class="font-type text-4xl md:text-5xl font-bold text-burnt-orange tracking-wider">${w.word}</h2>
+    </div>
+    <p class="text-center text-sm font-bold text-brown/70 mb-3 uppercase">Select the correct folder</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+      <button class="btn-folder py-4" style="background-color: ${currentColors[0]}" onclick="checkSort('FACE')">FACE</button>
+      <button class="btn-folder py-4" style="background-color: ${currentColors[1]}" onclick="checkSort('HAIR')">HAIR</button>
+      <button class="btn-folder py-4" style="background-color: ${currentColors[2]}" onclick="checkSort('SPECIAL FEATURES')">SPECIAL FEATURES</button>
+      <button class="btn-folder py-4" style="background-color: ${currentColors[3]}" onclick="checkSort('HEIGHT')">HEIGHT</button>
+      <button class="btn-folder py-4" style="background-color: ${currentColors[4]}" onclick="checkSort('BUILD')">BUILD</button>
+      <button class="btn-folder py-4" style="background-color: ${currentColors[5]}" onclick="checkSort('AGE')">AGE</button>
+      <button class="btn-folder py-4 md:col-span-3 lg:col-span-1" style="background-color: ${currentColors[6]}" onclick="checkSort('CHARACTER')">CHARACTER</button>
+    </div>
+  </div>`;
+}
+
+function checkSort(cat) {
+  const w = game.queue[game.currentIdx];
+  if (w.cat === cat) {
+    // เล่นเสียงตอบถูก
+    const sndCorrect = document.getElementById('sfxCorrect');
+    sndCorrect.currentTime = 0;
+    sndCorrect.play().catch(e => console.log("Audio blocked:", e));
+
+    game.results[cat].push(w.word);
+    game.currentIdx++;
+    if (game.currentIdx >= game.queue.length) finishSorting();
+    else render();
+  } else {
+    // เล่นเสียงตอบผิด
+    const sndWrong = document.getElementById('sfxWrong');
+    sndWrong.currentTime = 0;
+    sndWrong.play().catch(e => console.log("Audio blocked:", e));
+
+    game.errors++;
+    const panel = document.getElementById('wordPanel');
+    panel.classList.remove('shake'); void panel.offsetWidth; panel.classList.add('shake');
+    render();
+  }
+}
+
+function finishSorting() {
+  fetch(SCRIPT_URL, { 
+    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      studentId: session.id, 
+      studentName: session.name, 
+      rawScore: game.errors, 
+      finalCappedScore: 'Completed', 
+      status: 'vocab_sorting_done',
+      sheetName: 'คะแนนนักเรียน'
+    })
+  }).catch(e => console.log('Log error:', e));
+
+  session.phase = 'summary'; render();
+  setTimeout(() => {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#eab308', '#ea580c', '#14b8a6'] });
+  }, 100);
+}
+
+// ---------------- SUMMARY TABLE ----------------
+function getSummaryHTML() {
+  let maxRows = 0;
+  categories.forEach(c => { if(game.results[c].length > maxRows) maxRows = game.results[c].length; });
+  let rows = '';
+  for(let i=0; i<maxRows; i++){
+    rows += '<tr>' + categories.map(c => `<td>${game.results[c][i] || ''}</td>`).join('') + '</tr>';
+  }
+
+  return `
+  <div class="fade-in w-full max-w-4xl mx-auto pb-10">
+    <div class="panel p-6 bg-white">
+      <div class="text-center mb-4">
+        <div class="text-5xl mb-2">🏆</div>
+        <h2 class="font-retro text-2xl text-teal tracking-widest uppercase">MISSION COMPLETED!</h2>
+        <p class="text-sm font-bold text-brown/70 mt-2">นักสืบ ${session.name} ทำภารกิจสำเร็จ (กดผิด ${game.errors} ครั้ง)<br>ระบบได้บันทึกชื่อเรียบร้อยแล้ว ลอกตารางนี้ลงใบงานได้เลยครับ!</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-center bg-manila/30">
+          <thead>
+            <tr class="bg-mustard text-white">
+              <th style="background-color: #3b82f6;">FACE</th>
+              <th style="background-color: #ef4444;">HAIR</th>
+              <th style="background-color: #8b5cf6;">SPECIAL FEATURES</th>
+              <th style="background-color: #ec4899;">HEIGHT</th>
+              <th style="background-color: #f59e0b;">BUILD</th>
+              <th style="background-color: #d946ef;">AGE</th>
+              <th style="background-color: #84cc16;">CHARACTER</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="flex gap-4 mt-6">
+        <button onclick="goToPhase('dashboard')" class="btn-ghost flex-1 py-3 font-bold uppercase rounded-lg">Return to HQ</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---------------- INIT ----------------
+render();
+</script>
+</body>
+</html>
