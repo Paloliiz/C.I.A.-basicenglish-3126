@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ข้อสอบจำลอง — SPARK 3 Review</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">S3</span><span>SPARK 3 Review<small>ทบทวนภาษาอังกฤษ ม.3</small></span></a>
+    <nav class="desktop-nav">
+      <a href="index.html" data-nav="index.html">หน้าแรก</a>
+      <a href="review.html" data-nav="review.html">ทบทวนเนื้อหา</a>
+      <a href="quiz.html" data-nav="quiz.html">ฝึกทำโจทย์</a>
+      <a href="exam.html" data-nav="exam.html">สอบจำลอง</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="pagehead">
+    <h1 id="exam-title">ข้อสอบจำลอง</h1>
+    <p id="exam-subtitle"></p>
+  </div>
+
+  <section id="setup-screen" class="quiz-wrap">
+    <div class="card" style="padding:20px;margin-bottom:18px;">
+      <h3 style="margin-bottom:10px;">รายละเอียดข้อสอบ</h3>
+      <div class="breakdown" id="part-summary"></div>
+    </div>
+    <div class="card" style="padding:20px;margin-bottom:22px;font-size:.9rem;color:var(--ink-soft);">
+      <b style="color:var(--ink);font-family:'Kanit',sans-serif;">คำแนะนำก่อนเริ่มสอบ</b>
+      <p style="margin:8px 0 0;">ข้อสอบชุดนี้เป็นข้อสอบคู่ขนาน ข้อคำถามแตกต่างจากข้อสอบปลายภาคจริง แต่ครอบคลุมเนื้อหาชุดเดียวกัน ระบบจะจับเวลา 60 นาที เมื่อหมดเวลาระบบจะส่งคำตอบอัตโนมัติ นักเรียนสามารถข้ามไปทำข้ออื่นก่อน แล้วย้อนกลับมาทำทีหลังได้จากตารางข้อคำถาม</p>
+    </div>
+    <div class="cta-spacer"></div>
+  </section>
+  <div class="cta-bar" id="setup-cta">
+    <div class="cta-bar-inner"><button class="btn exam block" id="start-exam">เริ่มทำข้อสอบจำลอง (60 นาที)</button></div>
+  </div>
+
+  <section id="quiz-screen" class="quiz-wrap" style="display:none;"></section>
+
+  <section id="result-screen" class="quiz-wrap" style="display:none;"></section>
+</main>
+
+<footer class="site">โรงเรียนเขาฉกรรจ์วิทยาคม · ข้อสอบคู่ขนานสำหรับการฝึกฝนเท่านั้น</footer>
+
+<nav class="tabbar">
+  <a href="index.html" data-nav="index.html"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>หน้าแรก</a>
+  <a href="review.html" data-nav="review.html"><svg viewBox="0 0 24 24"><path d="M4 4h11a3 3 0 013 3v13H7a3 3 0 01-3-3V4z"/><path d="M8 8h8M8 12h8"/></svg>ทบทวน</a>
+  <a href="quiz.html" data-nav="quiz.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 .5c0 1.8-2.5 1.8-2.5 3.5"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>ฝึกทำ</a>
+  <a href="exam.html" data-nav="exam.html"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>สอบจำลอง</a>
+</nav>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/quiz-engine.js"></script>
+<script>
+(function(){
+  document.getElementById("exam-title").textContent = MOCK_EXAM.title;
+  document.getElementById("exam-subtitle").textContent = MOCK_EXAM.subtitle;
+
+  const totalQ = MOCK_EXAM.parts.reduce((s,p)=>s+p.items.length,0);
+  document.getElementById("part-summary").innerHTML = MOCK_EXAM.parts.map(p=>`
+    <div class="breakdown-row"><span>${p.label}</span><b>${p.items.length} ข้อ</b></div>
+  `).join("") + `<div class="breakdown-row"><span>รวมทั้งหมด</span><b>${totalQ} ข้อ · 30 คะแนน</b></div>`;
+
+  document.getElementById("start-exam").addEventListener("click", ()=>{
+    let questions = [];
+    MOCK_EXAM.parts.forEach(p=>{
+      p.items.forEach(raw=> questions.push(prepareQuestion(raw, p.label, p.color)));
+    });
+    document.getElementById("setup-screen").style.display = "none";
+    document.getElementById("setup-cta").style.display = "none";
+    const quizScreen = document.getElementById("quiz-screen");
+    quizScreen.style.display = "block";
+    createQuizEngine(quizScreen, questions, {
+      immediateFeedback: false,
+      showPalette: true,
+      timeLimitSec: 60*60,
+      onFinish: (state, qs, correctCount) => showResult(state, qs, correctCount)
+    });
+  });
+
+  function showResult(state, questions, correctCount){
+    document.getElementById("quiz-screen").style.display = "none";
+    const el = document.getElementById("result-screen");
+    el.style.display = "block";
+    const total = questions.length;
+    const scorePct = total ? (correctCount/total*100) : 0;
+    const points = (correctCount * 0.5).toFixed(1);
+    recordQuizResult("exam", scorePct);
+
+    const byPart = {};
+    questions.forEach((q,i)=>{
+      byPart[q.partLabel] = byPart[q.partLabel] || {correct:0,total:0};
+      byPart[q.partLabel].total++;
+      if (state.answers[i] === q.correct) byPart[q.partLabel].correct++;
+    });
+
+    const circumference = 2*Math.PI*66;
+    const dash = circumference * (scorePct/100);
+
+    el.innerHTML = `
+      <div class="result">
+        <h2>ผลสอบจำลอง</h2>
+        <div class="score-ring">
+          <svg viewBox="0 0 150 150">
+            <circle cx="75" cy="75" r="66" fill="none" stroke="var(--paper-alt)" stroke-width="14"/>
+            <circle cx="75" cy="75" r="66" fill="none" stroke="var(--exam)" stroke-width="14"
+              stroke-dasharray="${dash} ${circumference}" stroke-linecap="round"/>
+          </svg>
+          <div class="score-num"><b>${points}/30</b><span>${correctCount}/${total} ข้อ (${Math.round(scorePct)}%)</span></div>
+        </div>
+        <div class="breakdown">
+          ${Object.entries(byPart).map(([k,v])=>`
+            <div class="breakdown-row"><span>${k}</span><b>${v.correct}/${v.total}</b></div>
+          `).join("")}
+        </div>
+        <details style="margin-top:22px;text-align:left;">
+          <summary style="cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">ดูเฉลยรายข้อ</summary>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:20px;">
+            ${questions.map((q,i)=>{
+              const ok = state.answers[i] === q.correct;
+              return `<div class="q-card" style="padding:14px 16px;">
+                <div style="font-size:.75rem;color:var(--ink-faint);margin-bottom:4px;">${q.partLabel} · ข้อ ${i+1}</div>
+                <div style="font-weight:500;margin-bottom:8px;">${q.stem}</div>
+                ${q.options.map((opt,idx)=>{
+                  let style = "opacity:.6";
+                  if (idx===q.correct) style = "color:var(--ok);font-weight:600";
+                  else if (idx===state.answers[i] && !ok) style = "color:var(--bad);font-weight:600;text-decoration:line-through";
+                  return `<div style="font-size:.85rem;${style}">${LETTERS[idx]}. ${opt}</div>`;
+                }).join("")}
+                ${q.raw && q.raw.explain ? `<div class="explain-reason" style="margin-top:10px;"><b>หลักการ:</b> ${q.raw.explain}</div>` : ""}
+              </div>`;
+            }).join("")}
+          </div>
+        </details>
+      </div>
+      <div class="cta-spacer"></div>
+      <div class="cta-bar">
+        <div class="cta-bar-inner" style="display:flex;gap:10px;">
+          <button class="btn ghost block" id="retry-btn">ทำอีกครั้ง</button>
+          <a href="index.html" class="btn block" style="text-decoration:none;text-align:center;">กลับหน้าแรก</a>
+        </div>
+      </div>
+    `;
+    document.getElementById("retry-btn").addEventListener("click", ()=>{
+      el.style.display = "none";
+      document.getElementById("setup-screen").style.display = "block";
+      document.getElementById("setup-cta").style.display = "block";
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  }
+})();
+</script>
+</body>
+</html>

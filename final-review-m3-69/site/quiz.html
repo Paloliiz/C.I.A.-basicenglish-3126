@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ฝึกทำโจทย์ — SPARK 3 Review</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">S3</span><span>SPARK 3 Review<small>ทบทวนภาษาอังกฤษ ม.3</small></span></a>
+    <nav class="desktop-nav">
+      <a href="index.html" data-nav="index.html">หน้าแรก</a>
+      <a href="review.html" data-nav="review.html">ทบทวนเนื้อหา</a>
+      <a href="quiz.html" data-nav="quiz.html">ฝึกทำโจทย์</a>
+      <a href="exam.html" data-nav="exam.html">สอบจำลอง</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="pagehead">
+    <h1>ฝึกทำโจทย์</h1>
+    <p>เลือกหมวดและจำนวนข้อที่ต้องการฝึก ระบบจะสุ่มคำถามและสลับตัวเลือกใหม่ทุกครั้ง</p>
+  </div>
+
+  <section id="setup-screen" class="quiz-wrap">
+    <div class="setup-group">
+      <label>เลือกหมวด</label>
+      <div class="choice-row" id="pick-part">
+        <button class="choice-btn active" data-part="mixed">รวมทุกหมวด</button>
+        <button class="choice-btn" data-part="vocabulary">Vocabulary</button>
+        <button class="choice-btn" data-part="grammar">Grammar</button>
+        <button class="choice-btn" data-part="reading">Reading</button>
+      </div>
+    </div>
+    <div class="setup-group">
+      <label>เลือกหน่วยการเรียนรู้ (เลือกได้มากกว่า 1)</label>
+      <div class="choice-row" id="pick-unit">
+        <button class="choice-btn active" data-unit="all">ทุกหน่วย</button>
+        <button class="choice-btn" data-unit="starter">Starter</button>
+        <button class="choice-btn" data-unit="unit1">Unit 1</button>
+        <button class="choice-btn" data-unit="unit2">Unit 2</button>
+        <button class="choice-btn" data-unit="unit3">Unit 3</button>
+      </div>
+    </div>
+    <div class="setup-group">
+      <label>จำนวนข้อ</label>
+      <div class="choice-row" id="pick-count">
+        <button class="choice-btn" data-count="10">10 ข้อ</button>
+        <button class="choice-btn active" data-count="15">15 ข้อ</button>
+        <button class="choice-btn" data-count="25">25 ข้อ</button>
+        <button class="choice-btn" data-count="0">ทั้งหมดที่มี</button>
+      </div>
+    </div>
+    <p id="pool-info" style="color:var(--ink-faint);font-size:.85rem;"></p>
+    <div class="cta-spacer"></div>
+  </section>
+  <div class="cta-bar" id="setup-cta">
+    <div class="cta-bar-inner"><button class="btn quiz block" id="start-quiz">เริ่มฝึกทำโจทย์</button></div>
+  </div>
+
+  <section id="quiz-screen" class="quiz-wrap" style="display:none;"></section>
+
+  <section id="result-screen" class="quiz-wrap" style="display:none;"></section>
+</main>
+
+<footer class="site">โรงเรียนเขาฉกรรจ์วิทยาคม · ระบบฝึกทำโจทย์ SPARK 3 Review</footer>
+
+<nav class="tabbar">
+  <a href="index.html" data-nav="index.html"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>หน้าแรก</a>
+  <a href="review.html" data-nav="review.html"><svg viewBox="0 0 24 24"><path d="M4 4h11a3 3 0 013 3v13H7a3 3 0 01-3-3V4z"/><path d="M8 8h8M8 12h8"/></svg>ทบทวน</a>
+  <a href="quiz.html" data-nav="quiz.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 .5c0 1.8-2.5 1.8-2.5 3.5"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>ฝึกทำ</a>
+  <a href="exam.html" data-nav="exam.html"><svg viewBox="0 0 24 24"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>สอบจำลอง</a>
+</nav>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/quiz-engine.js"></script>
+<script>
+(function(){
+  const partColor = { vocabulary:"vocab", grammar:"grammar", reading:"reading" };
+  const partLabel = { vocabulary:"Vocabulary", grammar:"Grammar", reading:"Reading" };
+
+  let selPart = "mixed";
+  let selUnits = new Set(["all"]);
+  let selCount = 15;
+
+  function buildPool(){
+    let pool = [];
+    const parts = selPart === "mixed" ? ["vocabulary","grammar","reading"] : [selPart];
+    parts.forEach(p=>{
+      BANK[p].forEach(raw=>{
+        const u = raw.unit || (raw.readingId ? READING.find(r=>r.id===raw.readingId).unitKey : null);
+        if (selUnits.has("all") || (u && selUnits.has(u))){
+          pool.push(prepareQuestion(raw, partLabel[p], partColor[p]));
+        }
+      });
+    });
+    return pool;
+  }
+
+  function updatePoolInfo(){
+    const n = buildPool().length;
+    document.getElementById("pool-info").textContent = `พร้อมข้อคำถามทั้งหมด ${n} ข้อจากตัวเลือกนี้`;
+    document.getElementById("start-quiz").disabled = n === 0;
+  }
+
+  document.getElementById("pick-part").addEventListener("click", e=>{
+    const b = e.target.closest("button"); if (!b) return;
+    selPart = b.dataset.part;
+    [...e.currentTarget.children].forEach(c=>c.classList.toggle("active", c===b));
+    updatePoolInfo();
+  });
+  document.getElementById("pick-unit").addEventListener("click", e=>{
+    const b = e.target.closest("button"); if (!b) return;
+    const val = b.dataset.unit;
+    const row = e.currentTarget;
+    if (val === "all"){
+      selUnits = new Set(["all"]);
+    } else {
+      selUnits.delete("all");
+      if (selUnits.has(val)) selUnits.delete(val); else selUnits.add(val);
+      if (!selUnits.size) selUnits = new Set(["all"]);
+    }
+    [...row.children].forEach(c=>c.classList.toggle("active", selUnits.has(c.dataset.unit)));
+    updatePoolInfo();
+  });
+  document.getElementById("pick-count").addEventListener("click", e=>{
+    const b = e.target.closest("button"); if (!b) return;
+    selCount = parseInt(b.dataset.count,10);
+    [...e.currentTarget.children].forEach(c=>c.classList.toggle("active", c===b));
+    updatePoolInfo();
+  });
+  updatePoolInfo();
+
+  document.getElementById("start-quiz").addEventListener("click", ()=>{
+    let pool = shuffle(buildPool());
+    if (selCount > 0) pool = pool.slice(0, selCount);
+    if (!pool.length) return;
+    document.getElementById("setup-screen").style.display = "none";
+    document.getElementById("setup-cta").style.display = "none";
+    const quizScreen = document.getElementById("quiz-screen");
+    quizScreen.style.display = "block";
+    createQuizEngine(quizScreen, pool, {
+      immediateFeedback: true,
+      onFinish: (state, questions, correctCount) => {
+        showResult(state, questions, correctCount);
+      }
+    });
+  });
+
+  function showResult(state, questions, correctCount){
+    document.getElementById("quiz-screen").style.display = "none";
+    const el = document.getElementById("result-screen");
+    el.style.display = "block";
+    const total = questions.length;
+    const scorePct = total ? (correctCount/total*100) : 0;
+    recordQuizResult("quiz", scorePct);
+
+    const byTopic = {};
+    questions.forEach((q,i)=>{
+      const key = q.partLabel;
+      byTopic[key] = byTopic[key] || {correct:0,total:0};
+      byTopic[key].total++;
+      if (state.answers[i] === q.correct) byTopic[key].correct++;
+    });
+
+    const circumference = 2*Math.PI*66;
+    const dash = circumference * (scorePct/100);
+
+    el.innerHTML = `
+      <div class="result">
+        <h2>สรุปผลการฝึกทำโจทย์</h2>
+        <div class="score-ring">
+          <svg viewBox="0 0 150 150">
+            <circle cx="75" cy="75" r="66" fill="none" stroke="var(--paper-alt)" stroke-width="14"/>
+            <circle cx="75" cy="75" r="66" fill="none" stroke="var(--quiz)" stroke-width="14"
+              stroke-dasharray="${dash} ${circumference}" stroke-linecap="round"/>
+          </svg>
+          <div class="score-num"><b>${correctCount}/${total}</b><span>${Math.round(scorePct)}% ถูกต้อง</span></div>
+        </div>
+        <div class="breakdown">
+          ${Object.entries(byTopic).map(([k,v])=>`
+            <div class="breakdown-row"><span>${k}</span><b>${v.correct}/${v.total}</b></div>
+          `).join("")}
+        </div>
+        <details style="margin-top:22px;text-align:left;">
+          <summary style="cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;">ดูเฉลยทีละข้อ</summary>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:20px;">
+            ${questions.map((q,i)=>{
+              const ok = state.answers[i] === q.correct;
+              return `<div class="q-card" style="padding:14px 16px;">
+                <div style="font-weight:500;margin-bottom:8px;">${i+1}. ${q.stem}</div>
+                ${q.options.map((opt,idx)=>{
+                  let style = "opacity:.6";
+                  if (idx===q.correct) style = "color:var(--ok);font-weight:600";
+                  else if (idx===state.answers[i] && !ok) style = "color:var(--bad);font-weight:600;text-decoration:line-through";
+                  return `<div style="font-size:.85rem;${style}">${LETTERS[idx]}. ${opt}</div>`;
+                }).join("")}
+                ${q.raw && q.raw.explain ? `<div class="explain-reason" style="margin-top:10px;"><b>หลักการ:</b> ${q.raw.explain}</div>` : ""}
+              </div>`;
+            }).join("")}
+          </div>
+        </details>
+      </div>
+      <div class="cta-spacer"></div>
+      <div class="cta-bar">
+        <div class="cta-bar-inner" style="display:flex;gap:10px;">
+          <button class="btn ghost block" id="retry-btn">ฝึกอีกครั้ง</button>
+          <a href="review.html" class="btn block" style="text-decoration:none;text-align:center;">กลับไปทบทวน</a>
+        </div>
+      </div>
+    `;
+    document.getElementById("retry-btn").addEventListener("click", ()=>{
+      el.style.display = "none";
+      document.getElementById("setup-screen").style.display = "block";
+      document.getElementById("setup-cta").style.display = "block";
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  }
+})();
+</script>
+</body>
+</html>
