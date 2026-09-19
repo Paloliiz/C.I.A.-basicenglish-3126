@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Mission: Starter Unit Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--manila);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(45deg, rgba(69, 26, 3, 0.03) 0px, rgba(69, 26, 3, 0.03) 2px, transparent 2px, transparent 8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .container-box {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 4px solid var(--brown);
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px var(--brown);
+            padding: 30px;
+            position: relative;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Typography & Inputs */
+        .input-terminal {
+            background: #fff;
+            border: 3px solid var(--brown);
+            color: var(--brown);
+            font-family: 'Kanit', sans-serif;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .input-terminal:focus { outline: none; border-color: var(--teal); }
+        .input-id { font-family: 'Fredoka', sans-serif; letter-spacing: 0.2em; }
+
+        /* Buttons */
+        .btn-agent {
+            background-color: var(--teal);
+            color: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        .btn-agent:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+        .btn-agent:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+        .btn-agent:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); box-shadow: 4px 4px 0px var(--brown) !important; transform: none !important; }
+
+        .btn-warning {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .btn-warning:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+        .btn-warning:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .btn-danger:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+        .btn-danger:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+        .btn-ghost {
+            background-color: #f8fafc;
+            color: var(--brown);
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .btn-ghost:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+        .btn-ghost:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+        .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: 4px 4px 0px var(--brown) !important; transform: none !important; }
+
+
+        /* Quiz UI */
+        .status-bar {
+            background: var(--manila-dark);
+            border: 2px solid var(--brown);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .timer-warning { color: #dc2626 !important; animation: blinkRed 1s step-start infinite; }
+        @keyframes blinkRed { 50% { opacity: 0.5; } }
+
+        .question-box {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            color: var(--brown);
+        }
+
+        .options-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff;
+            color: var(--brown);
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 14px 16px;
+            text-align: left;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px rgba(69, 26, 3, 0.15);
+            transition: all .15s ease;
+        }
+        .option-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px rgba(69, 26, 3, 0.15);
+            border-color: var(--teal-dark);
+        }
+        .option-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px rgba(69, 26, 3, 0.15);
+        }
+        .option-btn.selected {
+            background-color: var(--teal);
+            color: #fff;
+            border-color: var(--brown);
+            box-shadow: 4px 4px 0px var(--brown);
+            transform: translate(-2px, -2px);
+            font-weight: 700;
+        }
+
+        /* Result UI */
+        .result-details {
+            background-color: var(--manila);
+            border: 2px solid var(--brown);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop { background: rgba(69, 26, 3, 0.8); backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body>
+
+    <div class="container-box relative">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 rounded-full bg-burnt-orange"></span>
+                <span class="text-xs tracking-[0.2em] text-burnt-orange font-bold uppercase">STARTER UNIT EXAM</span>
+                <span class="w-2 h-2 rounded-full bg-burnt-orange"></span>
+            </div>
+            <h1 class="font-retro text-4xl md:text-5xl font-bold text-teal-dark tracking-wider drop-shadow-sm">C.I.A. HQ</h1>
+            <p class="text-sm md:text-base text-brown font-bold mt-1 tracking-wide uppercase">Starter Unit Exam</p>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="panel">
+            
+            <!-- 1. Login Screen -->
+            <div id="login-screen">
+                <h2 class="font-retro text-xl text-burnt-orange tracking-wide border-b-2 border-brown/20 pb-2 mb-4 uppercase text-center">AGENT VERIFICATION</h2>
+                
+                <div class="flex flex-col gap-2 mb-4">
+                    <label for="student-id" class="text-xs font-bold text-brown/80 tracking-wide uppercase">Badge No. (รหัสนักเรียน 5 หลัก)</label>
+                    <input type="text" id="student-id" placeholder="•••••" maxlength="5" autocomplete="off" class="input-terminal input-id w-full px-4 py-3 text-2xl font-bold text-center">
+                </div>
+
+                <div class="flex flex-col gap-2 mb-6">
+                    <label for="student-name" class="text-xs font-bold text-brown/80 tracking-wide uppercase">First Name (ชื่อจริงภาษาไทย)</label>
+                    <input type="text" id="student-name" placeholder="ไม่ต้องใส่ ด.ช./ด.ญ." autocomplete="off" class="input-terminal w-full px-4 py-3 text-lg font-bold text-center">
+                </div>
+
+                <button id="btn-login" class="btn-agent py-3 font-retro text-lg tracking-widest uppercase w-full" onclick="checkLogin()">Unlock Exam ➔</button>
+                
+                <div id="confirm-box" class="hidden mt-6 bg-manila border-2 border-brown rounded-md p-4 text-center shadow-sm">
+                    <p class="text-xs text-brown/60 font-bold uppercase mb-1">Confirmed Identity</p>
+                    <p id="student-name-display" class="font-bold text-lg text-teal-dark mb-4"></p>
+                    <button id="btn-start" class="btn-agent py-3 mb-3 uppercase tracking-wider w-full" onclick="startExam()">Confirm & Start Mission</button>
+                    <button class="btn-warning py-3 uppercase tracking-wider text-sm w-full" onclick="resetLogin()">Cancel (Change ID)</button>
+                    <button id="btn-teacher-reset" class="hidden btn-danger py-3 mt-3 uppercase tracking-wider text-sm w-full" onclick="resetTeacher()">🔄 Admin Reset (Clear Cache)</button>
+                </div>
+            </div>
+
+            <!-- 2. Quiz Screen -->
+            <div id="quiz-screen" class="hidden">
+                <div class="status-bar">
+                    <span id="question-counter" class="font-retro tracking-widest text-brown">Clue: 1 / 30</span>
+                    <span id="time-display" class="font-retro tracking-widest text-teal-dark text-lg">30:00</span>
+                </div>
+                <div class="question-box" id="question-text">
+                    โจทย์จะแสดงที่นี่...
+                </div>
+                <div class="options-box" id="options-area">
+                </div>
+                
+                <!-- ชุดปุ่มนำทางแบบมี Overview -->
+                <div class="mt-8 flex gap-2">
+                    <button id="btn-prev" class="btn-ghost flex-1 py-3 rounded-md text-xs md:text-sm font-bold tracking-widest uppercase" onclick="prevQuestion()" disabled>◄ Back</button>
+                    <button id="btn-overview" class="btn-warning flex-1 py-3 rounded-md text-xs md:text-sm font-bold tracking-widest uppercase" onclick="showOverview()">📂 Folder</button>
+                    <button id="btn-next" class="btn-agent flex-1 py-3 rounded-md text-xs md:text-sm font-bold tracking-widest uppercase" onclick="nextQuestion()" disabled>Next ►</button>
+                </div>
+            </div>
+
+            <!-- 3. Result Screen -->
+            <div id="result-screen" class="hidden text-center">
+                <div class="text-5xl mb-2 font-retro" id="result-icon">📁</div>
+                <h2 id="result-title" class="font-retro text-2xl tracking-widest mb-2 uppercase">ประมวลผลเสร็จสิ้น</h2>
+                
+                <p class="text-sm font-medium text-brown/60 mb-1 uppercase tracking-wide mt-4">Evidence Collected</p>
+                <div class="font-retro text-6xl font-bold text-teal-dark mb-6 drop-shadow-sm">
+                    <span id="final-score">0</span><span class="text-3xl text-brown/40">/30</span>
+                </div>
+                
+                <div class="result-details">
+                    <p class="mb-1"><strong>Agent Name:</strong> <span id="res-name" class="text-teal-dark font-bold"></span></p>
+                    <p class="mb-1"><strong>Attempt:</strong> รอบที่ <span id="res-attempt"></span></p>
+                    <p class="mb-1"><strong>Target:</strong> 21 คะแนนขึ้นไป (Passed)</p>
+                    <p id="decay-warning" class="font-bold text-burnt-orange mt-2 text-xs uppercase tracking-wide"></p>
+                </div>
+
+                <div id="action-buttons" class="flex flex-col gap-3 mt-6">
+                </div>
+                
+                <div id="submit-status" class="hidden mt-4 p-3 bg-teal/10 border-2 border-teal rounded-md text-teal-dark font-bold text-sm"></div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- 4. Modal สำหรับ Overview -->
+    <div id="overview-modal" class="hidden fixed inset-0 z-[100] modal-backdrop flex items-center justify-center p-4">
+        <div class="panel max-w-md w-full p-6 relative bg-white">
+            <div class="flex flex-col items-center text-center w-full">
+                <div class="text-4xl mb-2 font-retro">📂</div>
+                <h3 class="font-retro text-xl text-teal-dark tracking-wide uppercase">CASE FILE OVERVIEW</h3>
+                <p class="text-xs text-brown/60 mb-2 font-medium">Select a clue number to jump directly to it.</p>
+                
+                <div class="flex gap-4 text-[11px] font-bold text-brown/70 mb-4">
+                    <span class="flex items-center gap-1"><div class="w-3 h-3 bg-teal border border-teal-dark rounded-sm"></div> Answered</span>
+                    <span class="flex items-center gap-1"><div class="w-3 h-3 bg-manila border border-brown/30 rounded-sm"></div> Missing</span>
+                </div>
+                
+                <!-- Grid ปุ่มข้อสอบจะถูกสร้างตรงนี้ -->
+                <div id="overview-grid" class="grid grid-cols-5 gap-2 mt-2 max-h-[300px] overflow-y-auto p-2 w-full"></div>
+                
+                <button onclick="closeOverview()" class="btn-ghost w-full mt-6 py-3 rounded-md text-sm tracking-wide uppercase">Close Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. นำลิงก์จาก Google Apps Script มาวางในเครื่องหมายคำพูดด้านล่าง
+        // =========================================================
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8-WFJt2cVwvMxMBlwlfLq_l6i_4hSobIgikvXXVJjaG4tIuNse9Nxui4cLUiRmusI/exec";
+
+        const ADMIN_ID = "72388";
+        const ADMIN_FIRSTNAME = "พะโล้";
+
+        // =========================================================
+        // 2. ฐานข้อมูลนักเรียน ม.3 (71 คน)
+        // =========================================================
+        const studentDB = {
+        // ม.3/1
+        "12514": { name: "ด.ช. กลวัชร สิงขรณ์", room: "ม.3/1", number: 1 }, "12515": { name: "ด.ช. ก้องภพ เอ้ยวัน", room: "ม.3/1", number: 2 }, "12517": { name: "ด.ช. เด็นนี่ คิง", room: "ม.3/1", number: 3 }, "12518": { name: "ด.ช. ทัศภูมิ ด่านลัดต้อน", room: "ม.3/1", number: 4 }, "12519": { name: "ด.ช. ธนกฤต ปัดนา", room: "ม.3/1", number: 5 }, "12520": { name: "ด.ช. ธันวา เพ็ชรเงิน", room: "ม.3/1", number: 6 }, "12521": { name: "ด.ช. ธีรภัทร์ ยาคำ", room: "ม.3/1", number: 7 }, "12522": { name: "ด.ช. ปัญญาพล คณาญาติ", room: "ม.3/1", number: 8 }, "12523": { name: "ด.ช. พรหมพิทักษ์ บุญสร้าง", room: "ม.3/1", number: 9 }, "12524": { name: "ด.ช. พีรณัฐ ยอดโพธิ์", room: "ม.3/1", number: 10 }, "12525": { name: "ด.ช. พีรพัฒน์ เก่าด่านจาก", room: "ม.3/1", number: 11 }, "12526": { name: "ด.ช. ภูรินท์ โงนสาย", room: "ม.3/1", number: 12 }, "12527": { name: "ด.ช. วรโชติ ศรีม่วงกลาง", room: "ม.3/1", number: 13 }, "12528": { name: "ด.ช. ศรัณย์ พิพัฒน์จรูญกุล", room: "ม.3/1", number: 14 }, "12529": { name: "ด.ช. ศิวกร เทียมโสภา", room: "ม.3/1", number: 15 }, "12530": { name: "ด.ช. สิทธิกร เพชรแท้", room: "ม.3/1", number: 16 }, "12531": { name: "ด.ช. สุรบดี คำผาย", room: "ม.3/1", number: 17 }, "12532": { name: "ด.ช. หัฎฐกร ซับจันทึก", room: "ม.3/1", number: 18 }, "12533": { name: "ด.ช. อัสนี ภัสสรรัชนีกร", room: "ม.3/1", number: 19 }, "13054": { name: "ด.ช. จิรภาส ศรีเมือง", room: "ม.3/1", number: 20 }, "12534": { name: "ด.ญ. กุลณัชญา ดวงเนตร", room: "ม.3/1", number: 21 }, "12535": { name: "ด.ญ. จิราภรณ์ สาวิสิทธิ์", room: "ม.3/1", number: 22 }, "12536": { name: "ด.ญ. ชนิดา ทัศนา", room: "ม.3/1", number: 23 }, "12537": { name: "ด.ญ. ณัฐชภัทร ปลั่งกลาง", room: "ม.3/1", number: 24 }, "12538": { name: "ด.ญ. ธัญชนก ชำนาญ", room: "ม.3/1", number: 25 }, "12539": { name: "ด.ญ. นงนภัส มิทะลา", room: "ม.3/1", number: 26 }, "12540": { name: "ด.ญ. ปภาวรินทร์ สีหลิ่ง", room: "ม.3/1", number: 27 }, "12541": { name: "ด.ญ. ปิยธิดา แก้วแก่นคูณ", room: "ม.3/1", number: 28 }, "12542": { name: "ด.ญ. ภัทรมน อานุการ", room: "ม.3/1", number: 29 }, "12544": { name: "ด.ญ. รัตนาภรณ์ ทูคำมี", room: "ม.3/1", number: 30 }, "12545": { name: "ด.ญ. รวิสรา ทำกินดี", room: "ม.3/1", number: 31 }, "12546": { name: "ด.ญ. วารุณี จิว", room: "ม.3/1", number: 32 }, "12548": { name: "ด.ญ. สุทธาทิพย์ ดีพรหม", room: "ม.3/1", number: 33 }, "12549": { name: "ด.ญ. สุภัสสรา สุขสำราญ", room: "ม.3/1", number: 34 }, "12550": { name: "ด.ญ. เสาวนีย์ ไชยนคร", room: "ม.3/1", number: 35 }, "13074": { name: "ด.ญ. กานต์สินี เหล็กสงษ์", room: "ม.3/1", number: 36 },
+        // ม.3/2
+        "12551": { name: "ด.ช. ทินภัทร เทพรักษา", room: "ม.3/2", number: 1 }, "12552": { name: "ด.ช. ธนวัฒน์ ไชยรักษ์", room: "ม.3/2", number: 2 }, "12553": { name: "ด.ช. ปัณณวัฒน์ ชาลีเปรี่ยม", room: "ม.3/2", number: 3 }, "12554": { name: "ด.ช. พุฒธิพงษ์ ฆ้องชะฎา", room: "ม.3/2", number: 4 }, "12555": { name: "ด.ช. รัชต์พล มหาโยธี", room: "ม.3/2", number: 5 }, "12556": { name: "ด.ช. วรเมธ ไพลเถื่อน", room: "ม.3/2", number: 6 }, "12557": { name: "ด.ช. สิทธิชัย นามธรรม", room: "ม.3/2", number: 7 }, "12558": { name: "ด.ช. อนันดา ธรรมวงศ์", room: "ม.3/2", number: 8 }, "12559": { name: "ด.ช. อนันต์ยศ ผุสดี", room: "ม.3/2", number: 9 }, "12561": { name: "ด.ญ. กัลยกร เจริญภูมิ", room: "ม.3/2", number: 10 }, "12562": { name: "ด.ญ. ชนิตา สวัสดี", room: "ม.3/2", number: 11 }, "12563": { name: "ด.ญ. ณัฐธิดา มาวิเศษ", room: "ม.3/2", number: 12 }, "12564": { name: "ด.ญ. เทวิกา พัสดร", room: "ม.3/2", number: 13 }, "12565": { name: "ด.ญ. ธนภรณ์ เหมือนอินทร์", room: "ม.3/2", number: 14 }, "12566": { name: "ด.ญ. ธนารีย์ บุญเย็น", room: "ม.3/2", number: 15 }, "12567": { name: "ด.ญ. เบญจาวรรณ ชื่นจิตร", room: "ม.3/2", number: 16 }, "12568": { name: "ด.ญ. ปวีณา บุญร่วม", room: "ม.3/2", number: 17 }, "12569": { name: "ด.ญ. พัชราภา วิเศษ", room: "ม.3/2", number: 18 }, "12570": { name: "ด.ญ. รุจิรดา ชาญสูงเนิน", room: "ม.3/2", number: 19 }, "12571": { name: "ด.ญ. วนิดา แสงคำ", room: "ม.3/2", number: 20 }, "12572": { name: "ด.ญ. วรกานต์ กัลยา", room: "ม.3/2", number: 21 }, "12573": { name: "ด.ญ. วรดา กลางนอก", room: "ม.3/2", number: 22 }, "12574": { name: "ด.ญ. วรรณดา หอศิลป์", room: "ม.3/2", number: 23 }, "12575": { name: "ด.ญ. วรัณญา พรรคทิง", room: "ม.3/2", number: 24 }, "12576": { name: "ด.ญ. วสุธัญ ชื่นบาน", room: "ม.3/2", number: 25 }, "12577": { name: "ด.ญ. สิริญากร พนังศรี", room: "ม.3/2", number: 26 }, "12578": { name: "ด.ญ. สุปรียา จันทนา", room: "ม.3/2", number: 27 }, "12579": { name: "ด.ญ. สุพรรษา เกตุสวย", room: "ม.3/2", number: 28 }, "12580": { name: "ด.ญ. สุมิตรา สิทธิไกรพงษ์", room: "ม.3/2", number: 29 }, "12581": { name: "ด.ญ. อัฐภิญญา เพ็ชรนิล", room: "ม.3/2", number: 30 }, "12582": { name: "ด.ญ. อิสริยา จากครบุรี", room: "ม.3/2", number: 31 }, "12583": { name: "ด.ญ. ขวัญชีวา บุตรจันทา", room: "ม.3/2", number: 32 }, "12585": { name: "ด.ญ. ชัญญา พนมสัก", room: "ม.3/2", number: 33 }, "12586": { name: "ด.ญ. ธัญญาภรณ์ ไพพร", room: "ม.3/2", number: 34 }, "13055": { name: "น.ส. ตรีสรา พานแก้ว", room: "ม.3/2", number: 35 }
+        };
+
+        // =========================================================
+        // 3. ฐานข้อมูลโจทย์ข้อสอบ (Starter Unit)
+        // =========================================================
+        const rawQuestions = [
+            // Greetings & Pronouns
+            { q: "A: How are you? \nB: _______________", options: ["I'm fine, thanks, and you?", "Pleased to meet you too.", "I don't think you've met Simone.", "Hello. I'm David."], a: "I'm fine, thanks, and you?" },
+            { q: "A: Hello, Tom. Pleased to meet you. \nB: _______________", options: ["Pleased to meet you too.", "Not bad, thanks.", "I'm fine.", "Pretty good, thanks."], a: "Pleased to meet you too." },
+            { q: "Where's Liz? _____ is at school.", options: ["She", "He", "It", "They"], a: "She" },
+            { q: "This is my puppy. Look at that dog! _____ tail is very short.", options: ["Its", "It's", "His", "Her"], a: "Its" },
+            { q: "Compare: These are my books. They're _____.", options: ["mine", "my", "me", "ours"], a: "mine" },
+            { q: "A: I don't have a pen. Can I borrow _____? \nB: Yes, it is on my desk.", options: ["yours", "your", "you", "mine"], a: "yours" },
+            // Can & Have got
+            { q: "_____ Tina got straight hair? No, she hasn't.", options: ["Has", "Have", "Do", "Are"], a: "Has" },
+            { q: "Are they from England? No, they _____.", options: ["aren't", "don't", "haven't", "can't"], a: "aren't" },
+            { q: "Tracey has got a laptop. She _____ got a car.", options: ["hasn't", "haven't", "isn't", "can't"], a: "hasn't" },
+            { q: "_____ you boil an egg?", options: ["Can", "Have", "Has", "Do"], a: "Can" },
+            // Present Simple
+            { q: "Tom _____ up early every day.", options: ["gets", "get", "getting", "is get"], a: "gets" },
+            { q: "I _____ rock music.", options: ["like", "likes", "liking", "am like"], a: "like" },
+            { q: "What _____ Tom and Jane do at the weekends?", options: ["do", "does", "are", "have"], a: "do" },
+            { q: "My dad _____ the car every Saturday.", options: ["washes", "wash", "washing", "is wash"], a: "washes" },
+            { q: "Max _____ goes out on Saturday night.", options: ["usually", "usual", "often is", "sometimes is"], a: "usually" },
+            { q: "Gina rarely _____ up late.", options: ["stays", "stay", "staying", "is stay"], a: "stays" },
+            // Question Words
+            { q: "_____ does the laundry every week? (My mum does.)", options: ["Who", "What", "Which", "Where"], a: "Who" },
+            { q: "_____ bicycle is that? (Jenny's.)", options: ["Whose", "Who", "What", "Which"], a: "Whose" },
+            { q: "_____ do you start school? (At 8 am.)", options: ["What time", "When time", "How long", "How often"], a: "What time" },
+            { q: "_____ far is our hotel from the airport? (About four kilometres.)", options: ["How", "What", "Where", "Which"], a: "How" },
+            // Prepositions
+            { q: "Is your birthday _____ 22nd May?", options: ["on", "in", "at", "to"], a: "on" },
+            { q: "Tim often plays football _____ the weekend.", options: ["at", "in", "on", "for"], a: "at" },
+            { q: "My birthday is _____ November.", options: ["in", "on", "at", "by"], a: "in" },
+            { q: "There is a picture _____ the wall.", options: ["on", "in", "at", "above"], a: "on" },
+            { q: "The glass table is _____ the sofa.", options: ["in front of", "between", "under", "in"], a: "in front of" },
+            // Food & Quantifiers
+            { q: "I need _____ cherries.", options: ["some", "any", "much", "a little"], a: "some" },
+            { q: "There isn't _____ cheese in the fridge.", options: ["any", "some", "many", "few"], a: "any" },
+            { q: "How _____ milk do you want?", options: ["much", "many", "some", "any"], a: "much" },
+            { q: "How _____ students are there in the class?", options: ["many", "much", "lot", "little"], a: "many" },
+            { q: "We've got _____ apples. I'll make a fruit salad.", options: ["a few", "a little", "much", "any"], a: "a few" }
+        ];
+
+        // =========================================================
+        // 4. ตัวแปรสำหรับควบคุมระบบ (State Variables)
+        // =========================================================
+        let currentStudent = null;
+        let currentStudentId = null;
+        let attemptCount = 1;
+
+        let quizPool = [];
+        let currentQIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        let timeLeft = 30 * 60; // 30 นาที (1800 วินาที)
+        let timerInterval;
+        let cheatWarnings = 0;
+
+        // =========================================================
+        // 5. ระบบล็อคอินและการจัดการนักเรียน
+        // =========================================================
+        function checkLogin() {
+            const idInput = document.getElementById("student-id").value.trim();
+            const nameInput = document.getElementById("student-name").value.trim();
+
+            if (idInput.length !== 5) {
+                alert("กรุณากรอกรหัสนักเรียน 5 หลักให้ครบถ้วน");
+                return;
+            }
+            if (nameInput === "") {
+                alert("กรุณากรอกชื่อจริง (ไม่ต้องใส่ ด.ช./ด.ญ.)");
+                return;
+            }
+            
+            // ตรวจสอบรหัสแอดมิน (ครูพะโล้)
+            if (idInput === ADMIN_ID && nameInput === ADMIN_FIRSTNAME) {
+                currentStudent = { name: "ครูพะโล้ (Admin)", room: "Staff", number: 0 };
+                currentStudentId = ADMIN_ID;
+                document.getElementById("student-name-display").innerText = `CHIEF INSPECTOR: ${currentStudent.name}`;
+                document.getElementById("confirm-box").classList.remove("hidden");
+                document.getElementById("btn-login").classList.add("hidden");
+                document.getElementById("btn-teacher-reset").classList.remove("hidden");
+                return;
+            }
+
+            if (studentDB[idInput]) {
+                const record = studentDB[idInput];
+
+                if (!record.name.includes(nameInput)) {
+                    alert("รหัสผ่านหรือชื่อไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง (ใส่แค่ชื่อจริง ไม่ต้องมีคำนำหน้า)");
+                    return;
+                }
+
+                currentStudent = record;
+                currentStudentId = idInput;
+                document.getElementById("student-name-display").innerText = `${currentStudent.name} (${currentStudent.room} เลขที่ ${currentStudent.number})`;
+                document.getElementById("confirm-box").classList.remove("hidden");
+                document.getElementById("btn-login").classList.add("hidden");
+                document.getElementById("btn-teacher-reset").classList.add("hidden");
+
+            } else {
+                alert("ไม่พบรหัสนักเรียนนี้ในระบบ กรุณาตรวจสอบอีกครั้ง");
+            }
+        }
+
+        // ฟังก์ชันพิเศษสำหรับครู (เคลียร์ความจำเบราว์เซอร์)
+        function resetTeacher() {
+            localStorage.removeItem('M3_Unit0_Attempts_' + ADMIN_ID);
+            alert("ล้างประวัติการสอบของแอดมินเรียบร้อยแล้ว!");
+        }
+
+        function resetLogin() {
+            document.getElementById("student-id").value = "";
+            document.getElementById("student-name").value = "";
+            document.getElementById("confirm-box").classList.add("hidden");
+            document.getElementById("btn-login").classList.remove("hidden");
+            currentStudent = null;
+            currentStudentId = null;
+        }
+
+        // =========================================================
+        // 6. เริ่มทำข้อสอบ & นำทาง (โหลดข้อสอบ + จดจำคำตอบเก่า)
+        // =========================================================
+        function startExam() {
+            let savedAttempt = localStorage.getItem('M3_Unit0_Attempts_' + currentStudentId);
+            if (savedAttempt) {
+                attemptCount = parseInt(savedAttempt) + 1;
+            } else {
+                attemptCount = 1;
+            }
+
+            quizPool = shuffleArray([...rawQuestions]).map(q => {
+                let shuffledOptions = shuffleArray([...q.options]);
+                return { ...q, options: shuffledOptions };
+            });
+            
+            // จองพื้นที่ Array คำตอบ
+            userAnswers = new Array(quizPool.length).fill(undefined);
+
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("hidden");
+            
+            enableAntiCheat();
+            startTimer();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= quizPool.length) {
+                finishExam();
+                return;
+            }
+
+            let qData = quizPool[currentQIndex];
+            document.getElementById("question-counter").innerText = `Clue: ${currentQIndex + 1} / 30`;
+            document.getElementById("question-text").innerText = qData.q;
+            
+            let optionsHtml = "";
+            qData.options.forEach((opt, idx) => {
+                // เช็คว่าข้อนี้เคยตอบตัวเลือกนี้ไว้หรือเปล่า เพื่อไฮไลต์ปุ่มเดิม
+                let isSelected = (userAnswers[currentQIndex] === opt) ? "selected" : "";
+                optionsHtml += `<button class="option-btn ${isSelected}" onclick="selectOption(this, ${idx})">${opt}</button>`;
+            });
+            
+            document.getElementById("options-area").innerHTML = optionsHtml;
+            
+            // เช็คสถานะปุ่ม Back
+            document.getElementById("btn-prev").disabled = (currentQIndex === 0);
+            
+            // เช็คสถานะปุ่ม Next/Submit
+            let btnNext = document.getElementById("btn-next");
+            if (currentQIndex === quizPool.length - 1) {
+                btnNext.innerText = "Submit ✔";
+                btnNext.classList.remove("btn-agent");
+                btnNext.classList.add("btn-danger");
+            } else {
+                btnNext.innerText = "Next ►";
+                btnNext.classList.remove("btn-danger");
+                btnNext.classList.add("btn-agent");
+            }
+
+            // ถ้าพึ่งเปิดข้อนี้ครั้งแรก และยังไม่เคยเลือกคำตอบ ให้ปิดปุ่ม Next ก่อน
+            btnNext.disabled = (userAnswers[currentQIndex] === undefined);
+        }
+
+        function selectOption(btnElement, selectedIndex) {
+            let allBtns = document.querySelectorAll(".option-btn");
+            allBtns.forEach(btn => btn.classList.remove("selected"));
+            btnElement.classList.add("selected");
+            
+            // บันทึกคำตอบ
+            userAnswers[currentQIndex] = quizPool[currentQIndex].options[selectedIndex];
+            document.getElementById("btn-next").disabled = false;
+        }
+        
+        function prevQuestion() {
+            if (currentQIndex > 0) {
+                currentQIndex--;
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQIndex < quizPool.length - 1) {
+                currentQIndex++;
+                loadQuestion();
+            } else {
+                // ตรวจสอบว่ามีข้อไหนยังไม่ได้ตอบไหม
+                let unanswered = 0;
+                for(let i = 0; i < quizPool.length; i++) {
+                    if (userAnswers[i] === undefined) unanswered++;
+                }
+                
+                if (unanswered > 0) {
+                    let confirmSubmit = confirm(`คุณยังตอบคำถามไม่ครบ ขาดอีก ${unanswered} ข้อ\nยืนยันที่จะปิดแฟ้มคดีและส่งคะแนนเลยหรือไม่?`);
+                    if (confirmSubmit) finishExam();
+                } else {
+                    let confirmSubmit = confirm(`รวบรวมหลักฐานครบทุกข้อแล้ว ยืนยันการส่งรายงาน?`);
+                    if (confirmSubmit) finishExam();
+                }
+            }
+        }
+
+        // =========================================================
+        // 7. ระบบ Overview (ดูภาพรวมข้อสอบ)
+        // =========================================================
+        function showOverview() {
+            let gridHtml = "";
+            for(let i = 0; i < quizPool.length; i++) {
+                let isAnswered = userAnswers[i] !== undefined;
+                // ถ้าตอบแล้วให้เป็นสีเขียว Teal ถ้ายังไม่ตอบให้เป็นพื้นขาว
+                let bgClass = isAnswered ? "bg-teal text-white border-teal-dark" : "bg-manila text-brown/50 border-brown/30";
+                // ใส่กรอบเน้นข้อปัจจุบันที่เปิดอยู่
+                let currentIndicator = (i === currentQIndex) ? "ring-4 ring-burnt-orange border-burnt-orange" : "";
+                
+                gridHtml += `<button onclick="jumpToQuestion(${i})" class="w-full aspect-square flex items-center justify-center rounded-md text-sm font-bold border-2 ${bgClass} ${currentIndicator} hover:border-burnt-orange transition-all">${i+1}</button>`;
+            }
+            document.getElementById("overview-grid").innerHTML = gridHtml;
+            
+            // เปิดหน้าต่าง Modal
+            document.getElementById("overview-modal").classList.remove("hidden");
+            document.getElementById("overview-modal").classList.add("flex");
+        }
+
+        function closeOverview() {
+            document.getElementById("overview-modal").classList.add("hidden");
+            document.getElementById("overview-modal").classList.remove("flex");
+        }
+
+        function jumpToQuestion(idx) {
+            currentQIndex = idx;
+            loadQuestion();
+            closeOverview();
+        }
+
+        // =========================================================
+        // 8. ระบบจับเวลา
+        // =========================================================
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                let tDisplay = document.getElementById("time-display");
+                tDisplay.innerText = `${m}:${s}`;
+                
+                if (timeLeft <= 300) tDisplay.classList.add("timer-warning");
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("หมดเวลาทำข้อสอบ! ระบบจะส่งคำตอบอัตโนมัติ");
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        // =========================================================
+        // 9. ประมวลผลและคิดคะแนน (Decay Multiplier)
+        // =========================================================
+        function finishExam() {
+            clearInterval(timerInterval);
+            disableAntiCheat();
+            document.getElementById("quiz-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.remove("hidden");
+
+            score = 0;
+            quizPool.forEach((q, idx) => {
+                if (userAnswers[idx] === q.a) score++;
+            });
+
+            document.getElementById("final-score").innerText = score;
+            document.getElementById("res-name").innerText = `${currentStudent.name}`;
+            document.getElementById("res-attempt").innerText = attemptCount;
+
+            let actionsHtml = "";
+            
+            if (score >= 21) {
+                document.getElementById("result-title").innerText = "MISSION ACCOMPLISHED!";
+                document.getElementById("result-title").style.color = "var(--teal-dark)";
+                document.getElementById("result-icon").innerText = "🏆";
+                
+                let netScore = score;
+                let decayMsg = "";
+                
+                if (attemptCount === 2) {
+                    netScore = Math.round(score * 0.9);
+                    decayMsg = "สอบผ่านในรอบที่ 2 (รับคะแนน 90%)";
+                } else if (attemptCount === 3) {
+                    netScore = Math.round(score * 0.8);
+                    decayMsg = "สอบผ่านในรอบที่ 3 (รับคะแนน 80%)";
+                } else if (attemptCount >= 4) {
+                    netScore = 21;
+                    decayMsg = "สอบผ่านในรอบที่ 4 ขึ้นไป (รับคะแนนผ่านเกณฑ์ขั้นต่ำ)";
+                } else {
+                    decayMsg = "สอบผ่านในรอบที่ 1 (รับคะแนนเต็ม 100%)";
+                }
+
+                document.getElementById("decay-warning").innerText = decayMsg;
+                actionsHtml = `<button class="btn-agent py-3 uppercase tracking-widest text-lg w-full" onclick="submitToGoogleSheets(${score}, ${netScore})">Submit Evidence ➔</button>`;
+                
+            } else {
+                document.getElementById("result-title").innerText = "MISSION FAILED!";
+                document.getElementById("result-title").style.color = "#dc2626";
+                document.getElementById("result-icon").innerText = "❌";
+                
+                localStorage.setItem('M3_Unit0_Attempts_' + currentStudentId, attemptCount);
+                actionsHtml = `<button class="btn-warning py-3 uppercase tracking-widest w-full" onclick="location.reload()">Review & Retry Mission</button>`;
+            }
+            
+            document.getElementById("action-buttons").innerHTML = actionsHtml;
+        }
+
+        // =========================================================
+        // 10. ส่งข้อมูลเข้า Google Sheets
+        // =========================================================
+        function submitToGoogleSheets(raw, net) {
+            if (APP_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                alert("อย่าลืมใส่ URL ของ Google Apps Script ในโค้ดบรรทัดที่ 262 นะครับ!");
+                return;
+            }
+
+            const submitBtn = document.querySelector("#action-buttons button");
+            submitBtn.innerText = "UPLOADING TO HQ...";
+            submitBtn.disabled = true;
+
+            const payload = {
+                unit: "Starter Unit",
+                studentId: currentStudentId,
+                name: currentStudent.name,
+                room: currentStudent.room,
+                number: currentStudent.number,
+                rawScore: raw,
+                attempt: attemptCount,
+                netScore: net
+            };
+
+            fetch(APP_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("action-buttons").classList.add("hidden");
+                document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
+                document.getElementById("submit-status").classList.remove("hidden");
+                localStorage.removeItem('M3_Unit0_Attempts_' + currentStudentId);
+            })
+            .catch(err => {
+                alert("เกิดข้อผิดพลาดในการส่งคะแนน โปรดตรวจสอบอินเทอร์เน็ตแล้วลองกดส่งใหม่");
+                submitBtn.innerText = "Submit Evidence ➔";
+                submitBtn.disabled = false;
+            });
+        }
+
+        // =========================================================
+        // 11. ฟังก์ชันเสริม: สุ่มข้อมูล (Fisher-Yates Shuffle)
+        // =========================================================
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // =========================================================
+        // 12. ระบบป้องกันการทุจริต (Anti-Cheat)
+        // =========================================================
+        function handleVisibilityChange() {
+            if (document.hidden && !document.getElementById("quiz-screen").classList.contains("hidden")) {
+                cheatWarnings++;
+                if (cheatWarnings >= 3) {
+                    alert("คุณสลับหน้าจอเกินกำหนด! ระบบทำการบังคับส่งข้อสอบทันที");
+                    finishExam();
+                } else {
+                    alert(`คำเตือนการสลับหน้าจอ! (${cheatWarnings}/3) ห้ามสลับหน้าจอไปที่อื่นขณะทำข้อสอบ`);
+                }
+            }
+        }
+
+        function disableRightClick(e) { e.preventDefault(); }
+
+        function enableAntiCheat() {
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+            document.addEventListener("contextmenu", disableRightClick);
+            document.addEventListener("selectstart", disableRightClick);
+        }
+
+        function disableAntiCheat() {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener("contextmenu", disableRightClick);
+            document.removeEventListener("selectstart", disableRightClick);
+        }
+    </script>
+
+</body>
+</html>
