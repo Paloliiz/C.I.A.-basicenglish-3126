@@ -645,11 +645,6 @@
         // 10. ส่งข้อมูลเข้า Google Sheets
         // =========================================================
         function submitToGoogleSheets(raw, net) {
-            if (APP_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
-                alert("อย่าลืมใส่ URL ของ Google Apps Script ในโค้ดบรรทัดที่ 262 นะครับ!");
-                return;
-            }
-
             const submitBtn = document.querySelector("#action-buttons button");
             submitBtn.innerText = "UPLOADING TO HQ...";
             submitBtn.disabled = true;
