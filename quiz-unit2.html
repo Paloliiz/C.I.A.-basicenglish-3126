@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Mission: Unit 2 Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--manila);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(45deg, rgba(69, 26, 3, 0.03) 0px, rgba(69, 26, 3, 0.03) 2px, transparent 2px, transparent 8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .container-box {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px;
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 4px solid var(--brown);
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px var(--brown);
+            padding: 30px;
+            position: relative;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Typography & Inputs */
+        .input-terminal {
+            background: #fff;
+            border: 3px solid var(--brown);
+            color: var(--brown);
+            font-family: 'Kanit', sans-serif;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .input-terminal:focus { outline: none; border-color: var(--teal); }
+        .input-id { font-family: 'Fredoka', sans-serif; letter-spacing: 0.2em; }
+
+        /* Buttons */
+        .btn-agent {
+            background-color: var(--teal);
+            color: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s ease-in-out;
+            padding: 12px 20px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .btn-agent:hover:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--brown); }
+        .btn-agent:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+        .btn-agent:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); box-shadow: 4px 4px 0px var(--brown) !important; transform: none !important; }
+
+        .btn-warning {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s;
+            padding: 12px 20px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .btn-warning:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--brown);
+            font-weight: 700;
+            transition: all 0.1s;
+            padding: 12px 20px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .btn-danger:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
+
+        /* Quiz UI */
+        .status-bar {
+            background: var(--manila-dark);
+            border: 2px solid var(--brown);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .timer-warning { color: #dc2626 !important; animation: blinkRed 1s step-start infinite; }
+        @keyframes blinkRed { 50% { opacity: 0.5; } }
+
+        .question-box {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            color: var(--brown);
+        }
+
+        .options-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff;
+            color: var(--brown);
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 14px 16px;
+            text-align: left;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px rgba(69, 26, 3, 0.15);
+            transition: all .15s ease;
+        }
+        .option-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px rgba(69, 26, 3, 0.15);
+            border-color: var(--teal-dark);
+        }
+        .option-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px rgba(69, 26, 3, 0.15);
+        }
+        .option-btn.selected {
+            background-color: var(--teal);
+            color: #fff;
+            border-color: var(--brown);
+            box-shadow: 4px 4px 0px var(--brown);
+            transform: translate(-2px, -2px);
+            font-weight: 700;
+        }
+
+        /* Result UI */
+        .result-details {
+            background-color: var(--manila);
+            border: 2px solid var(--brown);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-box">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 rounded-full bg-burnt-orange"></span>
+                <span class="text-xs tracking-[0.2em] text-burnt-orange font-bold uppercase">UNIT 2 EXAM</span>
+                <span class="w-2 h-2 rounded-full bg-burnt-orange"></span>
+            </div>
+            <h1 class="font-retro text-4xl md:text-5xl font-bold text-teal-dark tracking-wider drop-shadow-sm">C.I.A. HQ</h1>
+            <p class="text-sm md:text-base text-brown font-bold mt-1 tracking-wide uppercase">Unit 2: Believe it or not</p>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="panel">
+            
+            <!-- 1. Login Screen -->
+            <div id="login-screen">
+                <h2 class="font-retro text-xl text-burnt-orange tracking-wide border-b-2 border-brown/20 pb-2 mb-4 uppercase text-center">AGENT VERIFICATION</h2>
+                
+                <div class="flex flex-col gap-2 mb-4">
+                    <label for="student-id" class="text-xs font-bold text-brown/80 tracking-wide uppercase">Badge No. (รหัสนักเรียน 5 หลัก)</label>
+                    <input type="text" id="student-id" placeholder="•••••" maxlength="5" autocomplete="off" class="input-terminal input-id w-full px-4 py-3 text-2xl font-bold text-center">
+                </div>
+
+                <div class="flex flex-col gap-2 mb-6">
+                    <label for="student-name" class="text-xs font-bold text-brown/80 tracking-wide uppercase">First Name (ชื่อจริงภาษาไทย)</label>
+                    <input type="text" id="student-name" placeholder="ไม่ต้องใส่ ด.ช./ด.ญ." autocomplete="off" class="input-terminal w-full px-4 py-3 text-lg font-bold text-center">
+                </div>
+
+                <button id="btn-login" class="btn-agent font-retro text-lg tracking-widest uppercase" onclick="checkLogin()">Unlock Exam ➔</button>
+                
+                <div id="confirm-box" class="hidden mt-6 bg-manila border-2 border-brown rounded-md p-4 text-center shadow-sm">
+                    <p class="text-xs text-brown/60 font-bold uppercase mb-1">Confirmed Identity</p>
+                    <p id="student-name-display" class="font-bold text-lg text-teal-dark mb-4"></p>
+                    <button id="btn-start" class="btn-agent mb-3 uppercase tracking-wider" onclick="startExam()">Confirm & Start Mission</button>
+                    <button class="btn-warning uppercase tracking-wider text-sm" onclick="resetLogin()">Cancel (Change ID)</button>
+                    <button id="btn-teacher-reset" class="hidden btn-danger mt-3 uppercase tracking-wider text-sm" onclick="resetTeacher()">🔄 Admin Reset (Clear Cache)</button>
+                </div>
+            </div>
+
+            <!-- 2. Quiz Screen -->
+            <div id="quiz-screen" class="hidden">
+                <div class="status-bar">
+                    <span id="question-counter" class="font-retro tracking-widest text-brown">Clue: 1 / 30</span>
+                    <span id="time-display" class="font-retro tracking-widest text-teal-dark text-lg">30:00</span>
+                </div>
+                <div class="question-box" id="question-text">
+                    โจทย์จะแสดงที่นี่...
+                </div>
+                <div class="options-box" id="options-area">
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button id="btn-next" class="btn-agent w-auto px-8 uppercase tracking-widest" onclick="nextQuestion()" disabled>Next ➔</button>
+                </div>
+            </div>
+
+            <!-- 3. Result Screen -->
+            <div id="result-screen" class="hidden text-center">
+                <div class="text-5xl mb-2 font-retro" id="result-icon">📁</div>
+                <h2 id="result-title" class="font-retro text-2xl tracking-widest mb-2 uppercase">ประมวลผลเสร็จสิ้น</h2>
+                
+                <p class="text-sm font-medium text-brown/60 mb-1 uppercase tracking-wide mt-4">Evidence Collected</p>
+                <div class="font-retro text-6xl font-bold text-teal-dark mb-6 drop-shadow-sm">
+                    <span id="final-score">0</span><span class="text-3xl text-brown/40">/30</span>
+                </div>
+                
+                <div class="result-details">
+                    <p class="mb-1"><strong>Agent Name:</strong> <span id="res-name" class="text-teal-dark font-bold"></span></p>
+                    <p class="mb-1"><strong>Attempt:</strong> รอบที่ <span id="res-attempt"></span></p>
+                    <p class="mb-1"><strong>Target:</strong> 21 คะแนนขึ้นไป (Passed)</p>
+                    <p id="decay-warning" class="font-bold text-burnt-orange mt-2 text-xs uppercase tracking-wide"></p>
+                </div>
+
+                <div id="action-buttons" class="flex flex-col gap-3 mt-6">
+                </div>
+                
+                <div id="submit-status" class="hidden mt-4 p-3 bg-teal/10 border-2 border-teal rounded-md text-teal-dark font-bold text-sm"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. นำลิงก์จาก Google Apps Script มาวางในเครื่องหมายคำพูดด้านล่าง
+        // =========================================================
+        const APP_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+        const ADMIN_ID = "72388";
+        const ADMIN_FIRSTNAME = "พะโล้";
+
+        // =========================================================
+        // 2. ฐานข้อมูลนักเรียน ม.3 (71 คน)
+        // =========================================================
+        const studentDB = {
+        // ม.3/1
+        "12514": { name: "ด.ช. กลวัชร สิงขรณ์", room: "ม.3/1", number: 1 }, "12515": { name: "ด.ช. ก้องภพ เอ้ยวัน", room: "ม.3/1", number: 2 }, "12517": { name: "ด.ช. เด็นนี่ คิง", room: "ม.3/1", number: 3 }, "12518": { name: "ด.ช. ทัศภูมิ ด่านลัดต้อน", room: "ม.3/1", number: 4 }, "12519": { name: "ด.ช. ธนกฤต ปัดนา", room: "ม.3/1", number: 5 }, "12520": { name: "ด.ช. ธันวา เพ็ชรเงิน", room: "ม.3/1", number: 6 }, "12521": { name: "ด.ช. ธีรภัทร์ ยาคำ", room: "ม.3/1", number: 7 }, "12522": { name: "ด.ช. ปัญญาพล คณาญาติ", room: "ม.3/1", number: 8 }, "12523": { name: "ด.ช. พรหมพิทักษ์ บุญสร้าง", room: "ม.3/1", number: 9 }, "12524": { name: "ด.ช. พีรณัฐ ยอดโพธิ์", room: "ม.3/1", number: 10 }, "12525": { name: "ด.ช. พีรพัฒน์ เก่าด่านจาก", room: "ม.3/1", number: 11 }, "12526": { name: "ด.ช. ภูรินท์ โงนสาย", room: "ม.3/1", number: 12 }, "12527": { name: "ด.ช. วรโชติ ศรีม่วงกลาง", room: "ม.3/1", number: 13 }, "12528": { name: "ด.ช. ศรัณย์ พิพัฒน์จรูญกุล", room: "ม.3/1", number: 14 }, "12529": { name: "ด.ช. ศิวกร เทียมโสภา", room: "ม.3/1", number: 15 }, "12530": { name: "ด.ช. สิทธิกร เพชรแท้", room: "ม.3/1", number: 16 }, "12531": { name: "ด.ช. สุรบดี คำผาย", room: "ม.3/1", number: 17 }, "12532": { name: "ด.ช. หัฎฐกร ซับจันทึก", room: "ม.3/1", number: 18 }, "12533": { name: "ด.ช. อัสนี ภัสสรรัชนีกร", room: "ม.3/1", number: 19 }, "13054": { name: "ด.ช. จิรภาส ศรีเมือง", room: "ม.3/1", number: 20 }, "12534": { name: "ด.ญ. กุลณัชญา ดวงเนตร", room: "ม.3/1", number: 21 }, "12535": { name: "ด.ญ. จิราภรณ์ สาวิสิทธิ์", room: "ม.3/1", number: 22 }, "12536": { name: "ด.ญ. ชนิดา ทัศนา", room: "ม.3/1", number: 23 }, "12537": { name: "ด.ญ. ณัฐชภัทร ปลั่งกลาง", room: "ม.3/1", number: 24 }, "12538": { name: "ด.ญ. ธัญชนก ชำนาญ", room: "ม.3/1", number: 25 }, "12539": { name: "ด.ญ. นงนภัส มิทะลา", room: "ม.3/1", number: 26 }, "12540": { name: "ด.ญ. ปภาวรินทร์ สีหลิ่ง", room: "ม.3/1", number: 27 }, "12541": { name: "ด.ญ. ปิยธิดา แก้วแก่นคูณ", room: "ม.3/1", number: 28 }, "12542": { name: "ด.ญ. ภัทรมน อานุการ", room: "ม.3/1", number: 29 }, "12544": { name: "ด.ญ. รัตนาภรณ์ ทูคำมี", room: "ม.3/1", number: 30 }, "12545": { name: "ด.ญ. รวิสรา ทำกินดี", room: "ม.3/1", number: 31 }, "12546": { name: "ด.ญ. วารุณี จิว", room: "ม.3/1", number: 32 }, "12548": { name: "ด.ญ. สุทธาทิพย์ ดีพรหม", room: "ม.3/1", number: 33 }, "12549": { name: "ด.ญ. สุภัสสรา สุขสำราญ", room: "ม.3/1", number: 34 }, "12550": { name: "ด.ญ. เสาวนีย์ ไชยนคร", room: "ม.3/1", number: 35 }, "13074": { name: "ด.ญ. กานต์สินี เหล็กสงษ์", room: "ม.3/1", number: 36 },
+        // ม.3/2
+        "12551": { name: "ด.ช. ทินภัทร เทพรักษา", room: "ม.3/2", number: 1 }, "12552": { name: "ด.ช. ธนวัฒน์ ไชยรักษ์", room: "ม.3/2", number: 2 }, "12553": { name: "ด.ช. ปัณณวัฒน์ ชาลีเปรี่ยม", room: "ม.3/2", number: 3 }, "12554": { name: "ด.ช. พุฒธิพงษ์ ฆ้องชะฎา", room: "ม.3/2", number: 4 }, "12555": { name: "ด.ช. รัชต์พล มหาโยธี", room: "ม.3/2", number: 5 }, "12556": { name: "ด.ช. วรเมธ ไพลเถื่อน", room: "ม.3/2", number: 6 }, "12557": { name: "ด.ช. สิทธิชัย นามธรรม", room: "ม.3/2", number: 7 }, "12558": { name: "ด.ช. อนันดา ธรรมวงศ์", room: "ม.3/2", number: 8 }, "12559": { name: "ด.ช. อนันต์ยศ ผุสดี", room: "ม.3/2", number: 9 }, "12561": { name: "ด.ญ. กัลยกร เจริญภูมิ", room: "ม.3/2", number: 10 }, "12562": { name: "ด.ญ. ชนิตา สวัสดี", room: "ม.3/2", number: 11 }, "12563": { name: "ด.ญ. ณัฐธิดา มาวิเศษ", room: "ม.3/2", number: 12 }, "12564": { name: "ด.ญ. เทวิกา พัสดร", room: "ม.3/2", number: 13 }, "12565": { name: "ด.ญ. ธนภรณ์ เหมือนอินทร์", room: "ม.3/2", number: 14 }, "12566": { name: "ด.ญ. ธนารีย์ บุญเย็น", room: "ม.3/2", number: 15 }, "12567": { name: "ด.ญ. เบญจาวรรณ ชื่นจิตร", room: "ม.3/2", number: 16 }, "12568": { name: "ด.ญ. ปวีณา บุญร่วม", room: "ม.3/2", number: 17 }, "12569": { name: "ด.ญ. พัชราภา วิเศษ", room: "ม.3/2", number: 18 }, "12570": { name: "ด.ญ. รุจิรดา ชาญสูงเนิน", room: "ม.3/2", number: 19 }, "12571": { name: "ด.ญ. วนิดา แสงคำ", room: "ม.3/2", number: 20 }, "12572": { name: "ด.ญ. วรกานต์ กัลยา", room: "ม.3/2", number: 21 }, "12573": { name: "ด.ญ. วรดา กลางนอก", room: "ม.3/2", number: 22 }, "12574": { name: "ด.ญ. วรรณดา หอศิลป์", room: "ม.3/2", number: 23 }, "12575": { name: "ด.ญ. วรัณญา พรรคทิง", room: "ม.3/2", number: 24 }, "12576": { name: "ด.ญ. วสุธัญ ชื่นบาน", room: "ม.3/2", number: 25 }, "12577": { name: "ด.ญ. สิริญากร พนังศรี", room: "ม.3/2", number: 26 }, "12578": { name: "ด.ญ. สุปรียา จันทนา", room: "ม.3/2", number: 27 }, "12579": { name: "ด.ญ. สุพรรษา เกตุสวย", room: "ม.3/2", number: 28 }, "12580": { name: "ด.ญ. สุมิตรา สิทธิไกรพงษ์", room: "ม.3/2", number: 29 }, "12581": { name: "ด.ญ. อัฐภิญญา เพ็ชรนิล", room: "ม.3/2", number: 30 }, "12582": { name: "ด.ญ. อิสริยา จากครบุรี", room: "ม.3/2", number: 31 }, "12583": { name: "ด.ญ. ขวัญชีวา บุตรจันทา", room: "ม.3/2", number: 32 }, "12585": { name: "ด.ญ. ชัญญา พนมสัก", room: "ม.3/2", number: 33 }, "12586": { name: "ด.ญ. ธัญญาภรณ์ ไพพร", room: "ม.3/2", number: 34 }, "13055": { name: "น.ส. ตรีสรา พานแก้ว", room: "ม.3/2", number: 35 }
+        };
+
+        // =========================================================
+        // 3. ฐานข้อมูลโจทย์ข้อสอบ (Unit 2: Believe it or not)
+        // มีทั้งหมด 30 ข้อ เพื่อให้เกณฑ์ 21/30 (70%) ทำงานได้ตามปกติ
+        // =========================================================
+        const rawQuestions = [
+            // Q1-10: Natural Phenomena
+            { q: "When there is not enough water for plants and animals.", options: ["drought", "flood", "tornado", "avalanche"], a: "drought" },
+            { q: "A large amount of ice, snow and rock that falls down the side of a mountain.", options: ["avalanche", "earthquake", "hurricane", "tsunami"], a: "avalanche" },
+            { q: "Air that spins very fast and destroys everything in its path.", options: ["tornado", "lightning", "flood", "volcanic eruption"], a: "tornado" },
+            { q: "An enormous wave in the sea caused by an earthquake on the sea bed.", options: ["tsunami", "drought", "earthquake", "flood"], a: "tsunami" },
+            { q: "Many houses were destroyed by the ____________, which measured 6.5 on the Richter scale.", options: ["earthquake", "lightning", "hurricane", "drought"], a: "earthquake" },
+            { q: "Water from the ____________ filled the streets and damaged many houses.", options: ["flood", "tornado", "avalanche", "lightning"], a: "flood" },
+            { q: "The ____________ caused plants and animals to die from a lack of water.", options: ["drought", "tsunami", "flood", "avalanche"], a: "drought" },
+            { q: "After the ____________, lava came flowing down the mountain.", options: ["volcanic eruption", "tornado", "hurricane", "earthquake"], a: "volcanic eruption" },
+            { q: "A flash of bright light in the sky during a storm is called ____________.", options: ["lightning", "drought", "flood", "avalanche"], a: "lightning" },
+            { q: "A strong, dangerous wind that forms over the ocean is a ____________.", options: ["hurricane", "earthquake", "tsunami", "volcanic eruption"], a: "hurricane" },
+            
+            // Q11-18: Injuries, Accidents & First aid
+            { q: "Yesterday my mum ____________ on the frying pan.", options: ["burned her hand", "bruised her eye", "twisted her ankle", "pulled a muscle"], a: "burned her hand" },
+            { q: "Mark ____________ when a ball hit it. He couldn't see properly for days.", options: ["bruised his eye", "broke a leg", "hit his head", "cut his leg"], a: "bruised his eye" },
+            { q: "Jane fell and ____________. She had to put it in a plaster cast.", options: ["broke her leg", "cut her leg", "burned her hand", "hit her head"], a: "broke her leg" },
+            { q: "As Tom was climbing the rocks, he ____________ and it started bleeding.", options: ["cut his leg", "pulled a muscle", "sprained his wrist", "bruised his eye"], a: "cut his leg" },
+            { q: "While John was running, he ____________ in the back of his leg. It was very painful to walk home.", options: ["pulled a muscle", "hit his head", "burned his hand", "broke a leg"], a: "pulled a muscle" },
+            { q: "You can ____________ your ankle, but not your head.", options: ["twist", "cut", "hit", "burn"], a: "twist" },
+            { q: "You can ____________ your wrist when you fall on your hand.", options: ["sprain", "bruise", "hit", "pull"], a: "sprain" },
+            { q: "Susan ____________ against the door. Now she has a terrible headache.", options: ["hit her head", "cut her leg", "twisted her ankle", "broke her leg"], a: "hit her head" },
+            
+            // Q19-23: Aches & Pains
+            { q: "If he has ____________, he shouldn't lift anything heavy.", options: ["backache", "a rash", "toothache", "a cough"], a: "backache" },
+            { q: "John doesn't like the taste of milk. It makes him ____________.", options: ["feel sick", "have a rash", "have a cough", "have a temperature"], a: "feel sick" },
+            { q: "I have a skin ____________. It's very itchy.", options: ["rash", "cough", "backache", "headache"], a: "rash" },
+            { q: "Jane is sneezing and coughing a lot. I think she has ____________.", options: ["a cold", "toothache", "backache", "a rash"], a: "a cold" },
+            { q: "Paul needs to go to the dentist immediately. His ____________ is getting worse.", options: ["toothache", "backache", "headache", "stomach ache"], a: "toothache" },
+            
+            // Q24-25: Reading (Lightning)
+            { q: "Roy Sullivan worked as a ____________.", options: ["forest ranger", "doctor", "teacher", "pilot"], a: "forest ranger" },
+            { q: "How many lightning strikes did Roy survive?", options: ["Seven", "Six", "Five", "Four"], a: "Seven" },
+            
+            // Q26-30: Grammar (Past Simple vs Past Continuous)
+            { q: "As John ____________ to school yesterday, he slipped and sprained his ankle.", options: ["was walking", "walked", "is walking", "walks"], a: "was walking" },
+            { q: "I ____________ for the bus when my mobile rang.", options: ["was waiting", "waited", "wait", "am waiting"], a: "was waiting" },
+            { q: "The kids ____________ TV while Mum was reading a magazine.", options: ["were watching", "watched", "watch", "are watching"], a: "were watching" },
+            { q: "First he dialled the number and then he ____________ the fax.", options: ["sent", "was sending", "is sending", "sends"], a: "sent" },
+            { q: "Over a decade ago, Binti Jua ____________ one of the most famous gorillas in the world.", options: ["became", "was becoming", "becomes", "is becoming"], a: "became" }
+        ];
+
+        // =========================================================
+        // 4. ตัวแปรสำหรับควบคุมระบบ (State Variables)
+        // =========================================================
+        let currentStudent = null;
+        let currentStudentId = null;
+        let attemptCount = 1;
+
+        let quizPool = [];
+        let currentQIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        let timeLeft = 30 * 60; // 30 นาที (1800 วินาที)
+        let timerInterval;
+        let cheatWarnings = 0;
+
+        // =========================================================
+        // 5. ระบบล็อคอินและการจัดการนักเรียน
+        // =========================================================
+        function checkLogin() {
+            const idInput = document.getElementById("student-id").value.trim();
+            const nameInput = document.getElementById("student-name").value.trim();
+
+            if (idInput.length !== 5) {
+                alert("กรุณากรอกรหัสนักเรียน 5 หลักให้ครบถ้วน");
+                return;
+            }
+            if (nameInput === "") {
+                alert("กรุณากรอกชื่อจริง (ไม่ต้องใส่ ด.ช./ด.ญ.)");
+                return;
+            }
+            
+            // ตรวจสอบรหัสแอดมิน (ครูพะโล้)
+            if (idInput === ADMIN_ID && nameInput === ADMIN_FIRSTNAME) {
+                currentStudent = { name: "ครูพะโล้ (Admin)", room: "Staff", number: 0 };
+                currentStudentId = ADMIN_ID;
+                document.getElementById("student-name-display").innerText = `CHIEF INSPECTOR: ${currentStudent.name}`;
+                document.getElementById("confirm-box").classList.remove("hidden");
+                document.getElementById("btn-login").classList.add("hidden");
+                document.getElementById("btn-teacher-reset").classList.remove("hidden");
+                return;
+            }
+
+            if (studentDB[idInput]) {
+                const record = studentDB[idInput];
+
+                if (!record.name.includes(nameInput)) {
+                    alert("รหัสผ่านหรือชื่อไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง (ใส่แค่ชื่อจริง ไม่ต้องมีคำนำหน้า)");
+                    return;
+                }
+
+                currentStudent = record;
+                currentStudentId = idInput;
+                document.getElementById("student-name-display").innerText = `${currentStudent.name} (${currentStudent.room} เลขที่ ${currentStudent.number})`;
+                document.getElementById("confirm-box").classList.remove("hidden");
+                document.getElementById("btn-login").classList.add("hidden");
+                document.getElementById("btn-teacher-reset").classList.add("hidden");
+
+            } else {
+                alert("ไม่พบรหัสนักเรียนนี้ในระบบ กรุณาตรวจสอบอีกครั้ง");
+            }
+        }
+
+        // ฟังก์ชันพิเศษสำหรับครู (เคลียร์ความจำเบราว์เซอร์)
+        function resetTeacher() {
+            localStorage.removeItem('M3_Unit2_Attempts_' + ADMIN_ID);
+            alert("ล้างประวัติการสอบของแอดมินเรียบร้อยแล้ว!");
+        }
+
+        function resetLogin() {
+            document.getElementById("student-id").value = "";
+            document.getElementById("student-name").value = "";
+            document.getElementById("confirm-box").classList.add("hidden");
+            document.getElementById("btn-login").classList.remove("hidden");
+            currentStudent = null;
+            currentStudentId = null;
+        }
+
+        // =========================================================
+        // 6. เริ่มทำข้อสอบ
+        // =========================================================
+        function startExam() {
+            let savedAttempt = localStorage.getItem('M3_Unit2_Attempts_' + currentStudentId);
+            if (savedAttempt) {
+                attemptCount = parseInt(savedAttempt) + 1;
+            } else {
+                attemptCount = 1;
+            }
+
+            quizPool = shuffleArray([...rawQuestions]).map(q => {
+                let shuffledOptions = shuffleArray([...q.options]);
+                return { ...q, options: shuffledOptions };
+            });
+
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("hidden");
+            
+            enableAntiCheat();
+            startTimer();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= quizPool.length) {
+                finishExam();
+                return;
+            }
+
+            let qData = quizPool[currentQIndex];
+            document.getElementById("question-counter").innerText = `Clue: ${currentQIndex + 1} / 30`;
+            document.getElementById("question-text").innerText = qData.q;
+            
+            let optionsHtml = "";
+            qData.options.forEach((opt, idx) => {
+                optionsHtml += `<button class="option-btn" onclick="selectOption(this, ${idx})">${opt}</button>`;
+            });
+            
+            document.getElementById("options-area").innerHTML = optionsHtml;
+            document.getElementById("btn-next").disabled = true;
+        }
+
+        function selectOption(btnElement, selectedIndex) {
+            let allBtns = document.querySelectorAll(".option-btn");
+            allBtns.forEach(btn => btn.classList.remove("selected"));
+            btnElement.classList.add("selected");
+            
+            userAnswers[currentQIndex] = quizPool[currentQIndex].options[selectedIndex];
+            document.getElementById("btn-next").disabled = false;
+        }
+        
+        function nextQuestion() {
+            currentQIndex++;
+            loadQuestion();
+        }
+
+        // =========================================================
+        // 7. ระบบจับเวลา
+        // =========================================================
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                let tDisplay = document.getElementById("time-display");
+                tDisplay.innerText = `${m}:${s}`;
+                
+                if (timeLeft <= 300) tDisplay.classList.add("timer-warning");
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("หมดเวลาทำข้อสอบ! ระบบจะส่งคำตอบอัตโนมัติ");
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        // =========================================================
+        // 8. ประมวลผลและคิดคะแนน (Decay Multiplier)
+        // =========================================================
+        function finishExam() {
+            clearInterval(timerInterval);
+            disableAntiCheat();
+            document.getElementById("quiz-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.remove("hidden");
+
+            score = 0;
+            quizPool.forEach((q, idx) => {
+                if (userAnswers[idx] === q.a) score++;
+            });
+
+            document.getElementById("final-score").innerText = score;
+            document.getElementById("res-name").innerText = `${currentStudent.name}`;
+            document.getElementById("res-attempt").innerText = attemptCount;
+
+            let actionsHtml = "";
+            
+            if (score >= 21) {
+                document.getElementById("result-title").innerText = "MISSION ACCOMPLISHED!";
+                document.getElementById("result-title").style.color = "var(--teal-dark)";
+                document.getElementById("result-icon").innerText = "🏆";
+                
+                let netScore = score;
+                let decayMsg = "";
+                
+                if (attemptCount === 2) {
+                    netScore = Math.round(score * 0.9);
+                    decayMsg = "สอบผ่านในรอบที่ 2 (รับคะแนน 90%)";
+                } else if (attemptCount === 3) {
+                    netScore = Math.round(score * 0.8);
+                    decayMsg = "สอบผ่านในรอบที่ 3 (รับคะแนน 80%)";
+                } else if (attemptCount >= 4) {
+                    netScore = 21;
+                    decayMsg = "สอบผ่านในรอบที่ 4 ขึ้นไป (รับคะแนนผ่านเกณฑ์ขั้นต่ำ)";
+                } else {
+                    decayMsg = "สอบผ่านในรอบที่ 1 (รับคะแนนเต็ม 100%)";
+                }
+
+                document.getElementById("decay-warning").innerText = decayMsg;
+                actionsHtml = `<button class="btn-agent uppercase tracking-widest text-lg" onclick="submitToGoogleSheets(${score}, ${netScore})">Submit Evidence ➔</button>`;
+                
+            } else {
+                document.getElementById("result-title").innerText = "MISSION FAILED!";
+                document.getElementById("result-title").style.color = "#dc2626";
+                document.getElementById("result-icon").innerText = "❌";
+                
+                localStorage.setItem('M3_Unit2_Attempts_' + currentStudentId, attemptCount);
+                actionsHtml = `<button class="btn-warning uppercase tracking-widest" onclick="location.reload()">Review & Retry Mission</button>`;
+            }
+            
+            document.getElementById("action-buttons").innerHTML = actionsHtml;
+        }
+
+        // =========================================================
+        // 9. ส่งข้อมูลเข้า Google Sheets
+        // =========================================================
+        function submitToGoogleSheets(raw, net) {
+            if (APP_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                alert("อย่าลืมใส่ URL ของ Google Apps Script ในโค้ดบรรทัดที่ 4 นะครับ!");
+                return;
+            }
+
+            const submitBtn = document.querySelector("#action-buttons button");
+            submitBtn.innerText = "UPLOADING TO HQ...";
+            submitBtn.disabled = true;
+
+            const payload = {
+                unit: "Unit 2",
+                studentId: currentStudentId,
+                name: currentStudent.name,
+                room: currentStudent.room,
+                number: currentStudent.number,
+                rawScore: raw,
+                attempt: attemptCount,
+                netScore: net
+            };
+
+            fetch(APP_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("action-buttons").classList.add("hidden");
+                document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
+                document.getElementById("submit-status").classList.remove("hidden");
+                localStorage.removeItem('M3_Unit2_Attempts_' + currentStudentId);
+            })
+            .catch(err => {
+                alert("เกิดข้อผิดพลาดในการส่งคะแนน โปรดตรวจสอบอินเทอร์เน็ตแล้วลองกดส่งใหม่");
+                submitBtn.innerText = "Submit Evidence ➔";
+                submitBtn.disabled = false;
+            });
+        }
+
+        // =========================================================
+        // 10. ฟังก์ชันเสริม: สุ่มข้อมูล (Fisher-Yates Shuffle)
+        // =========================================================
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // =========================================================
+        // 11. ระบบป้องกันการทุจริต (Anti-Cheat)
+        // =========================================================
+        function handleVisibilityChange() {
+            if (document.hidden && !document.getElementById("quiz-screen").classList.contains("hidden")) {
+                cheatWarnings++;
+                if (cheatWarnings >= 3) {
+                    alert("คุณสลับหน้าจอเกินกำหนด! ระบบทำการบังคับส่งข้อสอบทันที");
+                    finishExam();
+                } else {
+                    alert(`คำเตือนการสลับหน้าจอ! (${cheatWarnings}/3) ห้ามสลับหน้าจอไปที่อื่นขณะทำข้อสอบ`);
+                }
+            }
+        }
+
+        function disableRightClick(e) { e.preventDefault(); }
+
+        function enableAntiCheat() {
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+            document.addEventListener("contextmenu", disableRightClick);
+            document.addEventListener("selectstart", disableRightClick);
+        }
+
+        function disableAntiCheat() {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener("contextmenu", disableRightClick);
+            document.removeEventListener("selectstart", disableRightClick);
+        }
+    </script>
+
+</body>
+</html>
