@@ -122,7 +122,6 @@
         .btn-ghost:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--brown); }
         .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: 4px 4px 0px var(--brown) !important; transform: none !important; }
 
-
         /* Quiz UI */
         .status-bar {
             background: var(--manila-dark);
@@ -473,6 +472,11 @@
         }
 
         function loadQuestion() {
+            if (currentQIndex >= quizPool.length) {
+                finishExam();
+                return;
+            }
+
             let qData = quizPool[currentQIndex];
             document.getElementById("question-counter").innerText = `Clue: ${currentQIndex + 1} / 30`;
             document.getElementById("question-text").innerText = qData.q;
