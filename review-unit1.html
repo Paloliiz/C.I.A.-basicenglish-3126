@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Briefing: Unit 1 Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--brown);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: repeating-linear-gradient(45deg, rgba(254, 243, 199, 0.05) 0px, rgba(254, 243, 199, 0.05) 2px, transparent 2px, transparent 8px);
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--manila);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 12px;
+                border: 4px solid #fff;
+            }
+        }
+
+        /* Top Header */
+        .app-header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-bottom: 4px solid var(--brown);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Slide Container */
+        .slide-area {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(69, 26, 3, 0.1) 28px);
+            background-attachment: local;
+        }
+
+        /* Slide Transitions */
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+            padding-bottom: 80px;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom UI Elements */
+        .concept-box {
+            background: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 4px 4px 0px var(--brown);
+        }
+
+        .highlight-teal { color: var(--teal-dark); font-weight: 700; }
+        .highlight-orange { color: var(--burnt-orange-dark); font-weight: 700; }
+
+        /* Interactive Flip/Reveal Button */
+        .reveal-btn {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 2px solid var(--brown);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--brown);
+            transition: all 0.1s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--brown); }
+        
+        .reveal-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--teal);
+            color: #fff;
+            border-radius: 6px;
+            border: 2px dashed #fff;
+            font-weight: 500;
+        }
+        .reveal-content.show { display: block; animation: fadeIn 0.3s; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 4px solid var(--brown);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: var(--teal);
+            color: white;
+            border: 3px solid var(--brown);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--brown);
+        }
+        .nav-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--brown); }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: 3px 3px 0px var(--brown); color: #888; }
+        
+        .nav-btn.prev { background: var(--mustard); color: var(--brown); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div>
+                <h1 class="font-retro text-2xl text-teal-dark">C.I.A. BRIEFING</h1>
+                <p class="text-xs font-bold text-burnt-orange tracking-widest uppercase">UNIT 1: LIFESTYLES</p>
+            </div>
+            <div class="text-right">
+                <span id="slide-indicator" class="font-retro text-xl text-brown bg-manila px-3 py-1 border-2 border-brown rounded-md shadow-sm">1/8</span>
+            </div>
+        </div>
+
+        <!-- Slides Area -->
+        <div class="slide-area" id="slide-container">
+
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" id="slide-1">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">💼</div>
+                    <h2 class="font-retro text-3xl text-burnt-orange mb-2">NEW MISSION!</h2>
+                    <p class="font-bold text-lg mb-6">แฟ้มสรุปคดี Unit 1: Lifestyles</p>
+                </div>
+                <div class="concept-box">
+                    <p class="mb-3">ยินดีต้อนรับสู่คดีใหม่! ภารกิจรอบนี้เราจะมาเจาะลึก <strong>"วิถีชีวิต"</strong> ของผู้คนกันค่ะ</p>
+                    <div class="p-3 bg-teal/10 border-l-4 border-teal text-teal-dark font-bold text-sm mt-4">
+                        🎯 เป้าหมาย: ทบทวนคำศัพท์อาชีพ (Jobs), ลักษณะนิสัย (Character), Tense แฝด (Present Simple VS Continuous) และการเปรียบเทียบ (Comparatives)
+                    </div>
+                </div>
+                <div class="text-center mt-8 animate-bounce">
+                    <p class="text-sm font-bold text-brown/60 uppercase tracking-widest">กด Next เพื่อเริ่มติว ➔</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Vocab - Jobs -->
+            <div class="slide" id="slide-2">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 1: คำศัพท์อาชีพ (Jobs)</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">จำแค่ "คีย์เวิร์ด" ก็ตอบได้แล้ว!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>👮‍♂️ <strong>security guard (รปภ.):</strong> ใบ้คำว่า <span class="highlight-orange">protects buildings</span> (ปกป้องอาคาร)</li>
+                        <li>✈️ <strong>travel agent (พนักงานจัดทัวร์):</strong> ใบ้คำว่า <span class="highlight-orange">plan holidays</span> (วางแผนวันหยุด)</li>
+                        <li>❤️ <strong>heart surgeon (ศัลยแพทย์หัวใจ):</strong> ใบ้คำว่า <span class="highlight-orange">operations on hearts</span> (ผ่าตัดหัวใจ)</li>
+                        <li>🗿 <strong>living statue (คนแต่งตัวเป็นรูปปั้น):</strong> ใบ้คำว่า <span class="highlight-orange">body paint</span> (ทาสีตัว)</li>
+                    </ul>
+
+                    <p class="font-bold text-sm mb-2 border-t-2 border-brown/20 pt-3">คำศัพท์จิปาถะที่ห้ามพลาด</p>
+                    <ul class="text-sm list-disc pl-5">
+                        <li><strong>tartan</strong> skirt = กระโปรงลายสก๊อตแบบชาวสกอตแลนด์</li>
+                        <li><strong>short-sleeved</strong> top = เสื้อแขนสั้น (ใส่ตอนอากาศร้อน hot)</li>
+                        <li><strong>wrinkles</strong> = รอยย่นบนใบหน้าคนแก่ (Old people)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-2')">🔍 ลองทำข้อสอบจริง</button>
+                    <div id="reveal-2" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> Eric Sprague has green tattoos all over his body to look like a ____________.</p>
+                        <p class="text-sm mt-2"><strong>วิเคราะห์:</strong> มีรอยสักสีเขียวเต็มตัวเพื่อให้ดูเหมือนอะไร? ➔ ตอบ <strong>lizard</strong> (กิ้งก่า) 🦎</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Character Adjectives -->
+            <div class="slide" id="slide-3">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 2: ลักษณะนิสัย (Character)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">เจอโจทย์ถามนิสัย ให้แปลอาการที่เขาเป็น แล้วจับคู่ให้ตรงกัน</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🤬 <strong>selfish (เห็นแก่ตัว):</strong> ใบ้คำว่า <span class="highlight-orange">cares about himself</span> (แคร์แต่ตัวเอง)</li>
+                        <li>🤝 <strong>outgoing (เข้าสังคมเก่ง):</strong> ใบ้คำว่า <span class="highlight-orange">loves meeting new people</span> (ชอบเจอคนใหม่ๆ)</li>
+                        <li>⚖️ <strong>honest (ซื่อสัตย์):</strong> ใบ้คำว่า <span class="highlight-orange">trust</span> (ไว้ใจได้)</li>
+                        <li>🧘‍♂️ <strong>patient (ใจเย็น/อดทน):</strong> ใบ้คำว่า ทำงานกับ <span class="highlight-orange">children</span> (เด็กๆ ต้องใช้ความใจเย็นสูง)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 4: Present Simple VS Continuous -->
+            <div class="slide" id="slide-4">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 3: Tense แฝดจอมป่วน</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-orange">1. Present Simple (ทำเป็นกิจวัตร/ตารางเวลา)</p>
+                    <p class="text-sm mb-2"><strong>สูตร:</strong> กริยาเติม s/es (ถ้าประธานคนเดียว)</p>
+                    <p class="text-sm mb-2"><strong>คำบอกใบ้:</strong> every day, on Sundays, sometimes, usually</p>
+                    <p class="text-sm text-gray-500 italic">ตัวอย่าง: We <strong>go</strong> on holiday every August. (ไปทุกๆ เดือนสิงหา)</p>
+                </div>
+
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-teal">2. Present Continuous (กำลังทำตอนนี้/แผนที่วางไว้ชัวร์ๆ)</p>
+                    <p class="text-sm mb-2"><strong>สูตร:</strong> is/am/are + V.ing</p>
+                    <p class="text-sm mb-2"><strong>คำบอกใบ้:</strong> now, tomorrow, at 7 pm.</p>
+                    <p class="text-sm text-gray-500 italic">ตัวอย่าง: Dad <strong>is walking</strong> the dog. (กำลังพาน้องหมาเดินเล่นอยู่ตอนนี้)</p>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-4')">🚨 กฎเหล็กที่มักโดนหลอก!</button>
+                    <div id="reveal-4" class="reveal-content bg-red-600">
+                        <p class="text-sm">คำกริยาที่บอก <strong>"ความรู้สึก/ความคิด" ห้ามเติม -ing เด็ดขาด!</strong></p>
+                        <p class="text-sm mt-1">เช่น want (ต้องการ), like (ชอบ), love (รัก)</p>
+                        <p class="text-sm mt-2">❌ I am wanting to buy jeans. (ผิด)</p>
+                        <p class="text-sm">✅ I <strong>want</strong> to buy jeans. (ถูก)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Comparatives -->
+            <div class="slide" id="slide-5">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 4: ขั้นกว่า (Comparatives)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-2">ใช้เปรียบเทียบของ <strong>2 สิ่ง</strong> (มักจะมีคำว่า <span class="highlight-orange">than</span> ตามหลังเสมอ)</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li><strong>คำสั้นๆ:</strong> ให้เติม <span class="highlight-teal">-er + than</span><br>
+                        เช่น hot ➔ <strong>hotter</strong> than (ร้อนกว่า) / hard ➔ <strong>harder</strong> than (หนักกว่า)</li>
+                        
+                        <li><strong>คำยาวๆ (3 พยางค์ขึ้นไป):</strong> ให้ใส่ <span class="highlight-teal">more + คำยาว + than</span><br>
+                        เช่น beautiful ➔ <strong>more beautiful</strong> than (สวยกว่า)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-5')">🔍 ดูตัวอย่างจากข้อสอบ</button>
+                    <div id="reveal-5" class="reveal-content">
+                        <p class="text-sm"><strong>โจทย์:</strong> Jane is ____________ than Mary. (beautiful)</p>
+                        <p class="text-sm mt-2"><strong>วิธีคิด:</strong> มีคำว่า than = ขั้นกว่า / beautiful เป็นคำยาว = ใช้ more</p>
+                        <p class="text-sm mt-1">➔ ตอบ <strong>more beautiful</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Superlatives -->
+            <div class="slide" id="slide-6">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 5: ขั้นสุด (Superlatives)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-2">ใช้บอกว่า <strong>ที่สุดในกลุ่ม</strong> (มักจะมีคำว่า <span class="highlight-orange">the</span> นำหน้าเสมอ)</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li><strong>คำสั้นๆ:</strong> ให้ใส่ <span class="highlight-teal">the + คำเติม -est</span><br>
+                        เช่น the hottest (ร้อนที่สุด)</li>
+                        
+                        <li><strong>คำยาวๆ:</strong> ให้ใส่ <span class="highlight-teal">the most + คำยาว</span><br>
+                        เช่น <strong>the most intelligent</strong> (ฉลาดที่สุด)</li>
+                    </ul>
+
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1">🚨 ตัวหลอกประจำคดี (คำเปลี่ยนรูป)</p>
+                        <p class="text-sm">คำบางคำไม่เติม -er หรือ -est แต่จะเปลี่ยนร่างไปเลย!</p>
+                        <ul class="text-sm mt-1 ml-4 list-disc">
+                            <li>good (ดี) ➔ better (ดีกว่า) ➔ <strong>best</strong> (ดีที่สุด)</li>
+                            <li>bad (แย่) ➔ worse (แย่กว่า) ➔ <strong>worst</strong> (แย่ที่สุด)</li>
+                        </ul>
+                        <p class="text-sm mt-2 italic text-gray-600">เช่น He is the <strong>worst</strong> singer in the world. (นักร้องที่แย่ที่สุด)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Too & Enough -->
+            <div class="slide" id="slide-7">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 6: Too & Enough</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">สองคำนี้เจอบ่อยมาก ความหมายต่างกันชัดเจน!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🙅‍♂️ <strong>Too + Adjective (มากเกินไป):</strong><br>
+                        ใช้ในความหมายเชิงลบ คือมากเกินไปจนทำไม่ได้/ไม่ดี<br>
+                        <span class="text-gray-500 italic">เช่น Jamie is <strong>too tired</strong> to do any work. (เจมี่เหนื่อยเกินไปที่จะทำงาน)</span></li>
+                        
+                        <li>👍 <strong>Adjective + Enough (เพียงพอ):</strong><br>
+                        ใช้ในความหมายเชิงบวก คือมีคุณสมบัติพอที่จะทำได้ (จำไว้ว่า enough ต้องอยู่ข้างหลังเสมอ!)<br>
+                        <span class="text-gray-500 italic">เช่น Sam is <strong>clever enough</strong> to become a doctor. (ฉลาดพอที่จะเป็นหมอ)</span></li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-7')">🔍 ลองวิเคราะห์ข้อนี้ดู</button>
+                    <div id="reveal-7" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> This dress is ____________ for me. Have you got it in a bigger size?</p>
+                        <p class="text-sm mt-2"><strong>วิธีคิด:</strong> เขาขอดู "ชุดไซส์ใหญ่ขึ้น" แสดงว่าชุดที่ใส่อยู่มันต้อง "เล็กเกินไป" ➔ ตอบ <strong>too small</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Finish -->
+            <div class="slide" id="slide-8">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🏆</div>
+                    <h2 class="font-retro text-3xl text-teal-dark mb-2">BRIEFING COMPLETE!</h2>
+                    <p class="font-bold text-lg mb-6">สายลับพร้อมลงสนามแล้ว!</p>
+                </div>
+                <div class="concept-box text-center">
+                    <p class="mb-3 text-sm">จำคีย์เวิร์ดที่เน้นสีส้มและสีเขียวเอาไว้ให้ดี มันคือตัวช่วยไขคดีในข้อสอบค่ะ</p>
+                    <p class="mb-3 text-sm">หายใจเข้าลึกๆ ไม่ต้องรีบ ค่อยๆ อ่านโจทย์แล้วหาคำบอกใบ้</p>
+                    <p class="font-bold text-burnt-orange-dark">ปิดแฟ้มหน้านี้ แล้วกลับไปทำข้อสอบ Unit 1 ได้เลยค่ะ!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button id="btn-prev" class="nav-btn prev" onclick="changeSlide(-1)" disabled>◄ Back</button>
+            <button id="btn-next" class="nav-btn" onclick="changeSlide(1)">Next ►</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8; // อัปเดตจำนวนสไลด์เป็น 8
+
+        function updateUI() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+            // Show current slide
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('slide-indicator').innerText = `${currentSlide}/${totalSlides}`;
+            
+            // Update buttons
+            document.getElementById('btn-prev').disabled = currentSlide === 1;
+            
+            let btnNext = document.getElementById('btn-next');
+            if (currentSlide === totalSlides) {
+                btnNext.innerText = "FINISH ✔";
+                btnNext.classList.add("bg-burnt-orange");
+                btnNext.classList.remove("bg-teal");
+            } else {
+                btnNext.innerText = "Next ►";
+                btnNext.classList.remove("bg-burnt-orange");
+                btnNext.classList.add("bg-teal");
+            }
+
+            // Scroll to top of slide area
+            document.getElementById('slide-container').scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) {
+                alert("ติวเข้มเสร็จสิ้น! ปิดหน้านี้แล้วไปทำข้อสอบ Unit 1 ได้เลยค่ะ แอดมินครูพลอยเป็นกำลังใจให้!");
+                currentSlide = totalSlides;
+                return;
+            }
+            updateUI();
+        }
+
+        function toggleReveal(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
