@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Briefing: Starter Unit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--brown);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: repeating-linear-gradient(45deg, rgba(254, 243, 199, 0.05) 0px, rgba(254, 243, 199, 0.05) 2px, transparent 2px, transparent 8px);
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--manila);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 12px;
+                border: 4px solid #fff;
+            }
+        }
+
+        /* Top Header */
+        .app-header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-bottom: 4px solid var(--brown);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Slide Container */
+        .slide-area {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(69, 26, 3, 0.1) 28px);
+            background-attachment: local;
+        }
+
+        /* Slide Transitions */
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom UI Elements */
+        .concept-box {
+            background: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 4px 4px 0px var(--brown);
+        }
+
+        .highlight-teal { color: var(--teal-dark); font-weight: 700; }
+        .highlight-orange { color: var(--burnt-orange-dark); font-weight: 700; }
+
+        /* Interactive Flip/Reveal Button */
+        .reveal-btn {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 2px solid var(--brown);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--brown);
+            transition: all 0.1s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--brown); }
+        
+        .reveal-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--teal);
+            color: #fff;
+            border-radius: 6px;
+            border: 2px dashed #fff;
+            font-weight: 500;
+        }
+        .reveal-content.show { display: block; animation: fadeIn 0.3s; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 4px solid var(--brown);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: var(--teal);
+            color: white;
+            border: 3px solid var(--brown);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--brown);
+        }
+        .nav-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--brown); }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: 3px 3px 0px var(--brown); color: #888; }
+        
+        .nav-btn.prev { background: var(--mustard); color: var(--brown); }
+
+        /* Simple Table */
+        .retro-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+            border: 2px solid var(--brown);
+        }
+        .retro-table th { background: var(--teal); color: white; padding: 8px; border: 2px solid var(--brown); font-size: 0.9rem;}
+        .retro-table td { padding: 8px; border: 2px solid var(--brown); text-align: center; font-size: 0.9rem;}
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div>
+                <h1 class="font-retro text-2xl text-teal-dark">C.I.A. BRIEFING</h1>
+                <p class="text-xs font-bold text-burnt-orange tracking-widest uppercase">Starter Unit</p>
+            </div>
+            <div class="text-right">
+                <span id="slide-indicator" class="font-retro text-xl text-brown bg-manila px-3 py-1 border-2 border-brown rounded-md shadow-sm">1/7</span>
+            </div>
+        </div>
+
+        <!-- Slides Area -->
+        <div class="slide-area" id="slide-container">
+
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" id="slide-1">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🕵️‍♂️</div>
+                    <h2 class="font-retro text-3xl text-burnt-orange mb-2">WELCOME, AGENT!</h2>
+                    <p class="font-bold text-lg mb-6">ยินดีต้อนรับสู่แฟ้มสรุปคดี Starter Unit</p>
+                </div>
+                <div class="concept-box">
+                    <p class="mb-3">บทนี้เป็นการทบทวน <strong>"อาวุธพื้นฐาน"</strong> ทางภาษาอังกฤษ ก่อนที่เราจะไปสืบคดีที่ยากขึ้นในบทต่อๆ ไป</p>
+                    <p class="mb-3">ไม่ต้องกลัวว่าจะไม่เข้าใจ! สไลด์นี้ทำมาเพื่ออธิบายให้ง่ายที่สุด แค่ค่อยๆ อ่านและกดดูตัวอย่างทีละหน้า</p>
+                    <div class="p-3 bg-teal/10 border-l-4 border-teal text-teal-dark font-bold text-sm mt-4">
+                        🎯 เป้าหมาย: ทบทวนคำสรรพนาม, การใช้ Can/Have got, Present Simple, การตั้งคำถาม และการบอกจำนวน
+                    </div>
+                </div>
+                <div class="text-center mt-8 animate-bounce">
+                    <p class="text-sm font-bold text-brown/60 uppercase tracking-widest">กด Next เพื่อเริ่มติว ➔</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Pronouns -->
+            <div class="slide" id="slide-2">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 1: สรรพนาม (Pronouns)</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-orange">การแสดงความเป็นเจ้าของ มี 2 แบบ</p>
+                    <p class="text-sm mb-4">เวลาเราจะบอกว่า "ของฉัน" หรือ "ของคุณ" ฝรั่งเค้ามีวิธีพูด 2 แบบครับ มาดูกัน:</p>
+                    
+                    <table class="retro-table mb-4">
+                        <tr>
+                            <th>แบบที่ 1 (ต้องมีของตามหลัง)</th>
+                            <th>แบบที่ 2 (จบเลย ไม่ต้องมีของตามหลัง)</th>
+                        </tr>
+                        <tr>
+                            <td><strong>my</strong> (ของฉัน)<br><span class="text-xs text-gray-500">my book</span></td>
+                            <td><strong>mine</strong> (ของฉัน)<br><span class="text-xs text-gray-500">The book is mine.</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>your</strong> (ของคุณ)<br><span class="text-xs text-gray-500">your pen</span></td>
+                            <td><strong>yours</strong> (ของคุณ)<br><span class="text-xs text-gray-500">The pen is yours.</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>her</strong> (ของหล่อน)<br><span class="text-xs text-gray-500">her tail</span></td>
+                            <td><strong>hers</strong> (ของหล่อน)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>his</strong> (ของเขา)<br><span class="text-xs text-gray-500">his car</span></td>
+                            <td><strong>his</strong> (ของเขา)</td>
+                        </tr>
+                    </table>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-2')">🔍 ลองวิเคราะห์รูปประโยคนี้</button>
+                    <div id="reveal-2" class="reveal-content">
+                        <p><strong>โจทย์:</strong> I don't have a pen. Can I borrow _____?</p>
+                        <p class="mt-2"><strong>เฉลย:</strong> ตอบ <strong>yours</strong> เพราะประโยคจบแค่นี้ ไม่มีคำว่า pen ตามหลังแล้ว (ขอยืม "ของคุณ" หน่อยสิ)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Can & Have got -->
+            <div class="slide" id="slide-3">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 2: Can & Have got</h2>
+                
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-orange">1. การใช้ Can (สามารถ/ทำได้)</p>
+                    <p class="text-sm mb-2">Can ใช้ง่ายมาก! <strong>ประธานทุกตัวใช้ Can ได้หมดเลย</strong> ไม่ต้องเปลี่ยนรูป</p>
+                    <ul class="text-sm list-disc pl-5 mb-2">
+                        <li>บอกเล่า: I can boil an egg. (ฉันต้มไข่เป็น)</li>
+                        <li>คำถาม: <span class="highlight-teal">Can</span> you boil an egg? (เอา Can สลับมาไว้หน้าสุด)</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-orange">2. การใช้ Have got / Has got (มี)</p>
+                    <p class="text-sm mb-2">แปลว่า "มี" เหมือนคำว่า have ปกติ แต่แบ่งการใช้ตามประธาน:</p>
+                    <ul class="text-sm list-disc pl-5 mb-4">
+                        <li><strong>I / You / We / They</strong> ➔ ใช้ <span class="highlight-teal">have got</span></li>
+                        <li><strong>He / She / It / ชื่อคนคนเดียว</strong> ➔ ใช้ <span class="highlight-orange">has got</span></li>
+                    </ul>
+                    
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-3')">🔍 ดูทริคการทำข้อสอบ</button>
+                    <div id="reveal-3" class="reveal-content bg-burnt-orange">
+                        <p><strong>โจทย์:</strong> _____ Tina got straight hair? No, she hasn't.</p>
+                        <p class="mt-2"><strong>วิธีคิด:</strong> Tina เป็นผู้หญิงคนเดียว (She) เลยต้องใช้ <strong>Has</strong> (Has Tina got...?)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Present Simple -->
+            <div class="slide" id="slide-4">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 3: Present Simple</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">Tense นี้ใช้เล่า <strong>"ความจริง, นิสัย, หรือสิ่งที่ทำเป็นประจำ"</strong></p>
+                    
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1">🔑 กฎเหล็กข้อเดียวที่ต้องจำ!</p>
+                        <p class="text-sm">ถ้าประธานมีคนเดียว (He, She, It, Tom) ➔ <span class="highlight-orange">กริยาต้องเติม s หรือ es เสมอ!</span></p>
+                        <p class="text-sm">ถ้าประธานมีหลายคน หรือ I, You ➔ <span class="highlight-teal">กริยาไม่ต้องเติมอะไรเลยปล่อยโล่งๆ</span></p>
+                    </div>
+
+                    <p class="text-sm font-bold mb-2">คำบอกใบ้ในประโยค (Adverbs of Frequency)</p>
+                    <p class="text-sm mb-3">คำพวกนี้มักจะวางไว้ <span class="underline">หน้าคำกริยา</span>: always (เสมอ), usually (ปกติ), often (บ่อยๆ), sometimes (บางครั้ง), rarely (แทบจะไม่), never (ไม่เคย)</p>
+                    
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-4')">🔍 ฝึกแยกแยะ</button>
+                    <div id="reveal-4" class="reveal-content">
+                        <ul class="text-sm space-y-2">
+                            <li>1. Tom _____ (get/gets) up early. ➔ ตอบ <strong>gets</strong> (Tom คนเดียว)</li>
+                            <li>2. I _____ (like/likes) rock music. ➔ ตอบ <strong>like</strong> (I ไม่ต้องเติม s)</li>
+                            <li>3. Max _____ goes out. ➔ ตอบ <strong>usually</strong> goes out. (คำบอกความถี่ต้องอยู่หน้ากริยา)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Question Words -->
+            <div class="slide" id="slide-5">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 4: Question Words</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">เวลาเจอข้อสอบให้เติมคำถาม ให้ <strong>"ดูคำตอบ"</strong> ว่าเค้าตอบเรื่องอะไร แล้วเราจะรู้ว่าต้องถามอะไรครับ</p>
+                    
+                    <table class="retro-table mb-4">
+                        <tr><th>คำถาม</th><th>แปลว่า</th><th>ใช้ถามหา</th></tr>
+                        <tr><td><strong>Who</strong></td><td>ใคร</td><td>คน (เช่น My mum)</td></tr>
+                        <tr><td><strong>Whose</strong></td><td>ของใคร</td><td>เจ้าของ (เช่น Jenny's)</td></tr>
+                        <tr><td><strong>What time</strong></td><td>กี่โมง</td><td>เวลาเป๊ะๆ (เช่น 8 am.)</td></tr>
+                        <tr><td><strong>How far</strong></td><td>ไกลแค่ไหน</td><td>ระยะทาง (เช่น 4 kilometres)</td></tr>
+                    </table>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-5')">🔍 ดูตัวอย่างจากข้อสอบจริง</button>
+                    <div id="reveal-5" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> _____ bicycle is that? (คำตอบ: Jenny's.)</p>
+                        <p class="text-sm mt-2"><strong>วิธีคิด:</strong> คำตอบบอกว่า "ของเจนนี่" แสดงว่าต้องถามว่าจักรยานนี้ "ของใคร" ตอบ <strong>Whose</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Prepositions -->
+            <div class="slide" id="slide-6">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 5: In / On / At</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">จำ 3 คำนี้ไว้ใช้บอกเวลาให้เป๊ะปัง!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li><span class="text-xl">📦</span> <strong>IN (ใน):</strong> ใช้กับเวลาที่กว้างๆ ใหญ่ๆ<br>
+                        ➔ เดือน (in November), ปี (in 2024), ฤดู</li>
+                        <li><span class="text-xl">📍</span> <strong>ON (บน):</strong> เล็กลงมาหน่อย ใช้กับ "วัน"<br>
+                        ➔ วันในสัปดาห์ (on Sunday), วันที่เป๊ะๆ (on 22nd May)</li>
+                        <li><span class="text-xl">🎯</span> <strong>AT (ที่):</strong> เจาะจงสุดๆ หรือสำนวนเฉพาะ<br>
+                        ➔ เวลาตามนาฬิกา (at 8 am.), วันหยุดเทศกาล (at the weekend)</li>
+                    </ul>
+
+                    <p class="font-bold text-sm mb-2 border-t-2 border-brown/20 pt-3">ส่วนการบอกตำแหน่ง (Place)</p>
+                    <p class="text-sm"><strong>in front of</strong> (ข้างหน้า) / <strong>between</strong> (อยู่ระหว่าง 2 สิ่ง) / <strong>above</strong> (อยู่เหนือขึ้นไป)</p>
+                </div>
+            </div>
+
+            <!-- Slide 7: Quantifiers -->
+            <div class="slide" id="slide-7">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 6: การบอกปริมาณ</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-2 font-bold highlight-orange">Some VS Any (มีอยู่บ้าง)</p>
+                    <ul class="text-sm list-disc pl-5 mb-4">
+                        <li><strong>Some</strong> ➔ ใช้กับประโยคบอกเล่า (I need some cherries.)</li>
+                        <li><strong>Any</strong> ➔ ใช้กับประโยคปฏิเสธและคำถาม (There isn't any cheese.)</li>
+                    </ul>
+
+                    <p class="text-sm mb-2 font-bold highlight-teal border-t-2 border-brown/20 pt-3">Much / Many / A few (มาก / นิดหน่อย)</p>
+                    <ul class="text-sm list-disc pl-5 mb-4">
+                        <li><strong>Many</strong> (มาก) / <strong>A few</strong> (2-3 ชิ้น) ➔ ใช้กับของที่ <span class="underline">นับเป็นชิ้นๆ ได้</span> และต้องเติม s (เช่น apples, students)</li>
+                        <li><strong>Much</strong> (มาก) / <strong>A little</strong> (นิดนึง) ➔ ใช้กับของที่ <span class="underline">นับไม่ได้</span> เป็นน้ำๆ หรือผงๆ (เช่น milk, cheese)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-7')">🔍 สรุปจบแฟ้มคดี</button>
+                    <div id="reveal-7" class="reveal-content text-center">
+                        <p class="text-xl mb-2">🎉</p>
+                        <p class="font-bold">ติวเนื้อหาครบหมดแล้ว!</p>
+                        <p class="text-sm mt-1">พร้อมรับภารกิจ Starter Unit แล้วใช่ไหม?<br>ปิดหน้านี้แล้วไปลุยทำข้อสอบกันเลย สายลับ!</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button id="btn-prev" class="nav-btn prev" onclick="changeSlide(-1)" disabled>◄ Back</button>
+            <button id="btn-next" class="nav-btn" onclick="changeSlide(1)">Next ►</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+
+        function updateUI() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+            // Show current slide
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('slide-indicator').innerText = `${currentSlide}/${totalSlides}`;
+            
+            // Update buttons
+            document.getElementById('btn-prev').disabled = currentSlide === 1;
+            
+            let btnNext = document.getElementById('btn-next');
+            if (currentSlide === totalSlides) {
+                btnNext.innerText = "FINISH ✔";
+                btnNext.classList.add("bg-burnt-orange");
+                btnNext.classList.remove("bg-teal");
+            } else {
+                btnNext.innerText = "Next ►";
+                btnNext.classList.remove("bg-burnt-orange");
+                btnNext.classList.add("bg-teal");
+            }
+
+            // Scroll to top of slide area
+            document.getElementById('slide-container').scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) {
+                // ถ้ากด finish หน้าสุดท้าย
+                alert("ติวเข้มเสร็จสิ้น! ปิดหน้านี้แล้วไปทำข้อสอบ Starter Unit ได้เลยครับ แอดมินเป็นกำลังใจให้!");
+                currentSlide = totalSlides;
+                return;
+            }
+            updateUI();
+        }
+
+        function toggleReveal(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
