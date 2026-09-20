@@ -282,7 +282,7 @@
                 
                 <div id="submit-status" class="hidden mt-4 p-3 bg-teal/10 border-2 border-teal rounded-md text-teal-dark font-bold text-sm"></div>
             </div>
-            
+
         </div>
     </div>
 
@@ -327,45 +327,48 @@
         };
 
         // =========================================================
-        // 3. ฐานข้อมูลโจทย์ข้อสอบ (Starter Unit)
+        // 3. ฐานข้อมูลโจทย์ข้อสอบ (Unit 1: Lifestyles)
         // =========================================================
         const rawQuestions = [
-            // Greetings & Pronouns
-            { q: "A: How are you? \nB: _______________", options: ["I'm fine, thanks, and you?", "Pleased to meet you too.", "I don't think you've met Simone.", "Hello. I'm David."], a: "I'm fine, thanks, and you?" },
-            { q: "A: Hello, Tom. Pleased to meet you. \nB: _______________", options: ["Pleased to meet you too.", "Not bad, thanks.", "I'm fine.", "Pretty good, thanks."], a: "Pleased to meet you too." },
-            { q: "Where's Liz? _____ is at school.", options: ["She", "He", "It", "They"], a: "She" },
-            { q: "This is my puppy. Look at that dog! _____ tail is very short.", options: ["Its", "It's", "His", "Her"], a: "Its" },
-            { q: "Compare: These are my books. They're _____.", options: ["mine", "my", "me", "ours"], a: "mine" },
-            { q: "A: I don't have a pen. Can I borrow _____? \nB: Yes, it is on my desk.", options: ["yours", "your", "you", "mine"], a: "yours" },
-            // Can & Have got
-            { q: "_____ Tina got straight hair? No, she hasn't.", options: ["Has", "Have", "Do", "Are"], a: "Has" },
-            { q: "Are they from England? No, they _____.", options: ["aren't", "don't", "haven't", "can't"], a: "aren't" },
-            { q: "Tracey has got a laptop. She _____ got a car.", options: ["hasn't", "haven't", "isn't", "can't"], a: "hasn't" },
-            { q: "_____ you boil an egg?", options: ["Can", "Have", "Has", "Do"], a: "Can" },
-            // Present Simple
-            { q: "Tom _____ up early every day.", options: ["gets", "get", "getting", "is get"], a: "gets" },
-            { q: "I _____ rock music.", options: ["like", "likes", "liking", "am like"], a: "like" },
-            { q: "What _____ Tom and Jane do at the weekends?", options: ["do", "does", "are", "have"], a: "do" },
-            { q: "My dad _____ the car every Saturday.", options: ["washes", "wash", "washing", "is wash"], a: "washes" },
-            { q: "Max _____ goes out on Saturday night.", options: ["usually", "usual", "often is", "sometimes is"], a: "usually" },
-            { q: "Gina rarely _____ up late.", options: ["stays", "stay", "staying", "is stay"], a: "stays" },
-            // Question Words
-            { q: "_____ does the laundry every week? (My mum does.)", options: ["Who", "What", "Which", "Where"], a: "Who" },
-            { q: "_____ bicycle is that? (Jenny's.)", options: ["Whose", "Who", "What", "Which"], a: "Whose" },
-            { q: "_____ do you start school? (At 8 am.)", options: ["What time", "When time", "How long", "How often"], a: "What time" },
-            { q: "_____ far is our hotel from the airport? (About four kilometres.)", options: ["How", "What", "Where", "Which"], a: "How" },
-            // Prepositions
-            { q: "Is your birthday _____ 22nd May?", options: ["on", "in", "at", "to"], a: "on" },
-            { q: "Tim often plays football _____ the weekend.", options: ["at", "in", "on", "for"], a: "at" },
-            { q: "My birthday is _____ November.", options: ["in", "on", "at", "by"], a: "in" },
-            { q: "There is a picture _____ the wall.", options: ["on", "in", "at", "above"], a: "on" },
-            { q: "The glass table is _____ the sofa.", options: ["in front of", "between", "under", "in"], a: "in front of" },
-            // Food & Quantifiers
-            { q: "I need _____ cherries.", options: ["some", "any", "much", "a little"], a: "some" },
-            { q: "There isn't _____ cheese in the fridge.", options: ["any", "some", "many", "few"], a: "any" },
-            { q: "How _____ milk do you want?", options: ["much", "many", "some", "any"], a: "much" },
-            { q: "How _____ students are there in the class?", options: ["many", "much", "lot", "little"], a: "many" },
-            { q: "We've got _____ apples. I'll make a fruit salad.", options: ["a few", "a little", "much", "any"], a: "a few" }
+            // Vocabulary: Jobs & Clothes
+            { q: "He protects buildings and people. He is a ____________.", options: ["security guard", "computer programmer", "graphic designer", "shop assistant"], a: "security guard" },
+            { q: "She helps people plan their holidays. She is a ____________.", options: ["travel agent", "bank clerk", "accountant", "TV presenter"], a: "travel agent" },
+            { q: "Scottish people traditionally wear a ____________ skirt.", options: ["tartan", "polka-dot", "polo-neck", "flat"], a: "tartan" },
+            { q: "It's really hot today, so you should put on a ____________ top.", options: ["short-sleeved", "polo-neck", "tight-fitting", "winter"], a: "short-sleeved" },
+            { q: "A ____________ performs operations on people's hearts.", options: ["heart surgeon", "make-up artist", "lifeguard", "interior decorator"], a: "heart surgeon" },
+            
+            // Reading: Extreme Jobs & Character Adjectives
+            { q: "Christina Clarkson covers her skin with body paint to become a ____________.", options: ["living statue", "sideshow performer", "Disney character", "graphic designer"], a: "living statue" },
+            { q: "Eric Sprague has green tattoos all over his body to look like a ____________.", options: ["lizard", "dog", "statue", "Pluto"], a: "lizard" },
+            { q: "One of the most important qualities for people working as a Disney character is to be ____________ with children.", options: ["patient", "selfish", "rude", "skinny"], a: "patient" },
+            { q: "Old people usually have ____________ on their faces.", options: ["wrinkles", "freckles", "dimples", "tattoos"], a: "wrinkles" },
+            { q: "He only cares about himself. He's so ____________.", options: ["selfish", "generous", "easy-going", "honest"], a: "selfish" },
+            { q: "Maria loves meeting new people. She is very ____________.", options: ["outgoing", "reserved", "shy", "rude"], a: "outgoing" },
+            { q: "You can trust Dan. He is very ____________.", options: ["honest", "selfish", "sensitive", "short"], a: "honest" },
+            
+            // Grammar: Present Simple vs Present Continuous
+            { q: "John and Val sometimes ____________ on Sundays.", options: ["work", "works", "are working", "is working"], a: "work" },
+            { q: "Ann ____________ a hairdressing course in London now.", options: ["is doing", "does", "do", "are doing"], a: "is doing" },
+            { q: "My brother ____________ a fancy dress party for his birthday tomorrow.", options: ["is having", "has", "have", "are having"], a: "is having" },
+            { q: "The sun ____________ in the east.", options: ["rises", "is rising", "rise", "are rising"], a: "rises" },
+            { q: "The train ____________ at 7 pm.", options: ["leaves", "is leaving", "leave", "are leaving"], a: "leaves" },
+            { q: "A: It's very quiet. Where is everybody?\nB: Dad ____________ the dog.", options: ["is walking", "walks", "walk", "are walking"], a: "is walking" },
+            { q: "We ____________ on holiday every August.", options: ["go", "goes", "are going", "is going"], a: "go" },
+            { q: "I ____________ to buy a new pair of jeans.", options: ["want", "am wanting", "wants", "is wanting"], a: "want" },
+            
+            // Grammar: Comparative & Superlative
+            { q: "Jane is ____________ than Mary.", options: ["more beautiful", "beautiful", "most beautiful", "beautifuler"], a: "more beautiful" },
+            { q: "Today is ____________ than yesterday.", options: ["hotter", "hot", "the hottest", "more hot"], a: "hotter" },
+            { q: "Jane is the ____________ girl in the class.", options: ["most intelligent", "more intelligent", "intelligent", "intelligenter"], a: "most intelligent" },
+            { q: "He is the ____________ singer in the world.", options: ["worst", "worse", "baddest", "bad"], a: "worst" },
+            { q: "I think Prague is ____________ than Vienna.", options: ["more beautiful", "most beautiful", "beautifuler", "beautiful"], a: "more beautiful" },
+            { q: "Carol studies ____________ than her classmates.", options: ["harder", "hard", "hardest", "more hard"], a: "harder" },
+            { q: "He is ____________ the best student.", options: ["by far", "much", "as", "a bit"], a: "by far" },
+            
+            // Grammar: Too & Enough
+            { q: "Sam is ____________ to become a doctor.", options: ["clever enough", "enough clever", "too clever", "clever too"], a: "clever enough" },
+            { q: "This dress is ____________ for me. Have you got it in a bigger size?", options: ["too small", "small enough", "enough small", "too big"], a: "too small" },
+            { q: "Jamie is ____________ to do any work today.", options: ["too tired", "tired enough", "enough tired", "tired too"], a: "too tired" }
         ];
 
         // =========================================================
@@ -377,7 +380,7 @@
 
         let quizPool = [];
         let currentQIndex = 0;
-        let userAnswers = [];
+        let userAnswers = []; // เก็บคำตอบด้วย String ของ option นั้นๆ
         let score = 0;
 
         let timeLeft = 30 * 60; // 30 นาที (1800 วินาที)
@@ -663,7 +666,7 @@
         // =========================================================
         function submitToGoogleSheets(raw, net) {
             if (APP_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
-                alert("อย่าลืมใส่ URL ของ Google Apps Script ในโค้ดบรรทัดที่ 262 นะครับ!");
+                alert("อย่าลืมใส่ URL ของ Google Apps Script นะครับ!");
                 return;
             }
 
@@ -688,13 +691,19 @@
             })
             .then(res => res.json())
             .then(data => {
-                document.getElementById("action-buttons").classList.add("hidden");
-                document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
-                document.getElementById("submit-status").classList.remove("hidden");
-                localStorage.removeItem('M3_Unit1_Attempts_' + currentStudentId);
+                if (data.status === "success") {
+                    document.getElementById("action-buttons").classList.add("hidden");
+                    document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
+                    document.getElementById("submit-status").classList.remove("hidden");
+                    localStorage.removeItem('M3_Unit1_Attempts_' + currentStudentId);
+                } else {
+                    alert("Google Sheets แจ้งเตือนข้อผิดพลาด: " + data.message);
+                    submitBtn.innerText = "Submit Evidence ➔";
+                    submitBtn.disabled = false;
+                }
             })
             .catch(err => {
-                alert("เกิดข้อผิดพลาดในการส่งคะแนน โปรดตรวจสอบอินเทอร์เน็ตแล้วลองกดส่งใหม่");
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
                 submitBtn.innerText = "Submit Evidence ➔";
                 submitBtn.disabled = false;
             });
