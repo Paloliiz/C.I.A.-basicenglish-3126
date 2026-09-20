@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Briefing: Unit 3 Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--brown);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: repeating-linear-gradient(45deg, rgba(254, 243, 199, 0.05) 0px, rgba(254, 243, 199, 0.05) 2px, transparent 2px, transparent 8px);
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--manila);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 12px;
+                border: 4px solid #fff;
+            }
+        }
+
+        /* Top Header */
+        .app-header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-bottom: 4px solid var(--brown);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Slide Container */
+        .slide-area {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(69, 26, 3, 0.1) 28px);
+            background-attachment: local;
+        }
+
+        /* Slide Transitions */
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+            padding-bottom: 80px;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom UI Elements */
+        .concept-box {
+            background: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 4px 4px 0px var(--brown);
+        }
+
+        .highlight-teal { color: var(--teal-dark); font-weight: 700; }
+        .highlight-orange { color: var(--burnt-orange-dark); font-weight: 700; }
+
+        /* Interactive Flip/Reveal Button */
+        .reveal-btn {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 2px solid var(--brown);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--brown);
+            transition: all 0.1s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--brown); }
+        
+        .reveal-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--teal);
+            color: #fff;
+            border-radius: 6px;
+            border: 2px dashed #fff;
+            font-weight: 500;
+        }
+        .reveal-content.show { display: block; animation: fadeIn 0.3s; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 4px solid var(--brown);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: var(--teal);
+            color: white;
+            border: 3px solid var(--brown);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--brown);
+        }
+        .nav-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--brown); }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: 3px 3px 0px var(--brown); color: #888; }
+        
+        .nav-btn.prev { background: var(--mustard); color: var(--brown); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div>
+                <h1 class="font-retro text-2xl text-teal-dark">C.I.A. BRIEFING</h1>
+                <p class="text-xs font-bold text-burnt-orange tracking-widest uppercase">UNIT 3: EXPERIENCES</p>
+            </div>
+            <div class="text-right">
+                <span id="slide-indicator" class="font-retro text-xl text-brown bg-manila px-3 py-1 border-2 border-brown rounded-md shadow-sm">1/8</span>
+            </div>
+        </div>
+
+        <!-- Slides Area -->
+        <div class="slide-area" id="slide-container">
+
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" id="slide-1">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🪂</div>
+                    <h2 class="font-retro text-3xl text-burnt-orange mb-2">FIELD MISSION!</h2>
+                    <p class="font-bold text-lg mb-6">แฟ้มสรุปคดี Unit 3: Experiences</p>
+                </div>
+                <div class="concept-box">
+                    <p class="mb-3">ยินดีต้อนรับสู่บทที่ 3! ภารกิจรอบนี้เราจะออกภาคสนามไปทำกิจกรรมเอ็กซ์ตรีม และรับมือกับปัญหาปวดหัวตอนไปเที่ยวกันค่ะ</p>
+                    <div class="p-3 bg-teal/10 border-l-4 border-teal text-teal-dark font-bold text-sm mt-4">
+                        🎯 เป้าหมาย: แยกแยะประเภทกีฬา, เลือกใช้อุปกรณ์กีฬาให้ถูก, การใช้ Play VS Go, และแก้ปัญหาการเดินทาง (Holiday Problems)
+                    </div>
+                </div>
+                <div class="text-center mt-8 animate-bounce">
+                    <p class="text-sm font-bold text-brown/60 uppercase tracking-widest">กด Next เพื่อเริ่มติว ➔</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Sports Categories -->
+            <div class="slide" id="slide-2">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 1: ประเภทกีฬาเอ็กซ์ตรีม</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">กีฬาแต่ละอย่างเล่นที่ไหน? แยกให้ออก!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🌊 <strong>Water (กีฬาทางน้ำ):</strong><br>
+                        <span class="highlight-teal">white-water rafting</span> (ล่องแก่ง), <span class="highlight-teal">canoeing</span> (พายเรือแคนู), <span class="highlight-teal">snorkelling</span> (ดำน้ำตื้น)</li>
+                        
+                        <li>✈️ <strong>Air (กีฬาทางอากาศ):</strong><br>
+                        <span class="highlight-orange">skydiving</span> (กระโดดร่ม), <span class="highlight-orange">hang-gliding</span> (เครื่องร่อน)</li>
+                        
+                        <li>⛰️ <strong>Land (กีฬาทางบก):</strong><br>
+                        <span class="text-amber-700 font-bold">mountain biking</span> (จักรยานภูเขา), <span class="text-amber-700 font-bold">rock climbing</span> (ปีนหน้าผา), <span class="text-amber-700 font-bold">motocross</span> (มอเตอร์ไซค์วิบาก)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-2')">🔍 ลองวิเคราะห์ข้อนี้</button>
+                    <div id="reveal-2" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> Skydiving is considered an ____________ sport.</p>
+                        <p class="text-sm mt-2"><strong>วิเคราะห์:</strong> Sky = ท้องฟ้า แสดงว่าต้องเป็นกีฬาทางอากาศ ➔ ตอบ <strong>air</strong> sport</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Play vs Go -->
+            <div class="slide" id="slide-3">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 2: เล่น (Play) หรือ ไป (Go)?</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">ในภาษาอังกฤษ เราไม่ได้ใช้คำว่า Play กับกีฬาทุกประเภทนะ!</p>
+                    
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1 text-lg highlight-teal">1. การใช้ PLAY (เล่น)</p>
+                        <p class="text-sm">ใช้กับกีฬาที่มี <strong>"ลูกบอล"</strong> หรือเล่นแข่งขันกันเป็นทีม</p>
+                        <p class="text-sm italic text-gray-600 mt-1">เช่น <strong>play</strong> football, <strong>play</strong> tennis, <strong>play</strong> badminton</p>
+                    </div>
+
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1 text-lg highlight-orange">2. การใช้ GO (ไป)</p>
+                        <p class="text-sm">ใช้กับกิจกรรมหรือกีฬาที่ลงท้ายด้วย <strong>"-ing"</strong></p>
+                        <p class="text-sm italic text-gray-600 mt-1">เช่น <strong>go</strong> snowboarding, <strong>go</strong> rock climbing, <strong>go</strong> white-water rafting</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Sports Equipment 1 -->
+            <div class="slide" id="slide-4">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 3: อุปกรณ์กีฬา (เซ็ตป้องกัน & น้ำ)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">ข้อสอบชอบถามว่าอุปกรณ์ชิ้นนี้ เอาไว้ป้องกันตรงไหน หรือใช้ตอนไหน</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🪖 <strong>helmet (หมวกกันน็อก):</strong> ไว้ป้องกัน <span class="highlight-orange">head</span> (ศีรษะ)</li>
+                        <li>🧤 <strong>gloves (ถุงมือ):</strong> ไว้ป้องกัน <span class="highlight-orange">hands</span> (มือ)</li>
+                        <li>🦿 <strong>pads (สนับศอก/เข่า):</strong> ไว้ป้องกัน <span class="highlight-orange">knees and elbows</span> (หัวเข่าและข้อศอก)</li>
+                        <li>🥽 <strong>goggles (แว่นตากันน้ำ):</strong> ไว้ใส่ปิด <span class="highlight-teal">eyes</span> (ตา) เพื่อมองใต้น้ำ (see underwater)</li>
+                        <li>🤿 <strong>mask (หน้ากากดำน้ำ):</strong> ไว้ปิด <span class="highlight-teal">face</span> (ใบหน้า) ตอน snorkelling เพื่อดูและหายใจ (breathe)</li>
+                        <li>🦶 <strong>flippers (ตีนกบ):</strong> ใส่ที่ <span class="highlight-teal">feet</span> (เท้า) เพื่อให้ว่ายน้ำเร็วขึ้น (swim faster)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 5: Sports Equipment 2 -->
+            <div class="slide" id="slide-5">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 4: อุปกรณ์กีฬา (เซ็ตตี & พาย)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">จำชื่ออุปกรณ์ให้ถูกกีฬา จะได้คะแนนฟรีๆ เลยค่ะ!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🏸 <strong>racquet (แร็กเกต):</strong> ต้องคู่กับกีฬา <span class="highlight-teal">tennis / badminton</span> เท่านั้น!</li>
+                        <li>🏏 <strong>bat (ไม้ตี):</strong> ต้องคู่กับกีฬา <span class="highlight-teal">cricket / baseball</span> (เบสบอล)</li>
+                        <li>🛶 <strong>paddle (ไม้พาย):</strong> ต้องคู่กับการพายเรือ <span class="highlight-orange">canoe / kayak</span></li>
+                        <li>🏂 <strong>snowboard (กระดานสโนว์บอร์ด):</strong> ต้องคู่กับการไปภูเขาหิมะ <span class="highlight-orange">snowboarding</span></li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-5')">🔍 ลองเช็คความจำ</button>
+                    <div id="reveal-5" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> You use a ____________ to row a canoe or kayak.</p>
+                        <p class="text-sm mt-2"><strong>วิเคราะห์:</strong> row (พาย) เรือแคนู ➔ ต้องใช้ไม้พาย ตอบ <strong>paddle</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Holiday Problems 1 -->
+            <div class="slide" id="slide-6">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 5: ทัวร์ลง! ปัญหารถ & เครื่องบิน</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">อ่านคำพูดของตัวละคร แล้วจับคู่กับปัญหานั้นให้เจอ!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>✈️ <strong>miss a flight (ตกเครื่องบิน)</strong><br>
+                        คำใบ้ในโจทย์: arrive late (มาสาย) หรือบอกว่า <span class="highlight-orange">"We'll catch the next one!"</span> (เดี๋ยวไปขึ้นเครื่องรอบหน้าก็ได้)</li>
+                        
+                        <li>🚗 <strong>car break down (รถเสีย)</strong><br>
+                        คำใบ้ในโจทย์: <span class="highlight-orange">engine stopped working</span> (เครื่องยนต์หยุดทำงาน)</li>
+                        
+                        <li>🛞 <strong>get a flat tyre / puncture (ยางแบน/ยางแตก)</strong><br>
+                        คำใบ้ในโจทย์: <span class="highlight-orange">spare tyre</span> (ยางอะไหล่) <em>"We've got a spare tyre in the boot!"</em></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 7: Holiday Problems 2 -->
+            <div class="slide" id="slide-7">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 6: ทัวร์ลง! ของหาย & เจ็บตัว</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">อ่านสถานการณ์แล้ววิเคราะห์ให้ออก</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🛂 <strong>lose passport (ทำพาสปอร์ตหาย)</strong><br>
+                        คำใบ้ในโจทย์: <span class="highlight-orange">"can't travel without it"</span> (ไปเที่ยวไม่ได้ถ้าไม่มีมัน!)</li>
+                        
+                        <li>🧳 <strong>lose luggage (กระเป๋าเดินทางหาย)</strong><br>
+                        คำใบ้ในโจทย์: <span class="highlight-orange">"clothes and laptop were in there"</span> (เสื้อผ้ากับแล็ปท็อปอยู่ในนั้น!)</li>
+                        
+                        <li>👛 <strong>steal a wallet (โดนล้วงกระเป๋าตังค์)</strong><br>
+                        คำใบ้ในโจทย์: <span class="highlight-orange">"took it from my pocket"</span> (ใครบางคนหยิบออกไปจากกระเป๋ากางเกง)</li>
+                        
+                        <li>🥵 <strong>get sunburnt (ผิวไหม้แดด)</strong><br>
+                        คำใบ้ในโจทย์: stay in the sun (ตากแดด) หรือบอกว่า <span class="highlight-teal">"It hurts! Just take me to a doctor"</span> (มันเจ็บ/แสบ! พาฉันไปหาหมอที)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 8: Finish -->
+            <div class="slide" id="slide-8">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🏆</div>
+                    <h2 class="font-retro text-3xl text-teal-dark mb-2">BRIEFING COMPLETE!</h2>
+                    <p class="font-bold text-lg mb-6">สายลับพร้อมลงสนามแล้ว!</p>
+                </div>
+                <div class="concept-box text-center">
+                    <p class="mb-3 text-sm">จำคีย์เวิร์ดสีส้มและสีเขียวเอาไว้ให้ดี มันคือตัวช่วยไขคดีในข้อสอบค่ะ</p>
+                    <p class="mb-3 text-sm">บทนี้เน้นจำคำศัพท์และสถานการณ์ ค่อยๆ อ่าน ไม่ต้องรีบแปลทุกคำ แค่หาคีย์เวิร์ดให้เจอก็พอ</p>
+                    <p class="font-bold text-burnt-orange-dark">ปิดแฟ้มหน้านี้ แล้วกลับไปทำข้อสอบ Unit 3 ได้เลยค่ะ!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button id="btn-prev" class="nav-btn prev" onclick="changeSlide(-1)" disabled>◄ Back</button>
+            <button id="btn-next" class="nav-btn" onclick="changeSlide(1)">Next ►</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+
+        function updateUI() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+            // Show current slide
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('slide-indicator').innerText = `${currentSlide}/${totalSlides}`;
+            
+            // Update buttons
+            document.getElementById('btn-prev').disabled = currentSlide === 1;
+            
+            let btnNext = document.getElementById('btn-next');
+            if (currentSlide === totalSlides) {
+                btnNext.innerText = "FINISH ✔";
+                btnNext.classList.add("bg-burnt-orange");
+                btnNext.classList.remove("bg-teal");
+            } else {
+                btnNext.innerText = "Next ►";
+                btnNext.classList.remove("bg-burnt-orange");
+                btnNext.classList.add("bg-teal");
+            }
+
+            // Scroll to top of slide area
+            document.getElementById('slide-container').scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) {
+                alert("ติวเข้มเสร็จสิ้น! ปิดหน้านี้แล้วไปทำข้อสอบ Unit 3 ได้เลยค่ะ โชคดีนะคะสายลับ!");
+                currentSlide = totalSlides;
+                return;
+            }
+            updateUI();
+        }
+
+        function toggleReveal(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
