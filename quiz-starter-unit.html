@@ -664,7 +664,7 @@
         // =========================================================
         function submitToGoogleSheets(raw, net) {
             if (APP_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
-                alert("ครูพลอยอย่าลืมใส่ URL ของ Google Apps Script ในโค้ดบรรทัดที่ 4 นะครับ!");
+                alert("อย่าลืมใส่ URL ของ Google Apps Script นะครับ!");
                 return;
             }
 
@@ -689,13 +689,19 @@
             })
             .then(res => res.json())
             .then(data => {
-                document.getElementById("action-buttons").classList.add("hidden");
-                document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
-                document.getElementById("submit-status").classList.remove("hidden");
-                localStorage.removeItem('M3_Unit0_Attempts_' + currentStudentId);
+                if (data.status === "success") {
+                    document.getElementById("action-buttons").classList.add("hidden");
+                    document.getElementById("submit-status").innerText = "EVIDENCE UPLOADED SUCCESSFULLY!";
+                    document.getElementById("submit-status").classList.remove("hidden");
+                    localStorage.removeItem('M3_Unit0_Attempts_' + currentStudentId);
+                } else {
+                    alert("Google Sheets แจ้งเตือนข้อผิดพลาด: " + data.message);
+                    submitBtn.innerText = "Submit Evidence ➔";
+                    submitBtn.disabled = false;
+                }
             })
             .catch(err => {
-                alert("เกิดข้อผิดพลาดในการส่งคะแนน โปรดตรวจสอบอินเทอร์เน็ตแล้วลองกดส่งใหม่");
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
                 submitBtn.innerText = "Submit Evidence ➔";
                 submitBtn.disabled = false;
             });
