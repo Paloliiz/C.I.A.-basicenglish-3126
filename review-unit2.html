@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.I.A. Briefing: Unit 2 Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1970s Retro Detective Theme ================= */
+        :root {
+            --mustard: #eab308;
+            --mustard-dark: #ca8a04;
+            --burnt-orange: #ea580c;
+            --burnt-orange-dark: #c2410c;
+            --teal: #14b8a6;
+            --teal-dark: #0f766e;
+            --brown: #451a03;
+            --manila: #fef3c7;
+            --manila-dark: #fde68a;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--brown);
+            color: var(--brown);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: repeating-linear-gradient(45deg, rgba(254, 243, 199, 0.05) 0px, rgba(254, 243, 199, 0.05) 2px, transparent 2px, transparent 8px);
+        }
+
+        .font-retro { font-family: 'Fredoka', sans-serif; }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--manila);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 12px;
+                border: 4px solid #fff;
+            }
+        }
+
+        /* Top Header */
+        .app-header {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-bottom: 4px solid var(--brown);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Slide Container */
+        .slide-area {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(69, 26, 3, 0.1) 28px);
+            background-attachment: local;
+        }
+
+        /* Slide Transitions */
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+            padding-bottom: 80px;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom UI Elements */
+        .concept-box {
+            background: #fff;
+            border: 3px solid var(--brown);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 4px 4px 0px var(--brown);
+        }
+
+        .highlight-teal { color: var(--teal-dark); font-weight: 700; }
+        .highlight-orange { color: var(--burnt-orange-dark); font-weight: 700; }
+
+        /* Interactive Flip/Reveal Button */
+        .reveal-btn {
+            background-color: var(--mustard);
+            color: var(--brown);
+            border: 2px solid var(--brown);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--brown);
+            transition: all 0.1s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .reveal-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--brown); }
+        
+        .reveal-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--teal);
+            color: #fff;
+            border-radius: 6px;
+            border: 2px dashed #fff;
+            font-weight: 500;
+        }
+        .reveal-content.show { display: block; animation: fadeIn 0.3s; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 4px solid var(--brown);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            background: var(--teal);
+            color: white;
+            border: 3px solid var(--brown);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--brown);
+        }
+        .nav-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--brown); }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: 3px 3px 0px var(--brown); color: #888; }
+        
+        .nav-btn.prev { background: var(--mustard); color: var(--brown); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div>
+                <h1 class="font-retro text-2xl text-teal-dark">C.I.A. BRIEFING</h1>
+                <p class="text-xs font-bold text-burnt-orange tracking-widest uppercase">UNIT 2: BELIEVE IT OR NOT</p>
+            </div>
+            <div class="text-right">
+                <span id="slide-indicator" class="font-retro text-xl text-brown bg-manila px-3 py-1 border-2 border-brown rounded-md shadow-sm">1/7</span>
+            </div>
+        </div>
+
+        <!-- Slides Area -->
+        <div class="slide-area" id="slide-container">
+
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" id="slide-1">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🌩️</div>
+                    <h2 class="font-retro text-3xl text-burnt-orange mb-2">EXTREME MISSION!</h2>
+                    <p class="font-bold text-lg mb-6">แฟ้มสรุปคดี Unit 2: Believe it or not</p>
+                </div>
+                <div class="concept-box">
+                    <p class="mb-3">บทนี้เราจะมาเจาะลึกเรื่อง <strong>"เรื่องเหลือเชื่อ ภัยพิบัติ และอุบัติเหตุ"</strong> กันค่ะ!</p>
+                    <div class="p-3 bg-teal/10 border-l-4 border-teal text-teal-dark font-bold text-sm mt-4">
+                        🎯 เป้าหมาย: จำคีย์เวิร์ดภัยพิบัติ (Disasters), จับคู่อาการบาดเจ็บ (Injuries), และเข้าใจการเล่าเรื่องในอดีตแบบ 2 เหตุการณ์ซ้อนกัน (Past Cont. แทรกด้วย Past Simp.)
+                    </div>
+                </div>
+                <div class="text-center mt-8 animate-bounce">
+                    <p class="text-sm font-bold text-brown/60 uppercase tracking-widest">กด Next เพื่อเริ่มติว ➔</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Disasters -->
+            <div class="slide" id="slide-2">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 1: ภัยพิบัติ (Disasters)</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">จำคู่คำศัพท์ให้ดี เจอในโจทย์แน่นอน!</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🏜️ <strong>drought (ภัยแล้ง):</strong> ใบ้คำว่า <span class="highlight-orange">not enough water</span> (น้ำไม่พอ)</li>
+                        <li>⛰️ <strong>avalanche (หิมะถล่ม):</strong> ใบ้คำว่า <span class="highlight-orange">snow and rock falls</span> (หิมะและหินตก)</li>
+                        <li>🌪️ <strong>tornado (ทอร์นาโด):</strong> ใบ้คำว่า <span class="highlight-orange">spins very fast</span> (หมุนเร็วมาก)</li>
+                        <li>🌊 <strong>tsunami (สึนามิ):</strong> ใบ้คำว่า <span class="highlight-orange">enormous wave</span> (คลื่นยักษ์)</li>
+                        <li>🌋 <strong>volcanic eruption (ภูเขาไฟระเบิด):</strong> ใบ้คำว่า <span class="highlight-orange">lava</span> (ลาวา)</li>
+                        <li>⚡ <strong>lightning (ฟ้าผ่า):</strong> ใบ้คำว่า <span class="highlight-orange">flash of bright light</span> (แสงสว่างวาบ)</li>
+                        <li>🌀 <strong>hurricane (เฮอริเคน):</strong> ใบ้คำว่า <span class="highlight-orange">wind over the ocean</span> (พายุลมแรงเหนือมหาสมุทร)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-2')">🔍 ลองวิเคราะห์โจทย์ข้อนี้</button>
+                    <div id="reveal-2" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> Water from the ____________ filled the streets and damaged many houses.</p>
+                        <p class="text-sm mt-2"><strong>วิเคราะห์:</strong> มีคำว่า "Water" (น้ำ) และ "filled the streets" (ท่วมถนน) ➔ ตอบ <strong>flood</strong> (น้ำท่วม) 🌊</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Injuries -->
+            <div class="slide" id="slide-3">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 2: อาการบาดเจ็บ (Injuries)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">ทริคการจำ: "อวัยวะไหน" ต้องคู่กับ "กริยาอะไร"</p>
+                    
+                    <ul class="text-sm space-y-3 mb-4">
+                        <li>🔥 <strong>burn (โดนลวก/ไหม้):</strong> มักคู่กับ <span class="highlight-orange">hand</span> (มือ)</li>
+                        <li>👁️ <strong>bruise (ฟกช้ำ):</strong> มักคู่กับ <span class="highlight-orange">eye</span> (ตา) ➔ <em>โดนลูกบอลอัดตาเขียว</em></li>
+                        <li>🦴 <strong>break (หัก):</strong> มักคู่กับ <span class="highlight-orange">leg</span> (ขา) ➔ <em>ต้องใส่เฝือก (plaster cast)</em></li>
+                        <li>🩸 <strong>cut (บาด/ตัด):</strong> มักคู่กับ <span class="highlight-orange">leg / hand</span> ➔ <em>มีเลือดออก (bleeding)</em></li>
+                        <li>🦵 <strong>pull (ตึง/ฉีก):</strong> มักคู่กับ <span class="highlight-orange">a muscle</span> (กล้ามเนื้อ) ➔ <em>เจ็บหลังวิ่ง</em></li>
+                        <li>🦶 <strong>twist (พลิก):</strong> มักคู่กับ <span class="highlight-orange">ankle</span> (ข้อเท้า)</li>
+                        <li>🖐️ <strong>sprain (เคล็ด/ซ้น):</strong> มักคู่กับ <span class="highlight-orange">wrist</span> (ข้อมือ) ➔ <em>ตอนล้มเอามือค้ำ</em></li>
+                        <li>🤕 <strong>hit (กระแทก):</strong> มักคู่กับ <span class="highlight-orange">head</span> (หัว) ➔ <em>ปวดหัวเลย (headache)</em></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 4: Aches & Reading -->
+            <div class="slide" id="slide-4">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 3: อาการป่วย & ข้อมูลลับ</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-sm mb-2 text-gray-500">อาการป่วย (Aches & Pains)</p>
+                    <ul class="text-sm list-disc pl-5 mb-4">
+                        <li><strong>rash (ผื่น):</strong> คู่กับคำว่า <span class="highlight-teal">itchy</span> (คันยุบยิบ)</li>
+                        <li><strong>a cold (ไข้หวัด):</strong> คู่กับคำว่า <span class="highlight-teal">sneezing and coughing</span> (จามและไอ)</li>
+                        <li><strong>toothache (ปวดฟัน):</strong> ต้องไปหา <span class="highlight-teal">dentist</span> (หมอฟัน)</li>
+                        <li><strong>feel sick (คลื่นไส้):</strong> เวลาได้กลิ่นหรือรสชาติที่ไม่ชอบ (taste of milk)</li>
+                    </ul>
+
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1">📖 แฟ้มบุคคล: Roy Sullivan</p>
+                        <p class="text-sm">จากเรื่องอ่านในบทเรียน ให้จำข้อมูลของรอย ซัลลิแวนไว้ 2 อย่างนะคะ:</p>
+                        <ul class="text-sm mt-1 ml-4 list-disc">
+                            <li>อาชีพของเขาคือ <strong>forest ranger</strong> (เจ้าหน้าที่พิทักษ์ป่า)</li>
+                            <li>เขารอดชีวิตจากการโดนฟ้าผ่า (lightning strikes) ถึง <strong>Seven</strong> (7 ครั้ง!)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Grammar - Past Continuous -->
+            <div class="slide" id="slide-5">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 4: อดีตกำลังทำอยู่</h2>
+                <div class="concept-box">
+                    <p class="font-bold text-lg mb-2 highlight-orange">Past Continuous Tense</p>
+                    <p class="text-sm mb-3">ใช้เล่าเรื่องที่ <strong>"กำลังดำเนินอยู่"</strong> ในอดีต</p>
+                    
+                    <p class="text-sm mb-2 font-bold border-t-2 border-brown/20 pt-2">สูตรการสร้าง:</p>
+                    <p class="text-sm mb-2 text-center bg-teal/10 p-2 rounded border border-teal"><strong>was / were + กริยาเติม -ing</strong></p>
+
+                    <ul class="text-sm list-disc pl-5 mb-4">
+                        <li>ใช้ <strong>was</strong> กับประธาน 1 คน (I, He, She, It, Roy)</li>
+                        <li>ใช้ <strong>were</strong> กับประธานหลายคน (You, We, They, The kids)</li>
+                    </ul>
+
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-5')">🔍 ดูตัวอย่าง</button>
+                    <div id="reveal-5" class="reveal-content bg-burnt-orange">
+                        <p class="text-sm"><strong>โจทย์:</strong> The kids ____________ TV while Mum was reading a magazine.</p>
+                        <p class="text-sm mt-2"><strong>วิธีคิด:</strong> The kids (เด็กหลายคน) ต้องใช้ were ➔ ตอบ <strong>were watching</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Grammar - Interrupting! -->
+            <div class="slide" id="slide-6">
+                <h2 class="font-retro text-2xl text-teal-dark mb-4 border-b-2 border-brown/20 pb-2">📂 CODE 5: คดีซ้อนทับ! (Grammar)</h2>
+                <div class="concept-box">
+                    <p class="text-sm mb-3">ข้อสอบชอบเอา 2 Tense มาชนกัน! คือมีเหตุการณ์นึงกำลังทำอยู่เพลินๆ แล้วอีกเหตุการณ์ก็ <span class="highlight-orange">"แทรก/ขัดจังหวะ"</span> เข้ามา</p>
+                    
+                    <div class="bg-manila-dark p-3 rounded border-2 border-brown mb-3">
+                        <p class="font-bold mb-1">จำสูตร "ตัวยาว" กับ "ตัวสั้น"</p>
+                        <ul class="text-sm list-disc pl-5">
+                            <li><strong>ตัวยาว (กำลังทำเพลินๆ):</strong> ใช้ <span class="highlight-teal">was/were + V.ing</span> (Past Continuous)</li>
+                            <li><strong>ตัวสั้น (พุ่งเข้าชน/แทรก):</strong> ใช้ <span class="highlight-orange">V.2 หรือเติม -ed</span> (Past Simple)</li>
+                        </ul>
+                    </div>
+
+                    <p class="font-bold text-sm mb-2">ตัวอย่างที่เจอบ่อย</p>
+                    <p class="text-sm mb-1">"ฉัน <span class="highlight-teal">กำลังรอ (was waiting)</span> รถบัสอยู่ตอนที่โทรศัพท์ <span class="highlight-orange">ดังขึ้น (rang)</span>"</p>
+                    
+                    <button class="reveal-btn" onclick="toggleReveal('reveal-6')">🔍 ลองข้อนี้ รับรองว่าเจอชัวร์</button>
+                    <div id="reveal-6" class="reveal-content">
+                        <p class="text-sm"><strong>โจทย์:</strong> As John ____________ to school yesterday, he slipped and sprained his ankle.</p>
+                        <p class="text-sm mt-2"><strong>วิธีคิด:</strong> จอห์นลื่นล้มข้อเท้าพลิก (slipped = แทรกตัวสั้น) แปลว่าก่อนหน้านั้นจอห์นต้อง <strong>"กำลังเดินยาวๆ เพลินๆ"</strong> ➔ ต้องตอบตัวยาวคือ <strong>was walking</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Finish -->
+            <div class="slide" id="slide-7">
+                <div class="text-center mt-10">
+                    <div class="text-7xl mb-4">🏆</div>
+                    <h2 class="font-retro text-3xl text-teal-dark mb-2">BRIEFING COMPLETE!</h2>
+                    <p class="font-bold text-lg mb-6">เตรียมตัวลงสนาม Unit 2!</p>
+                </div>
+                <div class="concept-box text-center">
+                    <p class="mb-3 text-sm">จำคีย์เวิร์ดของภัยพิบัติและการบาดเจ็บ (อวัยวะคู่กับกริยาอะไร) เอาไว้ให้ดีนะคะ</p>
+                    <p class="mb-3 text-sm">และเรื่องไวยากรณ์ แค่แยกให้ออกว่า "อะไรกำลังเกิด" (was/were+ing) และ "อะไรเข้ามาแทรก" (V.2) เท่านี้ก็เก็บคะแนนได้สบายๆ แล้ว!</p>
+                    <p class="font-bold text-burnt-orange-dark">ปิดแฟ้มหน้านี้ แล้วกลับไปทำข้อสอบ Unit 2 ได้เลยค่ะ!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button id="btn-prev" class="nav-btn prev" onclick="changeSlide(-1)" disabled>◄ Back</button>
+            <button id="btn-next" class="nav-btn" onclick="changeSlide(1)">Next ►</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+
+        function updateUI() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+            // Show current slide
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('slide-indicator').innerText = `${currentSlide}/${totalSlides}`;
+            
+            // Update buttons
+            document.getElementById('btn-prev').disabled = currentSlide === 1;
+            
+            let btnNext = document.getElementById('btn-next');
+            if (currentSlide === totalSlides) {
+                btnNext.innerText = "FINISH ✔";
+                btnNext.classList.add("bg-burnt-orange");
+                btnNext.classList.remove("bg-teal");
+            } else {
+                btnNext.innerText = "Next ►";
+                btnNext.classList.remove("bg-burnt-orange");
+                btnNext.classList.add("bg-teal");
+            }
+
+            // Scroll to top of slide area
+            document.getElementById('slide-container').scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) {
+                alert("ติวเข้มเสร็จสิ้น! ปิดหน้านี้แล้วไปทำข้อสอบ Unit 2 ได้เลยค่ะ สู้ๆ นะคะสายลับ!");
+                currentSlide = totalSlides;
+                return;
+            }
+            updateUI();
+        }
+
+        function toggleReveal(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
